@@ -26,11 +26,28 @@ export const createAccount = async (req: Request, res: Response): Promise<void> 
             data: newAccount
         });
 
-    } catch (error: unknown) {
-		// Extrair da mensagem de erro de forma segura, garantindo que o tipo é tratado corretamente
-		const message = error instanceof Error ? error.message : 'Erro desconhecido';
-		// Se o Service lançou um "throw new Error", o catch apanha-o aqui
-        console.error('Erro na criação de conta:', message);
+} catch (error: unknown) {
+        // Extrai a mensagem do erro, tentando cobrir tanto erros padrão do JavaScript quanto erros personalizados do Supabase.
+        let message = 'Erro desconhecido';
+
+        if (error instanceof Error) {
+            message = error.message;
+        } else if (error && typeof error === 'object') {
+            // Captura a mensagem principal do Supabase
+            if ('message' in error) {
+                message = String(error.message);
+            }
+            // Adiciona os detalhes do PostgREST
+            if ('details' in error && error.details) {
+                message += ` | Detalhes: ${error.details}`;
+            }
+            // Adiciona dicas se o Supabase as fornecer
+            if ('hint' in error && error.hint) {
+                message += ` | Dica: ${error.hint}`;
+            }
+        }
+
+        // Devolve o erro detalhado para o Postman
         res.status(400).json({
             status: 'error',
             message: message
