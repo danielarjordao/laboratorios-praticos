@@ -15,12 +15,15 @@ export interface TransactionInput {
 }
 
 // Recebe os dados já com a garantia de que respeitam a Interface "TransactionInput"
-export const createTransactionRecord = async (transactionData: TransactionInput) => {
+export const createTransactionRecord = async (transactionData: TransactionInput): Promise<TransactionInput> => {
     // Desestruturação dos dados para facilitar a manipulação
-    let {
-        account_id, transfer_account_id, category_id, type,
-        amount, date, effective_date, description, status
+    // Constantes para os campos que não devem mudar durante a lógica de negócio, garantindo que não sejam reatribuídos acidentalmente
+    const {
+        account_id, type, amount, date, effective_date, description, status
     } = transactionData;
+
+    // Estas podem mudar durante a lógica abaixo, por isso ficam como 'let'
+    let { transfer_account_id, category_id } = transactionData;
 
     // Força o valor a ser sempre positivo (absoluto)
     const safeAmount = Math.abs(Number(amount));
