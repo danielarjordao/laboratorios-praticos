@@ -8,11 +8,11 @@ on:
     branches: [ develop, main ]
 
 jobs:
-lint-and-build:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
+  lint-and-build:
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+          working-directory: backend
     steps:
     - name: Fazer o checkout do código
       uses: actions/checkout@v4
