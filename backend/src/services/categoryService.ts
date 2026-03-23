@@ -38,3 +38,44 @@ export const createCategory = async (categoryData: CategoryInput): Promise<Categ
 
     return data as CategoryResponse;
 };
+
+// Função para listar as categorias de um perfil específico.
+export const getCategories = async (profile_id: string): Promise<CategoryResponse[]> => {
+    const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('profile_id', profile_id)
+        .is('deleted_at', null);
+
+    if (error) {
+        throw new Error(`Database error: ${error.message}`);
+    }
+
+    return data as CategoryResponse[];
+};
+
+// Função para atualizar uma categoria existente.
+export const updateCategory = async (id: string, data: Partial<CategoryInput>): Promise<CategoryResponse> => {
+    const { data: category, error } = await supabase
+        .from('categories')
+        .update(data)
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error)
+        throw new Error(error.message);
+    
+    return category as CategoryResponse;
+};
+
+// Função para deletar uma categoria (soft delete).
+export const deleteCategory = async (id: string): Promise<void> => {
+    const { error } = await supabase
+        .from('categories')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id);
+
+    if (error)
+        throw new Error(`Error deleting category: ${error.message}`);
+};

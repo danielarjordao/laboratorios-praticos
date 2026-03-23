@@ -38,3 +38,61 @@ export const createAccount = async (req: Request, res: Response): Promise<void> 
         res.status(400).json({ status: 'error', message });
     }
 };
+
+// Controlador para listar todas as contas de um perfil.
+export const getAccounts = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { profile_id } = req.query;
+
+        // Validação de Defesa do profile_id
+        if (typeof profile_id !== 'string' || profile_id.trim() === '') {
+            res.status(400).json({ status: 'error', message: 'Invalid profile ID.' });
+            return;
+        }
+
+        const accounts = await accountService.getAccounts(profile_id);
+        res.status(200).json({ status: 'success', data: accounts });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Error';
+        res.status(400).json({ status: 'error', message });
+    }
+};
+
+// Controlador para atualizar os detalhes de uma conta existente.
+export const updateAccount = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const body = req.body as Partial<AccountInput>;
+
+        // Validação de Defesa do ID
+        if (typeof id !== 'string' || id.trim() === '') {
+            res.status(400).json({ status: 'error', message: 'Invalid account ID.' });
+            return;
+        }
+
+        const updatedAccount = await accountService.updateAccount(id, body);
+        res.status(200).json({ status: 'success', data: updatedAccount });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Error';
+        res.status(400).json({ status: 'error', message });
+    }
+};
+
+// Controlador para deletar uma conta (soft delete).
+export const deleteAccount = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        // Validação de Defesa do ID
+        if (typeof id !== 'string' || id.trim() === '') {
+            res.status(400).json({ status: 'error', message: 'Invalid account ID.' });
+            return;
+        }
+
+        await accountService.deleteAccount(id);
+        res.status(200).json({ status: 'success', message: 'Account removed.' });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Error';
+        res.status(400).json({ status: 'error', message });
+    }
+};

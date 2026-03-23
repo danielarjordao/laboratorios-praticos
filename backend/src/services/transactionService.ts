@@ -93,6 +93,36 @@ const updateAccountBalance = async (accountId: string, amount: number, operation
         throw new Error(`Failed to update account balance: ${updateError.message}`);
 };
 
+// Auxiliar: Reverte o impacto de uma transação no saldo
+const revertTransactionBalance = async (transaction: TransactionResponse): Promise<void> => {
+    const amount = Number(transaction.amount);
+    if (transaction.type === 'EXPENSE') {
+        await updateAccountBalance(transaction.account_id, amount, 'CREDIT');
+    } else if (transaction.type === 'INCOME') {
+        await updateAccountBalance(transaction.account_id, amount, 'DEBIT');
+    } else if (transaction.type === 'TRANSFER') {
+        await updateAccountBalance(transaction.account_id, amount, 'CREDIT');
+        if (transaction.transfer_account_id) {
+            await updateAccountBalance(transaction.transfer_account_id, amount, 'DEBIT');
+        }
+    }
+};
+
+// Auxiliar: Aplica o impacto de uma transação no saldo
+const applyTransactionBalance = async (transaction: TransactionResponse): Promise<void> => {
+    const amount = Number(transaction.amount);
+    if (transaction.type === 'EXPENSE') {
+        await updateAccountBalance(transaction.account_id, amount, 'DEBIT');
+    } else if (transaction.type === 'INCOME') {
+        await updateAccountBalance(transaction.account_id, amount, 'CREDIT');
+    } else if (transaction.type === 'TRANSFER') {
+        await updateAccountBalance(transaction.account_id, amount, 'DEBIT');
+        if (transaction.transfer_account_id) {
+            await updateAccountBalance(transaction.transfer_account_id, amount, 'CREDIT');
+        }
+    }
+};
+
 // Post condição: A função createTransaction deve ser responsável por criar uma nova transação,
 // validar as regras de negócio, atualizar os saldos das contas envolvidas e retornar os dados da transação criada.
 export const createTransaction = async (data: CreateTransactionDTO): Promise<TransactionResponse> => {
@@ -143,12 +173,12 @@ export const createTransaction = async (data: CreateTransactionDTO): Promise<Tra
 
 // Get condição: A função getTransactions deve ser responsável por retornar as transações de um perfil específico,
 // incluindo os nomes das categorias e contas associadas.
-export const getTransactions = async (profileId: string): Promise<TransactionWithDetails[]> => {
+export const getTransactions = async (profile_id: string): Promise<TransactionWithDetails[]> => {
     // Busca as contas do perfil
     const { data: accounts, error: accError } = await supabase
         .from('accounts')
         .select('id')
-        .eq('profile_id', profileId);
+        .eq('profile_id', profile_id);
 
     if (accError)
         throw new Error(`Error fetching profile accounts: ${accError.message}`);
@@ -166,6 +196,7 @@ export const getTransactions = async (profileId: string): Promise<TransactionWit
             destination_account:transfer_account_id (name)
         `)
         .in('account_id', accountIds)
+        .is('deleted_at', null)
         .order('date', { ascending: false });
 
     if (error)
@@ -173,4 +204,78 @@ export const getTransactions = async (profileId: string): Promise<TransactionWit
 
     // Faz o cast para a interface estendida
     return data as TransactionWithDetails[];
+};
+
+// Atualiza os detalhes de uma transação existente, garantindo que as regras de negócio sejam respeitadas e que os saldos das contas sejam ajustados corretamente.
+export const updateTransaction = async (id: string, newData: Partial<CreateTransactionDTO>): Promise<TransactionResponse> => {
+    // Busca o estado atual
+    const { data: oldTx, error: fetchError } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (fetchError || !oldTx)
+        throw new Error('Transaction not found');
+
+    // Valida as regras de negócio com os dados novos
+    // Faz uma mescla dos dados antigos com os novos para validar o estado resultante
+    await revertTransactionBalance(oldTx as TransactionResponse);
+
+    // Grava o novo estado na base de dados
+    const { data: updatedTx, error: updateError } = await supabase
+        .from('transactions')
+        .update(newData)
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (updateError)
+        throw new Error(`Update failed: ${updateError.message}`);
+
+    // Consolida o novo estado
+    await applyTransactionBalance(updatedTx as TransactionResponse);
+
+    return updatedTx as TransactionResponse;
+};
+
+// Delete condição: A função deleteTransaction deve ser responsável por realizar um soft delete de uma transação,
+// revertendo os saldos das contas envolvidas e marcando a transação como "CANCELLED".
+export const deleteTransaction = async (id: string): Promise<void> => {
+    // Busca a transação para saber o que reverter
+    const { data: transaction, error: fetchError } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('id', id)
+        // Garante que não tenta deletar algo que já foi deletado (soft delete)
+        .is('deleted_at', null)
+        .single();
+
+    if (fetchError || !transaction)
+        throw new Error('Transaction not found or already deleted');
+
+    // Reverte o Saldo das Contas Envolvidas
+    const amount = Number(transaction.amount);
+    if (transaction.type === 'EXPENSE') {
+        await updateAccountBalance(transaction.account_id, amount, 'CREDIT');
+    } else if (transaction.type === 'INCOME') {
+        await updateAccountBalance(transaction.account_id, amount, 'DEBIT');
+    } else if (transaction.type === 'TRANSFER') {
+        await updateAccountBalance(transaction.account_id, amount, 'CREDIT');
+        if (transaction.transfer_account_id) {
+            await updateAccountBalance(transaction.transfer_account_id, amount, 'DEBIT');
+        }
+    }
+
+    // Soft Delete
+    const { error: deleteError } = await supabase
+        .from('transactions')
+        .update({
+            deleted_at: new Date().toISOString(),
+            status: 'CANCELLED'
+        })
+        .eq('id', id);
+
+    if (deleteError)
+        throw new Error(`Failed to soft delete: ${deleteError.message}`);
 };

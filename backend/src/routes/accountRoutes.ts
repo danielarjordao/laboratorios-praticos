@@ -7,4 +7,15 @@ const router = Router();
 // URL: POST /api/v1/accounts
 router.post('/', accountController.createAccount);
 
+// Rota GET: Lista todas as contas de um perfil
+router.get('/', accountController.getAccounts);
+
+// Rota PATCH: Atualiza os detalhes de uma conta existente
+// URL: PATCH /api/v1/accounts/:id
+router.patch('/:id', accountController.updateAccount);
+
+// Rota DELETE: Deleta uma conta (soft delete)
+// URL: DELETE /api/v1/accounts/:id
+router.delete('/:id', accountController.deleteAccount);
+
 export default router;

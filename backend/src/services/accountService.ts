@@ -18,25 +18,59 @@ export interface AccountResponse extends AccountInput {
 
 // Cria uma nova conta bancária no sistema.
 export const createAccount = async (accountData: AccountInput): Promise<AccountResponse> => {
-    const { profile_id, name, type, initial_balance, balance } = accountData;
-
     const { data, error } = await supabase
         .from('accounts')
         .insert([{
-            profile_id,
-            name,
-            type: type || 'CHECKING',
-            initial_balance: initial_balance || 0,
-            // O balance atual começa igual ao initial_balance se não for enviado
-            balance: balance !== undefined ? balance : (initial_balance || 0)
+            ...accountData,
+            type: accountData.type || 'CHECKING',
+            balance: accountData.balance ?? accountData.initial_balance ?? 0
         }])
         .select()
-        // Retorna o objeto diretamente em vez de um array
         .single();
+
+    if (error)
+        throw new Error(`Database error: ${error.message}`);
+
+    return data as AccountResponse;
+};
+
+// Função para listar todas as contas de um perfil.
+export const getAccounts = async (profile_id: string): Promise<AccountResponse[]> => {
+    const { data, error } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('profile_id', profile_id)
+        .is('deleted_at', null);
 
     if (error) {
         throw new Error(`Database error: ${error.message}`);
     }
 
-    return data as AccountResponse;
+    return data as AccountResponse[];
+};
+
+// Função para atualizar os detalhes de uma conta existente.
+export const updateAccount = async (id: string, data: Partial<AccountInput>): Promise<AccountResponse> => {
+    const { data: account, error } = await supabase
+        .from('accounts')
+        .update(data)
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error)
+        throw new Error(error.message);
+
+    return account as AccountResponse;
+};
+
+// Função para deletar uma conta (soft delete).
+export const deleteAccount = async (id: string): Promise<void> => {
+    const { error } = await supabase
+        .from('accounts')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id);
+
+    if (error)
+        throw new Error(`Error deleting account: ${error.message}`);
 };

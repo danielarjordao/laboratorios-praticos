@@ -51,14 +51,14 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
 // Ele é responsável por receber a requisição, validar os dados de entrada, chamar o Service e retornar a resposta adequada.
 export const getTransactions = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { profileId } = req.query;
+        const { profile_id } = req.query;
 
-        if (!profileId) {
-            res.status(400).json({ status: 'error', message: 'Missing profileId in query parameters.' });
+        if (!profile_id) {
+            res.status(400).json({ status: 'error', message: 'Missing profile_id in query parameters.' });
             return;
         }
 
-        const transactions = await transactionService.getTransactions(profileId as string);
+        const transactions = await transactionService.getTransactions(profile_id as string);
 
         res.status(200).json({
             status: 'success',
@@ -71,3 +71,49 @@ export const getTransactions = async (req: Request, res: Response): Promise<void
     }
 };
 
+// Controller para atualizar os detalhes de uma transação existente.
+// Ele é responsável por receber a requisição, validar os dados de entrada, chamar o Service e retornar a resposta adequada.
+export const updateTransaction = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const body = req.body as Partial<CreateTransactionDTO>;
+
+        // Validação de Defesa do ID
+        if (typeof id !== 'string' || id.trim() === '') {
+            res.status(400).json({ status: 'error', message: 'Invalid transaction ID.' });
+            return;
+        }
+
+        const updatedTransaction = await transactionService.updateTransaction(id, body);
+        res.status(200).json({ status: 'success', data: updatedTransaction });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'An unknown error occurred';
+        console.error('[TransactionController Error]:', message);
+        res.status(400).json({ status: 'error', message });
+    }
+};
+
+// Controller para deletar uma transação (soft delete).
+// Ele é responsável por receber a requisição, validar os dados de entrada, chamar o Service e retornar a resposta adequada.
+export const deleteTransaction = async (req: Request, res: Response): Promise<void> => {
+    try {
+        // O ID vem da URL: /transactions/:id
+        const { id } = req.params;
+
+        // Validação de Defesa
+        if (typeof id !== 'string' || id.trim() === '') {
+            res.status(400).json({ status: 'error', message: 'Invalid transaction ID.' });
+            return;
+        }
+
+        await transactionService.deleteTransaction(id);
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Transaction successfully removed (soft delete).'
+        });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Error deleting transaction';
+        res.status(400).json({ status: 'error', message });
+    }
+};
