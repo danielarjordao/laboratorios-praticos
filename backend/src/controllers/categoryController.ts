@@ -38,3 +38,22 @@ export const createCategory = async (req: Request, res: Response): Promise<void>
         res.status(400).json({ status: 'error', message });
     }
 };
+
+// Controlador para deletar uma categoria (soft delete).
+export const deleteCategory = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        // Validação de Defesa do ID
+        if (typeof id !== 'string' || id.trim() === '') {
+            res.status(400).json({ status: 'error', message: 'Invalid category ID.' });
+            return;
+        }
+
+        await categoryService.deleteCategory(id);
+        res.status(200).json({ status: 'success', message: 'Category removed.' });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Error';
+        res.status(400).json({ status: 'error', message });
+    }
+};

@@ -38,3 +38,14 @@ export const createCategory = async (categoryData: CategoryInput): Promise<Categ
 
     return data as CategoryResponse;
 };
+
+// Função para deletar uma categoria (soft delete).
+export const deleteCategory = async (id: string): Promise<void> => {
+    const { error } = await supabase
+        .from('categories')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id);
+
+    if (error)
+        throw new Error(`Error deleting category: ${error.message}`);
+};

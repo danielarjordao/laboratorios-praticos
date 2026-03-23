@@ -7,4 +7,8 @@ const router = Router();
 // URL: POST /api/v1/categories
 router.post('/', categoryController.createCategory);
 
+// Rota DELETE: Deleta uma categoria (soft delete)
+// URL: DELETE /api/v1/categories/:id
+router.delete('/:id', categoryController.deleteCategory);
+
 export default router;
