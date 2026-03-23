@@ -27,6 +27,19 @@ export interface TransactionResponse {
     updated_at: string;
 }
 
+export interface TransactionWithDetails extends TransactionResponse {
+    categories: {
+        name: string;
+        icon: string;
+    } | null;
+    origin_account: {
+        name: string;
+    } | null;
+    destination_account: {
+        name: string;
+    } | null;
+}
+
 // --- FUNÇÕES AUXILIARES (SINGLE RESPONSIBILITY) ---
 
 // Valida as regras de negócio antes de interagir com a base de dados.
@@ -80,7 +93,8 @@ const updateAccountBalance = async (accountId: string, amount: number, operation
         throw new Error(`Failed to update account balance: ${updateError.message}`);
 };
 
-// Orquestra a criação de uma transação, chamando as funções auxiliares
+// Post condição: A função createTransaction deve ser responsável por criar uma nova transação,
+// validar as regras de negócio, atualizar os saldos das contas envolvidas e retornar os dados da transação criada.
 export const createTransaction = async (data: CreateTransactionDTO): Promise<TransactionResponse> => {
     // Normaliza os dados de entrada
     const type = data.type?.toUpperCase() || '';
@@ -125,4 +139,38 @@ export const createTransaction = async (data: CreateTransactionDTO): Promise<Tra
     }
 
     return transaction as TransactionResponse;
+};
+
+// Get condição: A função getTransactions deve ser responsável por retornar as transações de um perfil específico,
+// incluindo os nomes das categorias e contas associadas.
+export const getTransactions = async (profileId: string): Promise<TransactionWithDetails[]> => {
+    // Busca as contas do perfil
+    const { data: accounts, error: accError } = await supabase
+        .from('accounts')
+        .select('id')
+        .eq('profile_id', profileId);
+
+    if (accError)
+        throw new Error(`Error fetching profile accounts: ${accError.message}`);
+
+    // Extrai os IDs das contas para usar na consulta das transações
+    const accountIds = accounts.map(acc => acc.id);
+
+    // Busca as transações
+    const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+            *,
+            categories (name, icon),
+            origin_account:account_id (name),
+            destination_account:transfer_account_id (name)
+        `)
+        .in('account_id', accountIds)
+        .order('date', { ascending: false });
+
+    if (error)
+        throw new Error(`Error fetching transactions: ${error.message}`);
+
+    // Faz o cast para a interface estendida
+    return data as TransactionWithDetails[];
 };

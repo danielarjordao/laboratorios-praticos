@@ -46,3 +46,28 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
         });
     }
 };
+
+// Controller para obter as transações de um perfil específico.
+// Ele é responsável por receber a requisição, validar os dados de entrada, chamar o Service e retornar a resposta adequada.
+export const getTransactions = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { profileId } = req.query;
+
+        if (!profileId) {
+            res.status(400).json({ status: 'error', message: 'Missing profileId in query parameters.' });
+            return;
+        }
+
+        const transactions = await transactionService.getTransactions(profileId as string);
+
+        res.status(200).json({
+            status: 'success',
+            results: transactions.length,
+            data: transactions
+        });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'An unknown error occurred';
+        res.status(400).json({ status: 'error', message });
+    }
+};
+
