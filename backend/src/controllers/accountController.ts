@@ -58,6 +58,26 @@ export const getAccounts = async (req: Request, res: Response): Promise<void> =>
     }
 };
 
+// Controlador para atualizar os detalhes de uma conta existente.
+export const updateAccount = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const body = req.body as Partial<AccountInput>;
+
+        // Validação de Defesa do ID
+        if (typeof id !== 'string' || id.trim() === '') {
+            res.status(400).json({ status: 'error', message: 'Invalid account ID.' });
+            return;
+        }
+
+        const updatedAccount = await accountService.updateAccount(id, body);
+        res.status(200).json({ status: 'success', data: updatedAccount });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Error';
+        res.status(400).json({ status: 'error', message });
+    }
+};
+
 // Controlador para deletar uma conta (soft delete).
 export const deleteAccount = async (req: Request, res: Response): Promise<void> => {
     try {

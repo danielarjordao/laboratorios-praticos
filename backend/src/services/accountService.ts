@@ -49,6 +49,21 @@ export const getAccounts = async (profile_id: string): Promise<AccountResponse[]
     return data as AccountResponse[];
 };
 
+// Função para atualizar os detalhes de uma conta existente.
+export const updateAccount = async (id: string, data: Partial<AccountInput>): Promise<AccountResponse> => {
+    const { data: account, error } = await supabase
+        .from('accounts')
+        .update(data)
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error)
+        throw new Error(error.message);
+
+    return account as AccountResponse;
+};
+
 // Função para deletar uma conta (soft delete).
 export const deleteAccount = async (id: string): Promise<void> => {
     const { error } = await supabase
