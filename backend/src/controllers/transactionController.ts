@@ -28,12 +28,14 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
             data: newTransaction
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+        // Extrair da mensagem de erro de forma segura, garantindo que o tipo é tratado corretamente
+        const message = error instanceof Error ? error.message : 'Erro desconhecido';
         // Se o Service lançou um "throw new Error", o catch apanha-o aqui
-        console.error('Erro de Validação:', error.message);
+        console.error('Erro de Validação:', message);
         res.status(400).json({
             status: 'error',
-            message: error.message
+            message: message
         });
     }
 };

@@ -1,0 +1,32 @@
+name: CI Pipeline
+
+# O pipeline vai rodar sempre que fizer um Push ou abrir um Pull Request para a develop ou main
+on:
+  pull_request:
+    branches: [ develop, main ]
+  push:
+    branches: [ develop, main ]
+
+jobs:
+lint-and-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+    - name: Fazer o checkout do código
+      uses: actions/checkout@v4
+
+    - name: Configurar Node.js (Versão 24 como pede o enunciado)
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+
+    - name: Instalar dependências
+      run: npm install
+
+    - name: Executar o Linter (Verificar qualidade)
+      run: npm run lint
+
+    - name: Executar o Build (Verificar tipagem estrita TS)
+      run: npm run build
