@@ -7,6 +7,10 @@ const router = Router();
 // URL: POST /api/v1/categories
 router.post('/', categoryController.createCategory);
 
+// Rota GET: Lista todas as categorias de um perfil específico
+// URL: GET /api/v1/categories?profile_id=XXX
+router.get('/', categoryController.getCategories);
+
 // Rota DELETE: Deleta uma categoria (soft delete)
 // URL: DELETE /api/v1/categories/:id
 router.delete('/:id', categoryController.deleteCategory);
