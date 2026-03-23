@@ -10,7 +10,7 @@ export interface AccountInput {
 }
 
 // Recebe os dados já com a garantia de que respeitam a Interface "AccountInput"
-export const createAccountRecord = async (accountData: AccountInput) => {
+export const createAccountRecord = async (accountData: AccountInput): Promise<AccountInput> => {
 	// Desestruturação dos dados para facilitar a manipulação
     const { profile_id, name, type, balance } = accountData;
 
