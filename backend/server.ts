@@ -4,6 +4,7 @@ import type { Request, Response } from 'express';
 import cors from 'cors';
 import transactionRoutes from './src/routes/transactionRoutes.js';
 import accountRoutes from './src/routes/accountRoutes.js';
+import categoryRoutes from './src/routes/categoryRoutes.js';
 
 // Instância do Express
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.json());
 // Registo das Rotas
 app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/accounts', accountRoutes);
+app.use('/api/v1/categories', categoryRoutes);
 
 // Rota de saúde para verificar se a API está operacional
 app.get('/api/v1/health', (req: Request, res: Response) => {
