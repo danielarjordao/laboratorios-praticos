@@ -39,6 +39,25 @@ export const createAccount = async (req: Request, res: Response): Promise<void> 
     }
 };
 
+// Controlador para listar todas as contas de um perfil.
+export const getAccounts = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { profileId } = req.query;
+
+        // Validação de Defesa do profileId
+        if (typeof profileId !== 'string' || profileId.trim() === '') {
+            res.status(400).json({ status: 'error', message: 'Invalid profile ID.' });
+            return;
+        }
+
+        const accounts = await accountService.getAccounts(profileId);
+        res.status(200).json({ status: 'success', data: accounts });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Error';
+        res.status(400).json({ status: 'error', message });
+    }
+};
+
 // Controlador para deletar uma conta (soft delete).
 export const deleteAccount = async (req: Request, res: Response): Promise<void> => {
     try {

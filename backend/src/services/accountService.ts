@@ -41,6 +41,21 @@ export const createAccount = async (accountData: AccountInput): Promise<AccountR
     return data as AccountResponse;
 };
 
+// Função para listar todas as contas de um perfil.
+export const getAccounts = async (profile_id: string): Promise<AccountResponse[]> => {
+    const { data, error } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('profile_id', profile_id)
+        .is('deleted_at', null);
+
+    if (error) {
+        throw new Error(`Database error: ${error.message}`);
+    }
+
+    return data as AccountResponse[];
+};
+
 // Função para deletar uma conta (soft delete).
 export const deleteAccount = async (id: string): Promise<void> => {
     const { error } = await supabase
