@@ -51,14 +51,14 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
 // Ele é responsável por receber a requisição, validar os dados de entrada, chamar o Service e retornar a resposta adequada.
 export const getTransactions = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { profileId } = req.query;
+        const { profile_id } = req.query;
 
-        if (!profileId) {
-            res.status(400).json({ status: 'error', message: 'Missing profileId in query parameters.' });
+        if (!profile_id) {
+            res.status(400).json({ status: 'error', message: 'Missing profile_id in query parameters.' });
             return;
         }
 
-        const transactions = await transactionService.getTransactions(profileId as string);
+        const transactions = await transactionService.getTransactions(profile_id as string);
 
         res.status(200).json({
             status: 'success',

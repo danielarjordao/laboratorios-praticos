@@ -143,12 +143,12 @@ export const createTransaction = async (data: CreateTransactionDTO): Promise<Tra
 
 // Get condição: A função getTransactions deve ser responsável por retornar as transações de um perfil específico,
 // incluindo os nomes das categorias e contas associadas.
-export const getTransactions = async (profileId: string): Promise<TransactionWithDetails[]> => {
+export const getTransactions = async (profile_id: string): Promise<TransactionWithDetails[]> => {
     // Busca as contas do perfil
     const { data: accounts, error: accError } = await supabase
         .from('accounts')
         .select('id')
-        .eq('profile_id', profileId);
+        .eq('profile_id', profile_id);
 
     if (accError)
         throw new Error(`Error fetching profile accounts: ${accError.message}`);
