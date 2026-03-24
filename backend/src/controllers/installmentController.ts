@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import * as installmentService from '../services/installmentService.js';
-import * as transactionService from '../services/transactionService.js';
+import * as accountService from '../services/accountService.js';
 
 export const handleCreateInstallmentPlan = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -14,7 +14,7 @@ export const handleCreateInstallmentPlan = async (req: Request, res: Response): 
 
         // Desconta APENAS a primeira parcela do saldo da conta
         // Assumindo que o parcelamento é sempre uma despesa (DEBIT)
-        await transactionService.updateAccountBalance(
+        await accountService.updateAccountBalance(
             data.account_id,
             firstInstallmentAmount,
             'DEBIT'
