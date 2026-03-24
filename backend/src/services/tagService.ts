@@ -2,7 +2,6 @@ import { supabase } from '../config/supabase.js';
 
 export interface TagInput {
     name: string;
-    color?: string;
     profile_id: string;
 }
 
@@ -18,7 +17,6 @@ export const createTag = async (tagData: TagInput): Promise<TagResponse> => {
         .from('tags')
         .insert([{
             ...tagData,
-            color: tagData.color || '#3EB489'
         }])
         .select()
         .single();
