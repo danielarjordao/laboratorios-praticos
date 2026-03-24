@@ -63,3 +63,24 @@ export const deleteTag = async (id: string): Promise<void> => {
     if (error)
 		throw new Error(`Error deleting tag: ${error.message}`);
 };
+
+// Função para linkar tags a uma transação, inserindo os registros na tabela de junção transaction_tags
+export const linkTagsToTransaction = async (transactionId: string, tagIds: string[]): Promise<void> => {
+    // Valida se há tags para linkar
+    if (!tagIds || tagIds.length === 0) return;
+
+    // Prepara os dados para inserção em massa na tabela de junção
+    const tagAssociations = tagIds.map(tagId => ({
+        transaction_id: transactionId,
+        tag_id: tagId
+    }));
+
+    // Insere as associações na tabela de junção
+    const { error } = await supabase
+        .from('transaction_tags')
+        .insert(tagAssociations);
+
+    if (error) {
+        throw new Error(`Error linking tags to transaction: ${error.message}`);
+    }
+};
