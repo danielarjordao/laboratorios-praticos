@@ -1,5 +1,6 @@
 import { supabase } from '../config/supabase.js';
 import * as tagService from './tagService.js';
+import { updateAccountBalance } from './accountService.js';
 
 // --- INTERFACES ---
 export interface CreateTransactionDTO {
@@ -63,36 +64,6 @@ const validateTransactionLogic = (data: CreateTransactionDTO, type: string): voi
     } else {
          throw new Error('Invalid transaction type. Allowed types: INCOME, EXPENSE, TRANSFER.');
     }
-};
-
-// Atualiza o saldo de uma conta de forma matemática.
-export const updateAccountBalance = async (accountId: string, amount: number, operation: 'CREDIT' | 'DEBIT'): Promise<void> => {
-    // Busca o saldo atual
-    const { data: account, error: accError } = await supabase
-        .from('accounts')
-        .select('balance')
-        .eq('id', accountId)
-        .single();
-
-    if (accError) throw new Error(`Failed to fetch account balance: ${accError.message}`);
-
-    let newBalance = Number(account.balance);
-
-    // Calcula o novo saldo (Soma se for CREDIT, subtrai se for DEBIT)
-    if (operation === 'CREDIT') {
-        newBalance += amount;
-    } else {
-        newBalance -= amount;
-    }
-
-    // Grava o novo valor na base de dados
-    const { error: updateError } = await supabase
-        .from('accounts')
-        .update({ balance: newBalance })
-        .eq('id', accountId);
-
-    if (updateError)
-        throw new Error(`Failed to update account balance: ${updateError.message}`);
 };
 
 // Auxiliar: Reverte o impacto de uma transação no saldo

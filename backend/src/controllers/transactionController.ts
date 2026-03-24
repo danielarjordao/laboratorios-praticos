@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import * as transactionService from '../services/transactionService.js';
 import type { CreateTransactionDTO } from '../services/transactionService.js';
 import * as tagService from '../services/tagService.js';
+import * as accountService from '../services/accountService.js';
 
 // Controller para criar uma transação. Ele é responsável por receber a requisição, validar os dados de entrada, chamar o Service e retornar a resposta adequada.
 export const createTransaction = async (req: Request, res: Response): Promise<void> => {
@@ -132,7 +133,7 @@ export const handleCreateTransaction = async (req: Request, res: Response): Prom
         }
 
         // Atualiza o saldo
-        await transactionService.updateAccountBalance(
+        await accountService.updateAccountBalance(
             transactionData.account_id,
             transactionData.amount,
             transactionData.type
