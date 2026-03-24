@@ -1,61 +1,59 @@
-# Cronograma diário detalhado
+# Fase 1: Backend Avançado e Base de Dados (Foco: TP1)
 
-## Fase 1: Backend e Base de Dados (Foco: TP1)
+**Dia 24/03 (Terça-feira) - Funcionalidades Secundárias e Lógica Complexa:**
 
-**Dia 23/03 (Segunda-feira) - Fundação da Infraestrutura:**
+* **Manhã:** Implementar o CRUD de *Tags* e a lógica de associação com as Transações (`transaction_tags`).
+* **Tarde:** Desenvolver a lógica de *Installment Plans* (Planos de Parcelamento), garantindo o cálculo e a criação automática de múltiplas transações futuras com base no número de parcelas.
 
-* **Manhã:** Criar repositório `dashboardFinancas-backend` no GitHub. Inicializar o projeto (`npm init -y`) e instalar dependências (`express`, `cors`, `@supabase/supabase-js`, `dotenv`).
-* **Tarde:** Executar o script SQL final no Supabase. Configurar as variáveis de ambiente (`.env`) e criar a ligação à base de dados no Node.js. Testar se o servidor arranca sem erros.
+**Dia 25/03 (Quarta-feira) - Orçamentos, Metas e Qualidade:**
 
-**Dia 24/03 (Terça-feira) - O Motor Transacional (Parte 1):**
+* **Manhã:** Criar os endpoints para *Budgets* (Orçamentos) e *Goals* (Metas de Poupança).
+* **Tarde:** Implementar testes unitários focados nas regras de negócio críticas (ex: validação da reconciliação de saldos, bloqueio de deleção de contas). Revisão de código e limpeza.
 
-* **Manhã:** Criar o endpoint `POST /transactions`. Implementar a lógica rígida no Node.js (garantir valores absolutos, rejeitar transferências sem conta destino, verificar correspondência de perfil).
-* **Tarde:** Criar o endpoint `GET /transactions` com suporte a filtros básicos na *query string* (mês, tipo).
+**Dia 26/03 (Quinta-feira) - Deploy e Documentação (Entrega TP1):**
 
-**Dia 25/03 (Quarta-feira) - O Motor Transacional (Parte 2):**
+* **Manhã:** Configurar o deploy do backend no Render.com e conectar à base de dados de produção. Testar os endpoints via Postman contra o servidor na nuvem.
+* **Tarde:** Atualizar o README com instruções detalhadas de instalação e rotas. **Submeter TP1.** Encerramento das atividades do dia para descanso.
 
-* **Manhã:** Implementar os endpoints `GET /transactions/:id`, `PUT /transactions/:id` e `DELETE /transactions/:id`.
-* **Tarde:** Testar todos os endpoints exaustivamente via Postman. Corrigir eventuais quebras lógicas.
+## Fase 2: Frontend MVP (Foco: TP2)
 
-**Dia 26/03 (Quinta-feira) - Testes e Deploy (Entrega TP1):**
+**Dia 27/03 (Sexta-feira) - Fundação do Frontend e Conexão:**
 
-* **Manhã:** Escrever 3 testes unitários focados na validação (ex: rejeição de despesas sem categoria).
-* **Tarde:** Fazer o deploy do backend no Render.com. Capturar os *screenshots* do Postman e atualizar o README. **Submeter TP1.**
+* **Manhã:** Inicializar o projeto Angular (`ng new dashboardFinancas-frontend`). Estruturar o *Routing* (Login, Dashboard, Transações) e configurar o ambiente visual base.
+* **Tarde:** Criar os *Services* (HTTP Client) no Angular e estabelecer a comunicação bidirecional com a API Node.js alojada no Render.com.
 
-### Fase 2: Frontend MVP (Foco: TP2)
+**Dia 30/03 (Segunda-feira) - Interface e Estrutura Visual:**
 
-**Dia 27/03 (Sexta-feira) - Fundação do Frontend:**
+* **Manhã:** Estruturar o *layout* principal usando Flexbox/Grid e aplicar o sistema de cores do projeto.
+* **Tarde:** Construir os componentes visuais de leitura: Cartões de resumo do Dashboard (Saldo, Receitas, Despesas) e a Tabela de Listagem.
 
-* **Manhã:** Inicializar o projeto Angular (`ng new dashboardFinancas-frontend`). Limpar ficheiros padrão e configurar o *Routing* (Login, Dashboard, Lista, Formulário).
-* **Tarde:** Criar os *Services* (HTTP Client) para conectar a aplicação Angular à sua API Node.js que já está a rodar no Render.com. Fechar a semana com a comunicação Frontend-Backend estabelecida.
+**Dia 31/03 (Terça-feira) - Formulários e Interatividade:**
 
-**Dia 30/03 (Segunda-feira) - Interface e Estrutura:**
+* **Manhã:** Implementar *Reactive Forms* para as operações de criação e edição (Contas, Categorias e Transações).
+* **Tarde:** Adicionar validações visuais dinâmicas (ex: ocultar campo de conta de destino se o tipo não for transferência) e exibição de alertas de sucesso/erro vindos da API.
 
-* **Manhã:** Estruturar o HTML/SCSS base usando Flexbox/Grid. Aplicar a paleta de cores (Dark Slate Grey, Pearl Aqua, Burnt Peach).
-* **Tarde:** Construir os componentes visuais do Dashboard (cartões de resumo) e a Tabela de Listagem de Transações.
+**Dia 01/04 (Quarta-feira) - Deploy Frontend e Demo (Entrega TP2):**
 
-**Dia 31/03 (Terça-feira) - Interatividade e Formulários:**
-
-* **Manhã:** Implementar os *Reactive Forms* do Angular para o formulário de transações.
-* **Tarde:** Adicionar as validações visuais do formulário (ex: esconder a *drop-down* de Categorias se o utilizador selecionar "Transferência" e exibir a seleção de Conta Destino).
-
-**Dia 01/04 (Quarta-feira) - Deploy e Demo (Entrega TP2):**
-
-* **Manhã:** Testes locais da interface. Correção de bugs visuais e garantia de que o CRUD funciona de ponta a ponta.
-* **Tarde:** Fazer o deploy na Vercel ou Netlify. Gravar a demonstração em vídeo de 30 segundos. **Submeter TP2.**
+* **Manhã:** Testes *End-to-End* locais (fluxo completo: criar conta -> criar categoria -> registar transação -> verificar dashboard).
+* **Tarde:** Fazer o deploy do frontend na Vercel ou Netlify. Gravar a demonstração em vídeo (30 segundos). **Submeter TP2.**
 
 ### Fase 3: Segurança, CI/CD e Polimento (Foco: Defesa Final)
 
 **Dia 02/04 (Quinta-feira) - Segurança e Automação:**
 
-* **Manhã:** Integrar o Supabase Auth (JWT) no Angular. Remover o ID de perfil fixo que foi usado nos testes e passar a enviar o *token* real nas requisições.
-* **Tarde:** Configurar os *workflows* do GitHub Actions (CI/CD) para garantir a verificação automática de *Lint* e *Build* no repositório.
+* **Manhã:** Integrar a autenticação JWT. Atualizar o Backend para extrair o ID do perfil diretamente do *token* seguro, substituindo o envio manual nas requisições.
+* **Tarde:** Configurar *workflows* do GitHub Actions (CI/CD) para automatizar a verificação de código (*Lint*) e os processos de *Build*.
 
-**Dia 06/04 (Segunda-feira) - Polimento Final e Defesa:**
+**Dia 03/04 (Sexta-feira) - Funcionalidades Opcionais e Ajustes:**
 
-* **Manhã:** Testes *end-to-end* rigorosos em produção. Redação final do README (destacar o *Domain-Driven Design* e o impacto no ODS 1).
-* **Tarde:** Preparar as respostas para a defesa técnica. Estruturar os argumentos sobre arquitetura, validações a nível de base de dados e visão futura para a automação de ocorrências (Cron Jobs).
+* **Manhã:** Implementar a lógica de *Recurring Transactions* (Transações Recorrentes) ou refinar a interface de utilizador.
+* **Tarde:** Buffer dedicado para resolução de bugs residuais ou encerramento antecipado da semana de estudos.
 
-**Dia 07/04 (Terça-feira) - O Dia da Entrega:**
+**Dia 06/04 (Segunda-feira) - Preparação Estratégica para Defesa:**
 
-* **Manhã:** Submissão do código final e apresentação técnica presencial.
+* **Manhã:** Testes exaustivos no ambiente de produção. Revisão final da documentação (enfoque nas decisões arquiteturais e impacto prático).
+* **Tarde:** Estruturação dos argumentos técnicos para a apresentação, destacando soluções como o *Soft Delete* e a reconciliação matemática de saldos.
+
+**Dia 07/04 (Terça-feira) - Entrega e Apresentação:**
+
+* **Manhã:** Submissão final do código e defesa técnica presencial.
