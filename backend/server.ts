@@ -43,6 +43,13 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
     res.status(200).json({ status: 'success', message: 'API is running in TypeScript!' });
 });
 
+app.get('/api/v1', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'API is running in TypeScript! Welcome to the Financial Management API.'
+  });
+});
+
 // Inicia o servidor na porta definida
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
