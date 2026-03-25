@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import * as goalService from '../services/goalService.js';
 
-export const handleCreateGoal = async (req: Request, res: Response): Promise<void> => {
+export const createGoal = async (req: Request, res: Response): Promise<void> => {
     try {
         const goal = await goalService.createGoal(req.body);
         res.status(201).json({ status: 'success', data: goal });
@@ -11,7 +11,7 @@ export const handleCreateGoal = async (req: Request, res: Response): Promise<voi
     }
 };
 
-export const handleGetGoals = async (req: Request, res: Response): Promise<void> => {
+export const readGoals = async (req: Request, res: Response): Promise<void> => {
     try {
         const { profile_id } = req.query;
 
@@ -19,7 +19,7 @@ export const handleGetGoals = async (req: Request, res: Response): Promise<void>
             throw new Error('profile_id is required');
         }
 
-        const goals = await goalService.getGoalsByProfile(profile_id as string);
+        const goals = await goalService.readGoalsByProfile(profile_id as string);
         res.status(200).json({ status: 'success', data: goals });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -27,7 +27,7 @@ export const handleGetGoals = async (req: Request, res: Response): Promise<void>
     }
 };
 
-export const handleUpdateGoal = async (req: Request, res: Response): Promise<void> => {
+export const updateGoal = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params as { id: string };
         const updated = await goalService.updateGoal(id, req.body);
@@ -38,7 +38,7 @@ export const handleUpdateGoal = async (req: Request, res: Response): Promise<voi
     }
 };
 
-export const handleDeleteGoal = async (req: Request, res: Response): Promise<void> => {
+export const deleteGoal = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params as { id: string };
         await goalService.deleteGoal(id);

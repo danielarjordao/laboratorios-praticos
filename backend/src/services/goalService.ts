@@ -30,7 +30,7 @@ export const createGoal = async (data: CreateGoalDTO): Promise<GoalResponse> => 
 };
 
 // GET: Recupera todos os objetivos de um perfil específico, ordenados por deadline
-export const getGoalsByProfile = async (profileId: string): Promise<GoalResponse[]> => {
+export const readGoalsByProfile = async (profileId: string): Promise<GoalResponse[]> => {
     const { data, error } = await supabase
         .from('goals')
         .select('*')
