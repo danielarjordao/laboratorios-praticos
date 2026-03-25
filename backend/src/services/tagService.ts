@@ -43,13 +43,17 @@ export const getTags = async (profile_id: string): Promise<TagResponse[]> => {
 export const updateTag = async (id: string, data: Partial<TagInput>): Promise<TagResponse> => {
     const { data: updatedTag, error } = await supabase
         .from('tags')
-        .update(data)
+        .update({
+            ...data,
+            updated_at: new Date().toISOString()
+        })
         .eq('id', id)
         .select()
         .single();
 
     if (error)
-		throw new Error(`Error updating tag: ${error.message}`);
+        throw new Error(`Error updating tag: ${error.message}`);
+
     return updatedTag as TagResponse;
 };
 
