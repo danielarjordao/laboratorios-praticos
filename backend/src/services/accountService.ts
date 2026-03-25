@@ -7,6 +7,7 @@ export interface AccountInput {
     type?: 'CHECKING' | 'SAVINGS' | 'CREDIT' | 'CASH';
     initial_balance?: number;
     balance?: number;
+    is_main_featured?: boolean;
 }
 
 // Interface para a resposta da base de dados
@@ -53,7 +54,7 @@ export const getAccounts = async (profile_id: string): Promise<AccountResponse[]
 export const updateAccount = async (id: string, data: Partial<AccountInput>): Promise<AccountResponse> => {
     const { data: account, error } = await supabase
         .from('accounts')
-        .update(data)
+        .update({ ...data, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
         .single();
