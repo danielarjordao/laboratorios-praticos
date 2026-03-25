@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import * as recurringService from '../services/recurringService.js';
 import type { CreateRecurringDTO } from '../services/recurringService.js';
 
-export const handleCreateRecurring = async (req: Request, res: Response): Promise<void> => {
+export const createRecurring = async (req: Request, res: Response): Promise<void> => {
     try {
         const body = req.body as CreateRecurringDTO;
 
@@ -23,7 +23,7 @@ export const handleCreateRecurring = async (req: Request, res: Response): Promis
     }
 };
 
-export const handleGetRecurring = async (req: Request, res: Response): Promise<void> => {
+export const readRecurring = async (req: Request, res: Response): Promise<void> => {
     try {
         const { profile_id } = req.query;
 
@@ -40,7 +40,7 @@ export const handleGetRecurring = async (req: Request, res: Response): Promise<v
     }
 };
 
-export const handleUpdateRecurring = async (req: Request, res: Response): Promise<void> => {
+export const updateRecurring = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params as { id: string };
         const body = req.body as Partial<CreateRecurringDTO>;
@@ -53,7 +53,7 @@ export const handleUpdateRecurring = async (req: Request, res: Response): Promis
     }
 };
 
-export const handleDeleteRecurring = async (req: Request, res: Response): Promise<void> => {
+export const deleteRecurring = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params as { id: string };
         await recurringService.deleteRecurring(id);

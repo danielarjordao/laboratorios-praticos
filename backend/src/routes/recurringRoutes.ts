@@ -1,16 +1,16 @@
 import { Router } from 'express';
 import {
-    handleCreateRecurring,
-    handleGetRecurring,
-    handleUpdateRecurring,
-    handleDeleteRecurring
+    createRecurring,
+    readRecurring,
+    updateRecurring,
+    deleteRecurring
 } from '../controllers/recurringController.js';
 
 const router = Router();
 
-router.post('/', handleCreateRecurring);
-router.get('/', handleGetRecurring);
-router.patch('/:id', handleUpdateRecurring);
-router.delete('/:id', handleDeleteRecurring);
+router.post('/', createRecurring);
+router.get('/', readRecurring);
+router.patch('/:id', updateRecurring);
+router.delete('/:id', deleteRecurring);
 
 export default router;
