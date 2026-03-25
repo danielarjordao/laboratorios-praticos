@@ -11,6 +11,8 @@ import dashboardRoutes from './src/routes/dashboardRoutes.js';
 import budgetRoutes from './src/routes/budgetRoutes.js';
 import goalRoutes from './src/routes/goalRoutes.js';
 import recurringRoutes from './src/routes/recurringRoutes.js';
+import userSettingsRoutes from './src/routes/userSettingsRoutes.js';
+import profileRoutes from './src/routes/profileRoutes.js';
 
 // Instância do Express
 const app = express();
@@ -33,6 +35,8 @@ app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/budgets', budgetRoutes);
 app.use('/api/v1/goals', goalRoutes);
 app.use('/api/v1/recurring', recurringRoutes);
+app.use('/api/v1/user-settings', userSettingsRoutes);
+app.use('/api/v1/profiles', profileRoutes);
 
 // Rota de saúde para verificar se a API está operacional
 app.get('/api/v1/health', (req: Request, res: Response) => {
