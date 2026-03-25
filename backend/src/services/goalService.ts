@@ -7,16 +7,18 @@ export interface CreateGoalDTO {
     deadline?: string;
 }
 
+export interface GoalResponse {
+    id: string;
+    profile_id: string;
+    title: string;
+    target_amount: number;
+    deadline: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
 // POST: Cria um novo objetivo para um perfil específico
-export const createGoal = async (data: CreateGoalDTO): Promise<{
-	id: string;
-	profile_id: string;
-	title: string;
-	target_amount: number;
-	deadline: string | null;
-	created_at: string;
-	updated_at: string;
-}> => {
+export const createGoal = async (data: CreateGoalDTO): Promise<GoalResponse> => {
 	const { data: goal, error } = await supabase
         .from('goals')
         .insert([data])
@@ -28,15 +30,7 @@ export const createGoal = async (data: CreateGoalDTO): Promise<{
 };
 
 // GET: Recupera todos os objetivos de um perfil específico, ordenados por deadline
-export const getGoalsByProfile = async (profileId: string): Promise<Array<{
-	id: string;
-	profile_id: string;
-	title: string;
-	target_amount: number;
-	deadline: string | null;
-	created_at: string;
-	updated_at: string;
-}>> => {
+export const readGoalsByProfile = async (profileId: string): Promise<GoalResponse[]> => {
     const { data, error } = await supabase
         .from('goals')
         .select('*')
@@ -49,15 +43,7 @@ export const getGoalsByProfile = async (profileId: string): Promise<Array<{
 };
 
 // PATCH: Atualiza um objetivo existente, permitindo alterações parciais
-export const updateGoal = async (id: string, updates: Partial<CreateGoalDTO>): Promise<{
-	id: string;
-	profile_id: string;
-	title: string;
-	target_amount: number;
-	deadline: string | null;
-	created_at: string;
-	updated_at: string;
-}> => {
+export const updateGoal = async (id: string, updates: Partial<CreateGoalDTO>): Promise<GoalResponse> => {
     const { data, error } = await supabase
         .from('goals')
         .update({ ...updates, updated_at: new Date().toISOString() })

@@ -8,7 +8,7 @@ const router = Router();
 router.post('/', tagController.createTag);
 
 // Rota GET: Listar Tags (ex: /api/v1/tags?profile_id=UUID)
-router.get('/', tagController.getTags);
+router.get('/', tagController.readTags);
 
 // Rota PATCH: Atualizar Tag
 // URL: PATCH /api/v1/tags/:id

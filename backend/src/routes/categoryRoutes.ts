@@ -9,7 +9,7 @@ router.post('/', categoryController.createCategory);
 
 // Rota GET: Lista todas as categorias de um perfil específico
 // URL: GET /api/v1/categories?profile_id=XXX
-router.get('/', categoryController.getCategories);
+router.get('/', categoryController.readCategories);
 
 // Rota PATCH: Atualiza os detalhes de uma categoria existente
 // URL: PATCH /api/v1/categories/:id

@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import * as installmentService from '../services/installmentService.js';
 import * as accountService from '../services/accountService.js';
 
-export const handleCreateInstallmentPlan = async (req: Request, res: Response): Promise<void> => {
+export const createInstallmentPlan = async (req: Request, res: Response): Promise<void> => {
     try {
         const data = req.body;
 
@@ -31,12 +31,12 @@ export const handleCreateInstallmentPlan = async (req: Request, res: Response): 
     }
 };
 
-export const handleGetInstallmentPlans = async (req: Request, res: Response): Promise<void> => {
+export const readInstallmentPlans = async (req: Request, res: Response): Promise<void> => {
     try {
         const profileId = req.query.profile_id as string;
         if (!profileId) throw new Error('profile_id is required');
 
-        const plans = await installmentService.getInstallmentPlans(profileId);
+        const plans = await installmentService.readInstallmentPlans(profileId);
         res.status(200).json({ status: 'success', data: plans });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
@@ -44,7 +44,7 @@ export const handleGetInstallmentPlans = async (req: Request, res: Response): Pr
     }
 };
 
-export const handleUpdateInstallmentPlan = async (req: Request, res: Response): Promise<void> => {
+export const updateInstallmentPlan = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params as { id: string };
         const { description } = req.body;
@@ -57,7 +57,7 @@ export const handleUpdateInstallmentPlan = async (req: Request, res: Response): 
     }
 };
 
-export const handleDeleteInstallmentPlan = async (req: Request, res: Response): Promise<void> => {
+export const deleteInstallmentPlan = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params as { id: string };
         await installmentService.deleteInstallmentPlan(id);

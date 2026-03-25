@@ -1,16 +1,16 @@
 import { Router } from 'express';
 import {
-    handleCreateBudget,
-    handleGetBudgets,
-    handleUpdateBudget,
-    handleDeleteBudget
+    createBudget,
+    readBudgets,
+    updateBudget,
+    deleteBudget
 } from '../controllers/budgetController.js';
 
 const router = Router();
 
-router.post('/', handleCreateBudget);
-router.get('/', handleGetBudgets);
-router.patch('/:id', handleUpdateBudget);
-router.delete('/:id', handleDeleteBudget);
+router.post('/', createBudget);
+router.get('/', readBudgets);
+router.patch('/:id', updateBudget);
+router.delete('/:id', deleteBudget);
 
 export default router;

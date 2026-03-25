@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { handleGetMonthlySummary } from '../controllers/dashboardController.js';
+import { readMonthlySummary } from '../controllers/dashboardController.js';
 
 const router = Router();
-router.get('/summary', handleGetMonthlySummary);
+router.get('/summary', readMonthlySummary);
 
 export default router;

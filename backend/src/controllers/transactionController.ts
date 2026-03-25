@@ -7,51 +7,33 @@ import * as accountService from '../services/accountService.js';
 // Controller para criar uma transação. Ele é responsável por receber a requisição, validar os dados de entrada, chamar o Service e retornar a resposta adequada.
 export const createTransaction = async (req: Request, res: Response): Promise<void> => {
     try {
-        const body = req.body as CreateTransactionDTO;
+        const { tags, ...transactionData } = req.body;
 
-        //  Validação de Defesa (Fail-Fast)
-        // Verifica apenas a presença dos campos. A lógica de negócio fica no Service.
-        if (!body.account_id || !body.type || body.amount === undefined || !body.date) {
-            res.status(400).json({
-                status: 'error',
-                message: 'Missing required fields: account_id, type, amount, date.'
-            });
-            return;
+        // Cria a transação (Responsabilidade do TransactionService)
+        const newTransaction = await transactionService.createTransaction(transactionData);
+
+        // Associa as tags, se existirem (Responsabilidade do TagService)
+        if (tags && Array.isArray(tags) && tags.length > 0) {
+            await tagService.linkTagsToTransaction(newTransaction.id, tags);
         }
 
-        // Chama o Service
-        const transaction = await transactionService.createTransaction(body);
+        // Atualiza o saldo
+        await accountService.updateAccountBalance(
+            transactionData.account_id,
+            transactionData.amount,
+            transactionData.type
+        );
 
-        // Resposta de Sucesso
-        res.status(201).json({
-            status: 'success',
-            data: transaction
-        });
-
+        res.status(201).json({ status: 'success', data: newTransaction });
     } catch (error: unknown) {
-        // Tratamento de Erros
-        // Captura tanto erros do Service quanto erros diretos do Supabase/PostgreSQL
-        let errorMessage = 'An unknown error occurred';
-
-        if (error instanceof Error) {
-            errorMessage = error.message;
-        } else if (typeof error === 'object' && error !== null && 'message' in error) {
-            // Caso o erro venha do Supabase como um objeto literal
-            errorMessage = (error as { message: string }).message;
-        }
-
-        console.error('[TransactionController Error]:', errorMessage);
-
-        res.status(400).json({
-            status: 'error',
-            message: errorMessage
-        });
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        res.status(400).json({ status: 'error', message });
     }
 };
 
 // Controller para obter as transações de um perfil específico.
 // Ele é responsável por receber a requisição, validar os dados de entrada, chamar o Service e retornar a resposta adequada.
-export const getTransactions = async (req: Request, res: Response): Promise<void> => {
+export const readTransactions = async (req: Request, res: Response): Promise<void> => {
     try {
         const { profile_id } = req.query;
 
@@ -60,7 +42,7 @@ export const getTransactions = async (req: Request, res: Response): Promise<void
             return;
         }
 
-        const transactions = await transactionService.getTransactions(profile_id as string);
+        const transactions = await transactionService.readTransactions(profile_id as string);
 
         res.status(200).json({
             status: 'success',
@@ -116,32 +98,6 @@ export const deleteTransaction = async (req: Request, res: Response): Promise<vo
         });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Error deleting transaction';
-        res.status(400).json({ status: 'error', message });
-    }
-};
-
-export const handleCreateTransaction = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { tags, ...transactionData } = req.body;
-
-        // Cria a transação (Responsabilidade do TransactionService)
-        const newTransaction = await transactionService.createTransaction(transactionData);
-
-        // Associa as tags, se existirem (Responsabilidade do TagService)
-        if (tags && Array.isArray(tags) && tags.length > 0) {
-            await tagService.linkTagsToTransaction(newTransaction.id, tags);
-        }
-
-        // Atualiza o saldo
-        await accountService.updateAccountBalance(
-            transactionData.account_id,
-            transactionData.amount,
-            transactionData.type
-        );
-
-        res.status(201).json({ status: 'success', data: newTransaction });
-    } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
         res.status(400).json({ status: 'error', message });
     }
 };

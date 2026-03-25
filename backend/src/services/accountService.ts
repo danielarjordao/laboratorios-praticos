@@ -1,23 +1,24 @@
 import { supabase } from '../config/supabase.js';
 
 // Interface para os dados de entrada
-export interface AccountInput {
+export interface CreateAccountDTO {
     profile_id: string;
     name: string;
     type?: 'CHECKING' | 'SAVINGS' | 'CREDIT' | 'CASH';
     initial_balance?: number;
     balance?: number;
+    is_main_featured?: boolean;
 }
 
 // Interface para a resposta da base de dados
-export interface AccountResponse extends AccountInput {
+export interface AccountResponse extends CreateAccountDTO {
     id: string;
     created_at: string;
     updated_at: string;
 }
 
 // Cria uma nova conta bancária no sistema.
-export const createAccount = async (accountData: AccountInput): Promise<AccountResponse> => {
+export const createAccount = async (accountData: CreateAccountDTO): Promise<AccountResponse> => {
     const { data, error } = await supabase
         .from('accounts')
         .insert([{
@@ -35,7 +36,7 @@ export const createAccount = async (accountData: AccountInput): Promise<AccountR
 };
 
 // Função para listar todas as contas de um perfil.
-export const getAccounts = async (profile_id: string): Promise<AccountResponse[]> => {
+export const readAccounts = async (profile_id: string): Promise<AccountResponse[]> => {
     const { data, error } = await supabase
         .from('accounts')
         .select('*')
@@ -50,10 +51,10 @@ export const getAccounts = async (profile_id: string): Promise<AccountResponse[]
 };
 
 // Função para atualizar os detalhes de uma conta existente.
-export const updateAccount = async (id: string, data: Partial<AccountInput>): Promise<AccountResponse> => {
+export const updateAccount = async (id: string, data: Partial<CreateAccountDTO>): Promise<AccountResponse> => {
     const { data: account, error } = await supabase
         .from('accounts')
-        .update(data)
+        .update({ ...data, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
         .single();

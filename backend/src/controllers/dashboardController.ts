@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import * as dashboardService from '../services/dashboardService.js';
 
-export const handleGetMonthlySummary = async (req: Request, res: Response): Promise<void> => {
+export const readMonthlySummary = async (req: Request, res: Response): Promise<void> => {
     try {
         const { profile_id, month, year } = req.query;
 
@@ -9,7 +9,7 @@ export const handleGetMonthlySummary = async (req: Request, res: Response): Prom
             throw new Error('Missing parameters: profile_id, month, and year are required.');
         }
 
-        const summary = await dashboardService.getMonthlySummary(
+        const summary = await dashboardService.readMonthlySummary(
             profile_id as string,
             Number(month),
             Number(year)

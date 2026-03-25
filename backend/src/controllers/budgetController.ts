@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import * as budgetService from '../services/budgetService.js';
 
-export const handleCreateBudget = async (req: Request, res: Response): Promise<void> => {
+export const createBudget = async (req: Request, res: Response): Promise<void> => {
     try {
         const budget = await budgetService.createBudget(req.body);
         res.status(201).json({ status: 'success', data: budget });
@@ -11,7 +11,7 @@ export const handleCreateBudget = async (req: Request, res: Response): Promise<v
     }
 };
 
-export const handleGetBudgets = async (req: Request, res: Response): Promise<void> => {
+export const readBudgets = async (req: Request, res: Response): Promise<void> => {
     try {
         const { profile_id, month_date } = req.query;
 
@@ -19,7 +19,7 @@ export const handleGetBudgets = async (req: Request, res: Response): Promise<voi
             throw new Error('profile_id and month_date are required');
         }
 
-        const budgets = await budgetService.getBudgetsByMonth(
+        const budgets = await budgetService.readBudgetsByMonth(
             profile_id as string,
             month_date as string
         );
@@ -30,7 +30,7 @@ export const handleGetBudgets = async (req: Request, res: Response): Promise<voi
     }
 };
 
-export const handleUpdateBudget = async (req: Request, res: Response): Promise<void> => {
+export const updateBudget = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params as { id: string };
         const { limit_amount } = req.body;
@@ -45,7 +45,7 @@ export const handleUpdateBudget = async (req: Request, res: Response): Promise<v
     }
 };
 
-export const handleDeleteBudget = async (req: Request, res: Response): Promise<void> => {
+export const deleteBudget = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params as { id: string };
         await budgetService.deleteBudget(id);

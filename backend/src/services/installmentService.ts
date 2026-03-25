@@ -10,6 +10,35 @@ export interface CreateInstallmentDTO {
     description: string;
 }
 
+// Interface para o que a base de dados devolve
+export interface TransactionResponse {
+    id: string;
+    account_id: string;
+    transfer_account_id: string | null;
+    category_id: string;
+    installment_plan_id: string | null;
+    installment_number: number | null;
+    type: string;
+    amount: number;
+    date: string;
+    effective_date: string | null;
+    description: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+}
+
+export interface InstallmentPlanResponse {
+    id: string;
+    profile_id: string;
+    description: string;
+    total_parts: number;
+    created_at: string;
+    updated_at: string;
+    transactions?: TransactionResponse[];
+}
+
 // Função pura para gerar os payloads das transações com base nos dados de entrada e no ID do plano de parcelamento criado
 const generateInstallmentPayloads = (data: CreateInstallmentDTO, planId: string) => {
     const installmentAmount = Number((data.total_amount / data.installments).toFixed(2));
@@ -45,7 +74,7 @@ const generateInstallmentPayloads = (data: CreateInstallmentDTO, planId: string)
 };
 
 // Service principal para criar um plano de parcelamento e suas transações associadas
-export const createInstallmentPlan = async (data: CreateInstallmentDTO): Promise<CreateInstallmentDTO> => {
+export const createInstallmentPlan = async (data: CreateInstallmentDTO): Promise<InstallmentPlanResponse> => {
     // Cria o plano de parcelamento
     const { data: plan, error: planError } = await supabase
         .from('installment_plans')
@@ -79,7 +108,7 @@ export const createInstallmentPlan = async (data: CreateInstallmentDTO): Promise
 };
 
 // GET: Listar todos os planos de um perfil, incluindo as suas transações
-export const getInstallmentPlans = async (profileId: string): Promise<CreateInstallmentDTO[]> => {
+export const readInstallmentPlans = async (profileId: string): Promise<InstallmentPlanResponse[]> => {
     const { data, error } = await supabase
         .from('installment_plans')
         // O Supabase faz o JOIN automático com a tabela transactions
@@ -93,7 +122,7 @@ export const getInstallmentPlans = async (profileId: string): Promise<CreateInst
 };
 
 // UPDATE: Atualizar apenas a descrição do plano mestre
-export const updateInstallmentPlan = async (id: string, description: string): Promise<CreateInstallmentDTO> => {
+export const updateInstallmentPlan = async (id: string, description: string): Promise<InstallmentPlanResponse> => {
     const { data, error } = await supabase
         .from('installment_plans')
         .update({

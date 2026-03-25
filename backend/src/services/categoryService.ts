@@ -1,22 +1,22 @@
 import { supabase } from '../config/supabase.js';
 
 // Interface para os dados que entram (Data Transfer Object)
-export interface CategoryInput {
+export interface CreateCategoryDTO {
     name: string;
     icon?: string;
     profile_id: string;
     type: 'INCOME' | 'EXPENSE';
+    parent_id?: string;
 }
-
 // Interface para o que a base de dados devolve
-export interface CategoryResponse extends CategoryInput {
+export interface CategoryResponse extends CreateCategoryDTO {
     id: string;
     created_at: string;
     updated_at: string;
 }
 
 // Cria um novo registo de categoria.
-export const createCategory = async (categoryData: CategoryInput): Promise<CategoryResponse> => {
+export const createCategory = async (categoryData: CreateCategoryDTO): Promise<CategoryResponse> => {
     const { name, icon, profile_id, type } = categoryData;
 
     const { data, error } = await supabase
@@ -40,7 +40,7 @@ export const createCategory = async (categoryData: CategoryInput): Promise<Categ
 };
 
 // Função para listar as categorias de um perfil específico.
-export const getCategories = async (profile_id: string): Promise<CategoryResponse[]> => {
+export const readCategories = async (profile_id: string): Promise<CategoryResponse[]> => {
     const { data, error } = await supabase
         .from('categories')
         .select('*')
@@ -55,17 +55,17 @@ export const getCategories = async (profile_id: string): Promise<CategoryRespons
 };
 
 // Função para atualizar uma categoria existente.
-export const updateCategory = async (id: string, data: Partial<CategoryInput>): Promise<CategoryResponse> => {
+export const updateCategory = async (id: string, data: Partial<CreateCategoryDTO>): Promise<CategoryResponse> => {
     const { data: category, error } = await supabase
         .from('categories')
-        .update(data)
+        .update({ ...data, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
         .single();
 
     if (error)
         throw new Error(error.message);
-    
+
     return category as CategoryResponse;
 };
 

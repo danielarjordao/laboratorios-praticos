@@ -7,7 +7,7 @@ const router = Router();
 router.post('/', transactionController.createTransaction);
 
 // Rota GET: Lista todas as transações (ex: /api/v1/transactions?profile_id=XXX)
-router.get('/', transactionController.getTransactions);
+router.get('/', transactionController.readTransactions);
 
 // Rota PATCH com parâmetro de ID
 router.patch('/:id', transactionController.updateTransaction);

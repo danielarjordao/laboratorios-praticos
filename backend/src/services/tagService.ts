@@ -1,18 +1,18 @@
 import { supabase } from '../config/supabase.js';
 
-export interface TagInput {
+export interface CreateTagDTO {
     name: string;
     profile_id: string;
 }
 
-export interface TagResponse extends TagInput {
+export interface TagResponse extends CreateTagDTO {
     id: string;
     created_at: string;
     updated_at: string;
 }
 
 // Criar nova Tag
-export const createTag = async (tagData: TagInput): Promise<TagResponse> => {
+export const createTag = async (tagData: CreateTagDTO): Promise<TagResponse> => {
     const { data, error } = await supabase
         .from('tags')
         .insert([{
@@ -27,7 +27,7 @@ export const createTag = async (tagData: TagInput): Promise<TagResponse> => {
 };
 
 // Listar Tags de um perfil
-export const getTags = async (profile_id: string): Promise<TagResponse[]> => {
+export const readTags = async (profile_id: string): Promise<TagResponse[]> => {
     const { data, error } = await supabase
         .from('tags')
         .select('*')
@@ -40,16 +40,20 @@ export const getTags = async (profile_id: string): Promise<TagResponse[]> => {
 };
 
 // Atualizar Tag
-export const updateTag = async (id: string, data: Partial<TagInput>): Promise<TagResponse> => {
+export const updateTag = async (id: string, data: Partial<CreateTagDTO>): Promise<TagResponse> => {
     const { data: updatedTag, error } = await supabase
         .from('tags')
-        .update(data)
+        .update({
+            ...data,
+            updated_at: new Date().toISOString()
+        })
         .eq('id', id)
         .select()
         .single();
 
     if (error)
-		throw new Error(`Error updating tag: ${error.message}`);
+        throw new Error(`Error updating tag: ${error.message}`);
+
     return updatedTag as TagResponse;
 };
 

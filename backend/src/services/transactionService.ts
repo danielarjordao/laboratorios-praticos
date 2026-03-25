@@ -148,9 +148,9 @@ export const createTransaction = async (data: CreateTransactionDTO): Promise<Tra
     return transaction as TransactionResponse;
 };
 
-// Get condição: A função getTransactions deve ser responsável por retornar as transações de um perfil específico,
+// Get condição: A função readTransactions deve ser responsável por retornar as transações de um perfil específico,
 // incluindo os nomes das categorias e contas associadas.
-export const getTransactions = async (profile_id: string): Promise<TransactionWithDetails[]> => {
+export const readTransactions = async (profile_id: string): Promise<TransactionWithDetails[]> => {
     // Busca as contas do perfil
     const { data: accounts, error: accError } = await supabase
         .from('accounts')

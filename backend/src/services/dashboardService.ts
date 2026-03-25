@@ -11,7 +11,7 @@ export interface MonthlySummaryResponse {
 }
 
 // Função para obter o resumo mensal de receitas, despesas e saldo para um perfil específico.
-export const getMonthlySummary = async (
+export const readMonthlySummary = async (
     profileId: string,
     month: number,
     year: number

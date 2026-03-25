@@ -1,11 +1,11 @@
 import type { Request, Response } from 'express';
 import * as tagService from '../services/tagService.js';
-import type { TagInput } from '../services/tagService.js';
+import type { CreateTagDTO } from '../services/tagService.js';
 
 // Cria uma nova Tag validando os campos obrigatórios.
 export const createTag = async (req: Request, res: Response): Promise<void> => {
     try {
-        const body = req.body as TagInput;
+        const body = req.body as CreateTagDTO;
 
         // Validação de Defesa (Fail-Fast)
         if (!body.name || !body.profile_id) {
@@ -30,7 +30,7 @@ export const createTag = async (req: Request, res: Response): Promise<void> => {
 };
 
 // Lista as tags de um perfil (via query params).
-export const getTags = async (req: Request, res: Response): Promise<void> => {
+export const readTags = async (req: Request, res: Response): Promise<void> => {
     try {
         const { profile_id } = req.query;
 
@@ -39,7 +39,7 @@ export const getTags = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const tags = await tagService.getTags(profile_id);
+        const tags = await tagService.readTags(profile_id);
         res.status(200).json({
             status: 'success',
             results: tags.length,
@@ -57,7 +57,7 @@ export const getTags = async (req: Request, res: Response): Promise<void> => {
 export const updateTag = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params as { id: string };
-        const body = req.body as Partial<TagInput>;
+        const body = req.body as Partial<CreateTagDTO>;
 
         if (!id) {
             res.status(400).json({ status: 'error', message: 'Tag ID is required.' });
