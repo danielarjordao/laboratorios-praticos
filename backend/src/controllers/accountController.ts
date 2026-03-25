@@ -1,11 +1,11 @@
 import type { Request, Response } from 'express';
 import * as accountService from '../services/accountService.js';
-import type { AccountInput } from '../services/accountService.js';
+import type { CreateAccountDTO } from '../services/accountService.js';
 
 // Valida a entrada e orquestra a resposta para o utilizador.
 export const createAccount = async (req: Request, res: Response): Promise<void> => {
     try {
-        const body = req.body as AccountInput;
+        const body = req.body as CreateAccountDTO;
 
         // Validação de Defesa
         if (!body.profile_id || !body.name) {
@@ -40,7 +40,7 @@ export const createAccount = async (req: Request, res: Response): Promise<void> 
 };
 
 // Controlador para listar todas as contas de um perfil.
-export const getAccounts = async (req: Request, res: Response): Promise<void> => {
+export const readAccounts = async (req: Request, res: Response): Promise<void> => {
     try {
         const { profile_id } = req.query;
 
@@ -50,7 +50,7 @@ export const getAccounts = async (req: Request, res: Response): Promise<void> =>
             return;
         }
 
-        const accounts = await accountService.getAccounts(profile_id);
+        const accounts = await accountService.readAccounts(profile_id);
         res.status(200).json({ status: 'success', data: accounts });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Error';
@@ -62,7 +62,7 @@ export const getAccounts = async (req: Request, res: Response): Promise<void> =>
 export const updateAccount = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const body = req.body as Partial<AccountInput>;
+        const body = req.body as Partial<CreateAccountDTO>;
 
         // Validação de Defesa do ID
         if (typeof id !== 'string' || id.trim() === '') {
