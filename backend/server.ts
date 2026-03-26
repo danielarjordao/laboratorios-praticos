@@ -17,7 +17,7 @@ import profileRoutes from './src/routes/profileRoutes.js';
 // Instância do Express
 const app = express();
 // Define a porta a partir das variáveis de ambiente ou usa 3000 como default
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
 
 // Define os middlewares globais
 // CORS para permitir requisições de diferentes origens (ex: frontend Angular)
@@ -55,6 +55,6 @@ app.get('/api/v1', (req, res) => {
 });
 
 // Inicia o servidor na porta definida
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running on port ${port}`);
 });

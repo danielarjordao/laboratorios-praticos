@@ -1,0 +1,314 @@
+.top-header {
+  height: 80px;
+  width: 100%; /* Ocupa o ecrã todo */
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  position: fixed; /* Fixa no topo */
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 192px; /* Mantém o alinhamento com a sidebar */
+}
+
+.icon-logo {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-right: 12px;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.logo-text span {
+  color: var(--primary);
+}
+
+.header-greeting {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.greeting {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
+}
+
+.current-date {
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  text-transform: capitalize;
+}
+
+/* Divisória Vertical */
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border);
+  margin: 0 8px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Botão Nova Transação */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+
+.dropdown-container,
+.user-dropdown-container {
+  position: relative;
+}
+
+/* Botão do Seletor de Perfis */
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 6px 12px;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--foreground);
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.dropdown-trigger:hover {
+  background-color: var(--muted);
+  border-color: var(--primary);
+}
+
+.trigger-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.icon-small {
+  font-size: 1.2rem;
+  color: var(--muted-foreground);
+}
+
+/* Botão do Avatar (Utilizador) */
+.avatar-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.avatar-btn:hover {
+  border-color: var(--primary);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 240px;
+  border-radius: 12px;
+  padding: 8px 0;
+  background-color: var(--background);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  z-index: 1100;
+}
+
+.dropdown-header {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.full-name {
+  font-weight: 600;
+  color: var(--foreground);
+  font-size: 0.9rem;
+}
+
+.email {
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: var(--border);
+  margin: 4px 0;
+}
+
+/* Itens de dentro do menu (links e botões) */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  background: none;
+  border: none;
+  gap: 12px;
+  padding: 10px 16px;
+  color: var(--foreground);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Reset específico para a tag button não quebrar o layout */
+button.dropdown-item {
+  outline: none;
+  margin: 0;
+  appearance: none;
+}
+
+.dropdown-item:hover {
+  background-color: var(--muted);
+}
+
+.dropdown-item .material-symbols-outlined {
+  font-size: 1.2rem;
+  color: var(--muted-foreground);
+  transition: color 0.2s ease;
+}
+
+/* Destaque para o perfil que está ativo */
+.dropdown-item.active-item,
+button.dropdown-item.active-item {
+  color: var(--primary);
+  font-weight: 600;
+  background-color: var(--sidebar-accent);
+}
+
+/* Pinta o ícone do perfil ativo com a cor primária */
+.dropdown-item.active-item .material-symbols-outlined,
+button.dropdown-item.active-item .material-symbols-outlined {
+  color: var(--primary);
+}
+
+/* Botão de Logout (Estilo Destrutivo) */
+.dropdown-item.logout {
+  color: var(--destructive);
+}
+.dropdown-item.logout .material-symbols-outlined {
+  color: var(--destructive);
+}
+.dropdown-item.logout:hover {
+  background-color: rgba(220, 38, 38, 0.05);
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background-color: var(--muted);
+  color: var(--foreground);
+}
+
+/* Esconde o menu mobile no computador */
+.mobile-nav-only {
+  display: none;
+}
+
+/* O dropdown do lado esquerdo abre para a direita, não para a esquerda */
+.nav-menu-mobile {
+  left: 0;
+  right: auto;
+}
+
+/* Responsividade */
+@media (max-width: 850px) {
+  /* Mostra o botão do menu */
+  .mobile-nav-only {
+    display: block;
+    margin-right: 12px;
+  }
+
+  .header-greeting,
+  .divider {
+    display: none;
+  }
+
+  .logo { width: auto; }
+  .logo-text { display: none; }
+
+  .btn-text { display: none; }
+  .btn-primary {
+    padding: 8px;
+    border-radius: 50%;
+  }
+}

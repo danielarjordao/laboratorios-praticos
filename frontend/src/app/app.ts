@@ -1,12 +1,28 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { Sidebar } from './resources/sidebar/sidebar';
+import { Header } from './resources/header/header';
+import { Footer } from './resources/footer/footer';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, Sidebar, Header, Footer],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
 export class App {
-  protected readonly title = signal('frontend');
+  private router = inject(Router);
+  showSidebar = true;
+
+  constructor() {
+    // Fica à escuta das mudanças de URL
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      // Esconde a sidebar se o URL for o login
+      this.showSidebar = !event.url.includes('/auth/login');
+    });
+  }
 }

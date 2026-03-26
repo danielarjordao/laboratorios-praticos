@@ -1,0 +1,58 @@
+.main-content {
+  flex-grow: 1;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-body {
+  display: flex;
+  /* o calc abaixo é para garantir que o conteúdo principal ocupe toda a altura disponível, mesmo com o header fixo */
+  min-height: calc(100vh - 80px);
+  margin-top: 80px; /* Empurra o corpo para baixo do Header fixo */
+}
+
+.content-area {
+  flex-grow: 1;
+  margin-left: 80px; /* Largura da sidebar recolhida */
+  background-color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  /* O calc abaixo é para garantir que o conteúdo principal ocupe toda a altura disponível, mesmo com o header fixo */
+  min-height: calc(100vh - 80px);
+  /* Efeito de empurrar o ecrã */
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Quando a sidebar (dentro do layout-body) expandir, empurra o conteúdo */
+.layout-body:has(.sidebar:hover) .content-area {
+  margin-left: 260px; /* Largura da sidebar expandida */
+}
+
+.auth-area {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--muted);
+}
+
+/* Responsividade */
+@media (max-width: 850px) {
+  /* Desliga a barra lateral completamente */
+  app-sidebar {
+    display: none;
+  }
+
+  /* A área de conteúdo ocupa os 100% da largura (remove os 80px da margem) */
+  .content-area {
+    margin-left: 0;
+  }
+
+  /* Reduz o padding interno */
+  .main-content {
+    padding: 16px;
+  }
+
+}

@@ -1,0 +1,135 @@
+<header class="top-header">
+
+  <div class="header-left">
+    <div class="logo">
+      <span class="material-symbols-outlined icon-logo">token</span>
+      <h2 class="logo-text"><span>Finance</span>App</h2>
+    </div>
+
+    <div class="dropdown-container mobile-nav-only">
+      <button class="icon-btn" (click)="toggleNavMenu($event)">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+
+      @if (isNavMenuOpen) {
+        <div class="dropdown-menu glass-strong nav-menu-mobile">
+          <div class="dropdown-header">
+            <span class="full-name">Navigation</span>
+          </div>
+          <div class="dropdown-divider"></div>
+
+          <a routerLink="/dashboard" class="dropdown-item">
+            <span class="material-symbols-outlined">space_dashboard</span> Dashboard
+          </a>
+          <a routerLink="/transactions" class="dropdown-item">
+            <span class="material-symbols-outlined">receipt_long</span> Transactions
+          </a>
+          <a routerLink="/accounts" class="dropdown-item">
+            <span class="material-symbols-outlined">account_balance</span> Accounts
+          </a>
+          <a routerLink="/categories" class="dropdown-item">
+            <span class="material-symbols-outlined">category</span> Categories
+          </a>
+          <div class="dropdown-divider"></div>
+          <a routerLink="/past-12-months" class="dropdown-item">
+            <span class="material-symbols-outlined">calendar_month</span> Past 12 Months
+          </a>
+          <a routerLink="/forecast" class="dropdown-item">
+            <span class="material-symbols-outlined">trending_up</span> Forecast
+          </a>
+          <a routerLink="/goals" class="dropdown-item">
+            <span class="material-symbols-outlined">track_changes</span> Goals
+          </a>
+          <a routerLink="/budgets" class="dropdown-item">
+            <span class="material-symbols-outlined">pie_chart</span> Budgets
+          </a>
+        </div>
+      }
+    </div>
+
+    <!-- Divisória visual entre o logo e a saudação -->
+    <div class="divider"></div>
+
+    <div class="header-greeting">
+      <h1 class="greeting">{{ userName | greeting }}</h1>
+      <span class="current-date">{{ currentDate | date:'EEEE, MMMM d, y' }}</span>
+    </div>
+  </div>
+
+  <div class="header-right">
+
+<!-- Seletor de Perfis (Agora a usar as classes padronizadas) -->
+    <div class="dropdown-container">
+      <button class="dropdown-trigger" (click)="toggleProfileMenu($event)">
+        <span class="material-symbols-outlined icon-small">account_tree</span>
+        <span class="trigger-text">{{ activeProfile }}</span>
+        <span class="material-symbols-outlined icon-small">expand_more</span>
+      </button>
+
+      @if (isProfileMenuOpen) {
+        <div class="dropdown-menu glass-strong">
+          <div class="dropdown-header">
+            <span class="full-name">Change Profile</span>
+          </div>
+          <div class="dropdown-divider"></div>
+
+          @for (profile of availableProfiles; track profile) {
+            <button
+              class="dropdown-item"
+              (click)="selectProfile(profile)"
+              [class.active-item]="profile === activeProfile">
+
+              <span class="material-symbols-outlined">
+                {{ profile === activeProfile ? 'check_circle' : 'radio_button_unchecked' }}
+              </span>
+              <span>{{ profile }}</span>
+
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <button class="btn-primary">
+      <span class="material-symbols-outlined">add</span>
+      <span class="btn-text">New Transaction</span>
+    </button>
+
+    <div class="divider"></div>
+
+    <button class="icon-btn" (click)="toggleTheme()" [title]="isDarkMode ? 'Modo Claro' : 'Modo Escuro'">
+      <span class="material-symbols-outlined">
+        {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
+      </span>
+    </button>
+
+    <div class="user-dropdown-container">
+      <button class="avatar-btn" (click)="toggleUserMenu($event)">
+        {{ userInitial }}
+      </button>
+
+      @if (isUserMenuOpen) {
+        <div class="dropdown-menu glass-strong">
+          <div class="dropdown-header">
+            <span class="full-name">{{ userFullName }}</span>
+            <span class="email">{{ userEmail }}</span>
+          </div>
+          <div class="dropdown-divider"></div>
+
+          <a routerLink="/profile" class="dropdown-item">
+            <span class="material-symbols-outlined">person</span> My Profile
+          </a>
+          <a routerLink="/settings" class="dropdown-item">
+            <span class="material-symbols-outlined">tune</span> Preferences
+          </a>
+
+          <div class="dropdown-divider"></div>
+          <a routerLink="/auth/login" class="dropdown-item logout">
+            <span class="material-symbols-outlined">logout</span> Sign Out
+          </a>
+        </div>
+      }
+    </div>
+
+  </div>
+</header>
