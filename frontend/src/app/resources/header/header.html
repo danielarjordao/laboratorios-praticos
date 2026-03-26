@@ -56,6 +56,13 @@
       }
     </div>
 
+
+    <button class="icon-btn" (click)="toggleTheme()" [title]="isDarkMode ? 'Modo Claro' : 'Modo Escuro'">
+      <span class="material-symbols-outlined">
+        {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
+      </span>
+    </button>
+    
     <div class="user-dropdown-container">
       <button class="avatar-btn" (click)="toggleUserMenu($event)">
         {{ userInitial }}

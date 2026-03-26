@@ -29,6 +29,25 @@ export class Header {
   // Estados para controlar a visibilidade dos menus dropdown
   isUserMenuOpen: boolean = false;
   isProfileMenuOpen: boolean = false;
+  isDarkMode: boolean = false;
+
+  toggleTheme() {
+    this.isDarkMode = !this.isDarkMode;
+
+    // Adiciona ou remove a classe 'dark' no body, que ativa as tuas variáveis do Figma
+    if (this.isDarkMode) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }
+
+  changeProfile(event: Event) {
+    const selectElement = event.target as HTMLSelectElement;
+    this.activeProfile = selectElement.value;
+    console.log('Perfil alterado para:', this.activeProfile);
+    // No futuro: this.apiService.loadTransactionsForProfile(this.activeProfile);
+  }
 
   toggleProfileMenu(event: Event) {
     event.stopPropagation(); // Impede o clique de chegar ao HostListener
@@ -47,6 +66,7 @@ export class Header {
     this.isProfileMenuOpen = false;
   }
 
+  // Fecha os menus dropdown quando o utilizador clicar fora deles
   @HostListener('document:click')
   onDocumentClick() {
     this.isProfileMenuOpen = false;

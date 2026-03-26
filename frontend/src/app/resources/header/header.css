@@ -258,3 +258,23 @@ button.dropdown-item.active-item .material-symbols-outlined {
 .dropdown-item.logout:hover {
   background-color: rgba(220, 38, 38, 0.05);
 }
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background-color: var(--muted);
+  color: var(--foreground);
+}
