@@ -1,3 +1,4 @@
+
 {
   "dependencies": {
     "@supabase/supabase-js": "^2.99.3",
@@ -21,10 +22,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsx server.ts",
+    "start": "node dist/server.js",
     "dev": "tsx watch server.ts",
     "lint": "eslint \"src/**/*.ts\" server.ts",
-    "build": "tsc --noEmit",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
