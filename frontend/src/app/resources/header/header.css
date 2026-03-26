@@ -278,3 +278,37 @@ button.dropdown-item.active-item .material-symbols-outlined {
   background-color: var(--muted);
   color: var(--foreground);
 }
+
+/* Esconde o menu mobile no computador */
+.mobile-nav-only {
+  display: none;
+}
+
+/* O dropdown do lado esquerdo abre para a direita, não para a esquerda */
+.nav-menu-mobile {
+  left: 0;
+  right: auto;
+}
+
+/* Responsividade */
+@media (max-width: 850px) {
+  /* Mostra o botão do menu */
+  .mobile-nav-only {
+    display: block;
+    margin-right: 12px;
+  }
+
+  .header-greeting,
+  .divider {
+    display: none;
+  }
+
+  .logo { width: auto; }
+  .logo-text { display: none; }
+
+  .btn-text { display: none; }
+  .btn-primary {
+    padding: 8px;
+    border-radius: 50%;
+  }
+}

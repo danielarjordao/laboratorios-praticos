@@ -29,6 +29,7 @@ export class Header {
   // Estados para controlar a visibilidade dos menus dropdown
   isUserMenuOpen: boolean = false;
   isProfileMenuOpen: boolean = false;
+  isNavMenuOpen: boolean = false;
   isDarkMode: boolean = false;
 
   toggleTheme() {
@@ -45,7 +46,6 @@ export class Header {
   changeProfile(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     this.activeProfile = selectElement.value;
-    console.log('Perfil alterado para:', this.activeProfile);
     // No futuro: this.apiService.loadTransactionsForProfile(this.activeProfile);
   }
 
@@ -53,17 +53,27 @@ export class Header {
     event.stopPropagation(); // Impede o clique de chegar ao HostListener
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
     this.isUserMenuOpen = false; // Fecha o outro menu se estiver aberto
+    this.isNavMenuOpen = false; // Fecha o menu de navegação se estiver aberto
   }
 
   toggleUserMenu(event: Event) {
     event.stopPropagation(); // Impede o clique de chegar ao HostListener
     this.isUserMenuOpen = !this.isUserMenuOpen;
     this.isProfileMenuOpen = false; // Fecha o outro menu se estiver aberto
+    this.isNavMenuOpen = false; // Fecha o menu de navegação se estiver aberto
+  }
+
+  toggleNavMenu(event: Event) {
+    event.stopPropagation();
+    this.isNavMenuOpen = !this.isNavMenuOpen;
+    this.isProfileMenuOpen = false;
+    this.isUserMenuOpen = false;
   }
 
   selectProfile(profile: string) {
     this.activeProfile = profile;
     this.isProfileMenuOpen = false;
+    this.isNavMenuOpen = false;
   }
 
   // Fecha os menus dropdown quando o utilizador clicar fora deles
@@ -71,5 +81,6 @@ export class Header {
   onDocumentClick() {
     this.isProfileMenuOpen = false;
     this.isUserMenuOpen = false;
+    this.isNavMenuOpen = false;
   }
 }
