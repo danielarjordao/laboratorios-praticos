@@ -29,15 +29,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 5px;
+  margin-top: 80px; /* Para compensar a altura do header fixo */
 }
 
 .login-form {
   background: var(--card);
-  padding: 32px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 8px 24px var(--border);
-  width: 100%;
+  width:500rem;
   max-width: 500px;
   display: flex;
   flex-direction: column;
