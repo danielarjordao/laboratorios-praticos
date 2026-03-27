@@ -4,11 +4,12 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { Router } from '@angular/router';
 import { Auth } from '../../services/auth';
 import { Logo } from '../../resources/logo/logo';
+import { Footer } from '../../resources/footer/footer';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Logo],
+  imports: [CommonModule, ReactiveFormsModule, Logo, Footer],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })

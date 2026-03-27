@@ -27,10 +27,12 @@
 
 .login-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 5px;
   margin-top: 80px; /* Para compensar a altura do header fixo */
+  margin-bottom: 35px; /* Para compensar a altura do footer fixo */
 }
 
 .login-form {
@@ -65,7 +67,7 @@
 }
 
 .form-group input {
-  padding: 12px 16px;
+  padding: 8px;
   border: 1px solid var(--input);
   border-radius: 8px;
   font-size: 1rem;
@@ -149,4 +151,11 @@ button:disabled {
 .icon-btn:hover {
   background-color: var(--muted);
   color: var(--foreground);
+}
+
+.login-footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
 }
