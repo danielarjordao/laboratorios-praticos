@@ -1,0 +1,151 @@
+.top-header {
+  height: 80px;
+  width: 100%;
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.login-form {
+  background: var(--card);
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px var(--border);
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-form h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: var(--foreground);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+.form-group input {
+  padding: 12px 16px;
+  border: 1px solid var(--input);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: var(--input-background);
+  color: var(--foreground);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  /* Usa o accent (icy-aqua) para criar um anel de foco suave em volta do input */
+  box-shadow: 0 0 0 3px var(--accent);
+}
+
+.error-message {
+  color: var(--destructive);
+  padding: 2px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+button {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+  margin-top: 10px;
+}
+
+button:hover:not(:disabled) {
+  /* Usa o deep-ocean para o hover do botão principal */
+  background-color: var(--deep-ocean);
+}
+
+button:disabled {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.toggle-mode {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted-foreground);
+  margin-top: 10px;
+}
+
+.toggle-mode a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.toggle-mode a:hover {
+  color: var(--deep-ocean);
+  text-decoration: underline;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background-color: var(--muted);
+  color: var(--foreground);
+}
