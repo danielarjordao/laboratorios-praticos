@@ -67,8 +67,8 @@ export class Login implements OnInit {
     const lastNameCtrl = this.loginForm.get('lastName');
 
     if (this.isRegistering) {
-      firstNameCtrl?.setValidators([Validators.required, Validators.minLength(2)]);
-      lastNameCtrl?.setValidators([Validators.required, Validators.minLength(2)]);
+      firstNameCtrl?.setValidators([Validators.required, Validators.minLength(2), Validators.maxLength(50)]);
+      lastNameCtrl?.setValidators([Validators.required, Validators.minLength(2), Validators.maxLength(50)]);
     } else {
       firstNameCtrl?.clearValidators();
       lastNameCtrl?.clearValidators();
