@@ -12,24 +12,26 @@ import { Categories } from './components/categories/categories';
 import { Budgets } from './components/budgets/budgets';
 import { Settings } from './components/settings/settings';
 import { Terms } from './components/terms/terms';
+import { authGuard } from './guards/auth-guard';
+import { guestGuard } from './guards/guest-guard';
 
 export const routes: Routes = [
   // --- Fluxo de Autenticação ---
-  { path: 'auth/login', component: Login },
+  { path: 'auth/login', component: Login, canActivate: [guestGuard] },
 
   // --- Fluxo Principal (Com Sidebar) ---
-  { path: 'dashboard', component: Dashboard },
-  { path: 'transactions', component: Transactions },
+  { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
+  { path: 'transactions', component: Transactions, canActivate: [authGuard] },
 
-  { path: 'accounts', component: Accounts },
+  { path: 'accounts', component: Accounts, canActivate: [authGuard] },
 
-  { path: 'past-12-months', component: Past12Months },
-  { path: 'forecast', component: Forecast },
-  { path: 'goals', component: Goals },
-  { path: 'categories', component: Categories },
-  { path: 'budgets', component: Budgets },
+  { path: 'past-12-months', component: Past12Months, canActivate: [authGuard] },
+  { path: 'forecast', component: Forecast, canActivate: [authGuard] },
+  { path: 'goals', component: Goals, canActivate: [authGuard] },
+  { path: 'categories', component: Categories, canActivate: [authGuard] },
+  { path: 'budgets', component: Budgets, canActivate: [authGuard] },
 
-  { path: 'settings', component: Settings },
+  { path: 'settings', component: Settings, canActivate: [authGuard] },
 
   { path: 'terms', component: Terms },
 
