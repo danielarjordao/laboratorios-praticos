@@ -86,7 +86,7 @@
       }
     </div>
 
-    <button class="btn-primary">
+    <button class="btn-primary" routerLink="/transactions/new">
       <span class="material-symbols-outlined">add</span>
       <span class="btn-text">New Transaction</span>
     </button>
@@ -101,13 +101,13 @@
 
     <div class="user-dropdown-container">
       <button class="avatar-btn" (click)="toggleUserMenu($event)">
-        {{ userInitial }}
+        {{ userInitials }}
       </button>
 
       @if (isUserMenuOpen) {
         <div class="dropdown-menu glass-strong">
           <div class="dropdown-header">
-            <span class="full-name">{{ userFullName }}</span>
+            <span class="full-name">{{ userName + ' ' + userSurname }}</span>
             <span class="email">{{ userEmail }}</span>
           </div>
           <div class="dropdown-divider"></div>

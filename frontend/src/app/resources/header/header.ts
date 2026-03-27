@@ -14,12 +14,23 @@ import { Auth } from '../../services/auth';
 })
 export class Header {
   Auth = Auth; // Para usar os métodos de autenticação no template
-  // Dados do utilizador
-  // TODO: Estes dados devem ser obtidos a partir de um serviço de autenticação real
-  userName: string = 'Daniela';
-  userFullName: string = 'Daniela Jordão';
-  userEmail: string = 'appfinancas.suporte@gmail.com';
-  userInitial: string = this.userName.charAt(0).toUpperCase();
+  userName: string = '';
+  userSurname: string = '';
+  userInitials: string = '';
+  userEmail: string = '';
+
+
+  async ngOnInit() {
+    // Verifica se o utilizador está logado e, se não estiver, redireciona para a página de login
+    const authService = new Auth();
+    const user = await authService.getCurrentUser();
+    if (user) {
+      this.userName = user.user_metadata['first_name'] || '';
+      this.userSurname = user.user_metadata['last_name'] || '';
+      this.userEmail = user.email || '';
+      this.userInitials = `${this.userName.charAt(0)}${this.userSurname.charAt(0)}`;
+    }
+  }
 
   // Data atual para exibir no header
   currentDate = new Date();
