@@ -48,9 +48,26 @@ export class Auth {
     await this.authClient.signOut();
   }
 
+  // Atualizar perfil (Nome, Sobrenome e Password)
+  async updateProfile(firstName?: string, lastName?: string, password?: string): Promise<{ success: boolean; error?: string }> {
+    const updates: any = { data: {} };
+
+    // Atualiza os metadados se os nomes forem fornecidos
+    if (firstName) updates.data.first_name = firstName;
+    if (lastName) updates.data.last_name = lastName;
+
+    if (password) updates.password = password;
+
+    const { error } = await this.authClient.updateUser(updates);
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  }
+
   // Obter utilizador atual
   async getCurrentUser() {
-    const { data: { user } } = await this.authClient.getUser();
-    return user;
+    // Verifica a sessão local primeiro (não faz chamadas de rede lentas)
+    const { data: { session } } = await this.authClient.getSession();
+    return session?.user || null;
   }
 }
