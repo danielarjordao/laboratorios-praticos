@@ -79,4 +79,10 @@ export class Auth {
     const { data: { session } } = await this.authClient.getSession();
     return session?.user || null;
   }
+
+  // Método para verificar se o utilizador está autenticado
+  async getAccessToken(): Promise<string | undefined> {
+    const { data } = await this.supabase.auth.getSession();
+    return data.session?.access_token;
+  }
 }
