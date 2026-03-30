@@ -14,7 +14,7 @@ import { filter } from 'rxjs/operators';
 })
 export class App {
   private router = inject(Router);
-  showSidebar = true;
+  showSidebar = false;
 
   constructor() {
     // Fica à escuta das mudanças de URL
@@ -22,7 +22,7 @@ export class App {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       // Esconde a sidebar se o URL for o login
-      this.showSidebar = !event.url.includes('/auth/login');
+      this.showSidebar = !event.urlAfterRedirects.includes('/auth/login');
     });
   }
 }
