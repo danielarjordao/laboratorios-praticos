@@ -3,6 +3,7 @@ import * as transactionService from '../services/transactionService.js';
 import type { CreateTransactionDTO } from '../services/transactionService.js';
 import * as tagService from '../services/tagService.js';
 import * as accountService from '../services/accountService.js';
+import type { TransactionFilters } from '../services/transactionService.js';
 
 // Controller para criar uma transação. Ele é responsável por receber a requisição, validar os dados de entrada, chamar o Service e retornar a resposta adequada.
 export const createTransaction = async (req: Request, res: Response): Promise<void> => {
@@ -35,19 +36,31 @@ export const createTransaction = async (req: Request, res: Response): Promise<vo
 // Ele é responsável por receber a requisição, validar os dados de entrada, chamar o Service e retornar a resposta adequada.
 export const readTransactions = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { profile_id } = req.query;
+        const { profile_id, month, year, type, categoryId } = req.query;
 
         if (!profile_id) {
             res.status(400).json({ status: 'error', message: 'Missing profile_id in query parameters.' });
             return;
         }
 
-        const transactions = await transactionService.readTransactions(profile_id as string);
+        const filters: TransactionFilters = {};
+        if (month) filters.month = Number(month);
+        if (year) filters.year = Number(year);
+        if (type) filters.type = String(type);
+        if (categoryId) filters.categoryId = String(categoryId);
+        if (req.query.search) filters.search = String(req.query.search);
+        if (req.query.page) filters.page = Number(req.query.page);
+        if (req.query.limit) filters.limit = Number(req.query.limit);
+        if (req.query.sortBy) filters.sortBy = String(req.query.sortBy);
+        if (req.query.sortOrder) filters.sortOrder = String(req.query.sortOrder) as 'asc' | 'desc';
+
+        const transactions = await transactionService.readTransactions(profile_id as string, filters);
 
         res.status(200).json({
             status: 'success',
-            results: transactions.length,
-            data: transactions
+            results: transactions.data.length,
+            totalRecords: transactions.totalCount,
+            data: transactions.data
         });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'An unknown error occurred';

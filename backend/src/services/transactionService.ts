@@ -30,6 +30,18 @@ export interface TransactionResponse {
     updated_at: string;
 }
 
+export interface TransactionFilters {
+    month?: number;
+    year?: number;
+    type?: string;
+    categoryId?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+}
+
 export interface TransactionWithDetails extends TransactionResponse {
     categories: {
         name: string;
@@ -150,7 +162,7 @@ export const createTransaction = async (data: CreateTransactionDTO): Promise<Tra
 
 // Get condição: A função readTransactions deve ser responsável por retornar as transações de um perfil específico,
 // incluindo os nomes das categorias e contas associadas.
-export const readTransactions = async (profile_id: string): Promise<TransactionWithDetails[]> => {
+export const readTransactions = async (profile_id: string, filters?: TransactionFilters): Promise<{ data: TransactionWithDetails[]; totalCount: number }> => {
     // Busca as contas do perfil
     const { data: accounts, error: accError } = await supabase
         .from('accounts')
@@ -163,8 +175,13 @@ export const readTransactions = async (profile_id: string): Promise<TransactionW
     // Extrai os IDs das contas para usar na consulta das transações
     const accountIds = accounts.map(acc => acc.id);
 
+    if (accountIds.length === 0) {
+        // Se o perfil não tiver contas, retorna um array vazio
+        return { data: [], totalCount: 0 };
+    }
+
     // Busca as transações
-    const { data, error } = await supabase
+    let query = supabase
         .from('transactions')
         .select(`
             *,
@@ -172,16 +189,48 @@ export const readTransactions = async (profile_id: string): Promise<TransactionW
             origin_account:account_id (name),
             destination_account:transfer_account_id (name),
             tags:transaction_tags( tag_id )
-        `)
+        `, { count: 'exact' })
         .in('account_id', accountIds)
-        .is('deleted_at', null)
-        .order('date', { ascending: false });
+        .is('deleted_at', null);
 
-    if (error)
-        throw new Error(`Error fetching transactions: ${error.message}`);
+    // Aplica os filtros opcionais
+    if (filters?.type) {
+        query = query.eq('type', filters.type);
+    }
+    if (filters?.categoryId) {
+        query = query.eq('category_id', filters.categoryId);
+    }
+    if (filters?.month && filters?.year) {
+        const monthIndex = filters.month - 1;
+        const startDate = new Date(filters.year, monthIndex, 1).toISOString();
+        const endDate = new Date(filters.year, monthIndex + 1, 0, 23, 59, 59).toISOString();
+        query = query.gte('date', startDate).lte('date', endDate);
+    }
+
+    if (filters?.search) {
+        query = query.ilike('description', `%${filters.search}%`);
+    }
+
+    const sortBy = filters?.sortBy || 'date';
+    const sortOrder = filters?.sortOrder || 'desc';
+    query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+    // Paginação
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 20;
+    const offset = (page - 1) * limit;
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error: txError, count } = await query;
+
+    if (txError)
+        throw new Error(`Error fetching transactions: ${txError.message}`);
 
     // Faz o cast para a interface estendida
-    return data as TransactionWithDetails[];
+    return {
+        data: data as TransactionWithDetails[],
+        totalCount: count || 0
+    };
 };
 
 // Atualiza os detalhes de uma transação existente, garantindo que as regras de negócio sejam respeitadas e que os saldos das contas sejam ajustados corretamente.
