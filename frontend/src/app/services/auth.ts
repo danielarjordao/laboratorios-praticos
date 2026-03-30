@@ -1,30 +1,48 @@
 import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
-import type { GoTrueClient } from '@supabase/auth-js';
+import { createClient, SupabaseClient, User as SupabaseUser } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { AuthUser } from '../models/authUser';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Auth {
   private supabase: SupabaseClient;
-  private authClient: GoTrueClient;
 
-  // Estado do utilizador atual para partilhar entre componentes
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
+  public currentUser$: Observable<AuthUser | null> = this.currentUserSubject.asObservable();
 
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
-    this.authClient = this.supabase.auth as unknown as GoTrueClient;
+
+    // Carrega a sessão inicial no arranque da aplicação
+    this.supabase.auth.getSession().then(({ data }) => {
+      this.currentUserSubject.next(this.mapToAuthUser(data.session?.user));
+    });
+
+    // Ouve ativamente qualquer mudança de estado (Login, Logout, Atualização de Token)
+    this.supabase.auth.onAuthStateChange((_event, session) => {
+      this.currentUserSubject.next(this.mapToAuthUser(session?.user));
+    });
   }
 
-  // Registo com metadados (primeiro e último nome)
+  // Transforma o objeto complexo do Supabase no modelo definido para a aplicação
+  private mapToAuthUser(supabaseUser: SupabaseUser | undefined | null): AuthUser | null {
+    if (!supabaseUser) return null;
+
+    return {
+      id: supabaseUser.id,
+      email: supabaseUser.email || '',
+      firstName: supabaseUser.user_metadata?.['first_name'] || '',
+      lastName: supabaseUser.user_metadata?.['last_name'] || ''
+    };
+  }
+
   async signUp(email: string, password: string, firstName: string, lastName: string): Promise<{ success: boolean; error?: string }> {
-    const { error } = await this.authClient.signUp({
-      email: email,
-      password: password,
+    const { error } = await this.supabase.auth.signUp({
+      email,
+      password,
       options: {
         data: {
           first_name: firstName,
@@ -37,50 +55,44 @@ export class Auth {
     return { success: true };
   }
 
-  // Login
   async signIn(email: string, password: string): Promise<{ success: boolean; error?: string }> {
-    const { error } = await this.authClient.signInWithPassword({
-      email: email,
-      password: password,
+    const { error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
     if (error) return { success: false, error: error.message };
     return { success: true };
   }
 
-  // Logout
   async signOut(): Promise<void> {
-    await this.authClient.signOut();
+    await this.supabase.auth.signOut();
   }
 
-  // Atualizar perfil (Nome, Sobrenome e Password)
   async updateProfile(firstName?: string, lastName?: string, password?: string): Promise<{ success: boolean; error?: string }> {
-    const updates: any = { data: {} };
+    const updates: { data?: { first_name?: string; last_name?: string }; password?: string } = {};
 
-    // Atualiza os metadados se os nomes forem fornecidos
-    if (firstName) updates.data.first_name = firstName;
-    if (lastName) updates.data.last_name = lastName;
+    if (firstName || lastName) {
+      updates.data = {};
+      if (firstName) updates.data.first_name = firstName;
+      if (lastName) updates.data.last_name = lastName;
+    }
 
     if (password) updates.password = password;
 
-    const { error } = await this.authClient.updateUser(updates);
+    const { error } = await this.supabase.auth.updateUser(updates);
 
     if (error) return { success: false, error: error.message };
     return { success: true };
   }
 
-  updateUserState(user: User | null): void {
-    this.currentUserSubject.next(user);
+  // Retorna o utilizador atual (sincronizado) mapeado para o modelo
+  async getCurrentUser(): Promise<AuthUser | null> {
+    const { data: { session } } = await this.supabase.auth.getSession();
+    return this.mapToAuthUser(session?.user);
   }
 
-  // Obter utilizador atual
-  async getCurrentUser() {
-    // Verifica a sessão local primeiro (não faz chamadas de rede lentas)
-    const { data: { session } } = await this.authClient.getSession();
-    return session?.user || null;
-  }
-
-  // Método para verificar se o utilizador está autenticado
+  // Fornece o Token JWT para as chamadas à API Express
   async getAccessToken(): Promise<string | undefined> {
     const { data } = await this.supabase.auth.getSession();
     return data.session?.access_token;
