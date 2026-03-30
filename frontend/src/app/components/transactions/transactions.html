@@ -1,1 +1,121 @@
-<p>transactions works!</p>
+<div class="page-container">
+  <div class="page-header">
+    <h2>Transactions</h2>
+    <div class="header-actions">
+      <!-- Botão para a funcionalidade de exportação -->
+      <button class="btn-secondary" (click)="exportToCsv()" [disabled]="transactions.length === 0 || isLoading">
+        <span class="material-symbols-outlined">download</span>
+        Export CSV
+      </button>
+      <button class="btn-primary">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Area -->
+  <form [formGroup]="filterForm" class="filters-row">
+	<div class="form-group">
+		<label for="search">Search</label>
+		<input type="text" id="search" formControlName="search" placeholder="Search description...">
+	</div>
+    <div class="form-group">
+      <label for="month">Month</label>
+      <select id="month" formControlName="month">
+        <option [ngValue]="1">January</option>
+        <option [ngValue]="2">February</option>
+        <option [ngValue]="3">March</option>
+        <option [ngValue]="4">April</option>
+        <option [ngValue]="5">May</option>
+        <option [ngValue]="6">June</option>
+        <option [ngValue]="7">July</option>
+        <option [ngValue]="8">August</option>
+        <option [ngValue]="9">September</option>
+        <option [ngValue]="10">October</option>
+        <option [ngValue]="11">November</option>
+        <option [ngValue]="12">December</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="year">Year</label>
+      <input type="number" id="year" formControlName="year" min="2000" max="2100">
+    </div>
+
+    <div class="form-group">
+      <label for="type">Type</label>
+      <select id="type" formControlName="type">
+        <option value="">All Types</option>
+        <option value="INCOME">Income</option>
+		<option value="EXPENSE">Expense</option>
+		<option value="TRANSFER">Transfer</option>
+      </select>
+    </div>
+  </form>
+
+  <!-- Data Table Area -->
+  <div class="table-card">
+    @if (isLoading) {
+      <div class="state-message">Loading transactions...</div>
+    } @else if (errorMessage) {
+      <div class="state-message error-text">{{ errorMessage }}</div>
+    } @else if (transactions.length === 0) {
+      <div class="state-message">No transactions found for the selected period.</div>
+    } @else {
+	<!-- Tabela de transações - com colunas para data, descrição, tipo, status e valor -->
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th class="align-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tx of transactions; track tx.id) {
+            <tr>
+              <td>{{ tx.date | date:'dd/MM/yyyy' }}</td>
+              <td>{{ tx.description || '---' }}</td>
+              <td>
+                <!-- Badge colorido para diferenciar tipos de transação -->
+                <span class="badge" [ngClass]="'badge-' + tx.type.toLowerCase()">
+                  {{ tx.type }}
+                </span>
+              </td>
+              <td>{{ tx.status || 'completed' }}</td>
+              <td class="align-right"
+                  [ngClass]="{'text-success': tx.type === 'INCOME', 'text-danger': tx.type === 'EXPENSE'}">
+                {{ tx.type === 'EXPENSE' ? '-' : '' }}{{ tx.amount | currency }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <div class="pagination-footer">
+        <span class="pagination-info">
+          Showing {{ transactions.length }} of {{ totalRecords }} transactions
+        </span>
+
+        <div class="pagination-controls">
+          <button class="btn-secondary"
+                  [disabled]="filterForm.value.page === 1"
+                  (click)="filterForm.patchValue({ page: (filterForm.value.page || 1) - 1 })">
+            Previous
+          </button>
+
+          <span class="pagination-page">
+            Page {{ filterForm.value.page }} of {{ Math.ceil(totalRecords / (filterForm.value.limit || 10)) }}
+          </span>
+
+          <button class="btn-secondary"
+                  [disabled]="(filterForm.value.page || 1) * (filterForm.value.limit || 10) >= totalRecords"
+                  (click)="filterForm.patchValue({ page: (filterForm.value.page || 1) + 1 })">
+            Next
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

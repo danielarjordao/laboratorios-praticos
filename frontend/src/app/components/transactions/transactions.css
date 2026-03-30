@@ -1,0 +1,223 @@
+/* Layout Principal */
+.page-container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Botões */
+.btn-primary, .btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--background);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Área de Filtros */
+.filters-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 12px;
+  backdrop-filter: blur(12px); /* Efeito Glass partilhado */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 180px;
+}
+
+.form-group label {
+  color: var(--muted-foreground);
+  font-weight: 600;
+}
+
+.form-group select,
+.form-group input {
+  padding: 10px 12px;
+  border: 1px solid var(--input);
+  border-radius: 8px;
+  background-color: var(--input-background);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  border-color: var(--primary);
+}
+
+/* Tabela de Dados */
+.table-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  overflow-x: auto; /* Permite scroll horizontal em ecrãs pequenos */
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.data-table th,
+.data-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.data-table th {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--muted);
+}
+
+.align-right {
+  text-align: right;
+}
+
+/* Badges e Cores de Estado */
+.badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.badge-income {
+  background-color: rgba(0, 191, 191, 0.15); /* var(--primary) */
+  color: var(--income);
+}
+
+.badge-expense {
+  background-color: rgba(255, 138, 114, 0.15); /* var(--salmon) */
+  color: var(--expense);
+}
+
+.badge-transfer {
+  background-color: var(--muted);
+  color: var(--foreground);
+}
+
+.text-success {
+  color: var(--income);
+  font-weight: 700;
+}
+
+.text-danger {
+  color: var(--expense);
+  font-weight: 700;
+}
+
+/* Estados Vazios ou de Carregamento */
+.state-message {
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.error-text {
+  color: var(--destructive);
+}
+
+/* Pagination controls */
+.pagination-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: var(--card); /* Mantém o tema consistente com a tabela */
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 12px 12px; /* Arredonda apenas os cantos inferiores se estiver colado à tabela */
+}
+
+.pagination-info {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pagination-page {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
