@@ -86,9 +86,12 @@ export class Profile implements OnInit {
       this.successMessage = 'Profile updated successfully!';
       this.profileForm.get('password')?.reset();
 
-      // Volta a trancar o formulário após guardar com sucesso
       this.isReadOnly = true;
       this.profileForm.disable();
+
+      // Fetch the fresh data from Supabase and broadcast it to the Header
+      const updatedUser = await this.authService.getCurrentUser();
+      this.authService.updateUserState(updatedUser);
     } else {
       this.errorMessage = result.error || 'Failed to update profile.';
     }
