@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Auth } from '../../services/auth';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -10,10 +11,12 @@ import { Auth } from '../../services/auth';
   templateUrl: './profile.html',
   styleUrls: ['./profile.css']
 })
-export class Profile implements OnInit {
+export class Profile implements OnInit, OnDestroy {
   private authService = inject(Auth);
+  private cdr = inject(ChangeDetectorRef);
+  private destroy$ = new Subject<void>();
 
-  // Formulário inicializado
+  // Reactive form for user profile editing
   profileForm = new FormGroup({
     firstName: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
     lastName: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
@@ -23,25 +26,34 @@ export class Profile implements OnInit {
   successMessage = '';
   errorMessage = '';
   isLoading = false;
-
-  // Flag para controlar o estado do formulário
   isReadOnly = true;
 
-  async ngOnInit(): Promise<void> {
-    const user = await this.authService.getCurrentUser();
+  ngOnInit(): void {
+    // Listens to auth changes to fill the form with current data
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        if (user) {
+          this.profileForm.patchValue({
+            firstName: user.firstName || '',
+            lastName: user.lastName || ''
+          });
 
-    if (user && user.user_metadata) {
-      this.profileForm.patchValue({
-        firstName: user.user_metadata['first_name'] || '',
-        lastName: user.user_metadata['last_name'] || ''
+          if (this.isReadOnly) {
+            this.profileForm.disable();
+          }
+
+          this.cdr.markForCheck(); // Soft UI update
+        }
       });
-
-      // Tranca o formulário no carregamento inicial
-      this.profileForm.disable();
-    }
   }
 
-  // Método para destrancar o formulário
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // Unlocks the form for editing
   enableEditing(): void {
     this.isReadOnly = false;
     this.profileForm.enable();
@@ -49,53 +61,52 @@ export class Profile implements OnInit {
     this.errorMessage = '';
   }
 
-  // Método para cancelar e voltar a trancar
+  // Locks the form and discards unsaved changes
   cancelEditing(): void {
     this.isReadOnly = true;
     this.profileForm.disable();
     this.successMessage = '';
     this.errorMessage = '';
 
-    // Recarrega os dados do utilizador para desfazer alterações
-    this.ngOnInit();
+    // Values will be naturally reset by the currentUser$ subscription
   }
 
+  /**
+   * Handles profile update submission to the Auth service
+   */
   async onSubmit(): Promise<void> {
-    this.successMessage = '';
-    this.errorMessage = '';
-
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
       return;
     }
 
     this.isLoading = true;
+    this.successMessage = '';
+    this.errorMessage = '';
 
-    // Usa getRawValue para garantir que apanha os valores mesmo se houver campos desativados
     const { firstName, lastName, password } = this.profileForm.getRawValue();
 
-    const pwdToUpdate = password ? password : undefined;
+    try {
+      const result = await this.authService.updateProfile(
+        firstName as string,
+        lastName as string,
+        password || undefined
+      );
 
-    const result = await this.authService.updateProfile(
-      firstName as string,
-      lastName as string,
-      pwdToUpdate
-    );
-
-    if (result.success) {
-      this.successMessage = 'Profile updated successfully!';
-      this.profileForm.get('password')?.reset();
-
-      this.isReadOnly = true;
-      this.profileForm.disable();
-
-      // Fetch the fresh data from Supabase and broadcast it to the Header
-      const updatedUser = await this.authService.getCurrentUser();
-      this.authService.updateUserState(updatedUser);
-    } else {
-      this.errorMessage = result.error || 'Failed to update profile.';
+      if (result.success) {
+        this.successMessage = 'Profile updated successfully!';
+        this.profileForm.get('password')?.reset();
+        this.isReadOnly = true;
+        this.profileForm.disable();
+      } else {
+        this.errorMessage = result.error || 'Failed to update profile.';
+      }
+    } catch (err) {
+      this.errorMessage = 'An unexpected error occurred.';
+      console.error('Profile update error:', err);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck(); // Important: signal UI to reflect loading/message state changes
     }
-
-    this.isLoading = false;
   }
 }
