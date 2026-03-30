@@ -64,15 +64,29 @@
           <label>Category</label>
           <select formControlName="category_id">
             <option value="">Select Category</option>
-            @for (cat of categories; track cat.id) {
+            @for (cat of filteredCategories; track cat.id) {
               <option [value]="cat.id">{{ cat.name }}</option>
             }
           </select>
         </div>
       }
-
       <div class="form-group">
-        <label>Description (Optional)</label>
+        <label>Tags</label>
+        <div class="tags-selector">
+          @for (tag of tags; track tag.id) {
+            <button
+              type="button"
+              class="tag-chip"
+              [class.active]="transactionForm.get('tags')?.value?.includes(tag.id)"
+              (click)="toggleTag(tag.id)"
+              [style.border-color]="tag.color">
+              {{ tag.name }}
+            </button>
+          }
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
         <input type="text" formControlName="description" placeholder="Ex: Supermarket, Salary...">
       </div>
 
