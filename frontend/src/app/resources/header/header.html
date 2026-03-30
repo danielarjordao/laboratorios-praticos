@@ -2,8 +2,9 @@
 
   <div class="header-left">
     <app-logo></app-logo>
+
     <div class="dropdown-container mobile-nav-only">
-      <button class="icon-btn" (click)="toggleNavMenu($event)">
+      <button class="icon-btn" (click)="toggleNavMenu($event)" aria-label="Toggle Navigation">
         <span class="material-symbols-outlined">menu</span>
       </button>
 
@@ -14,51 +15,51 @@
           </div>
           <div class="dropdown-divider"></div>
 
-          <a routerLink="/dashboard" class="dropdown-item">
+          <a routerLink="/dashboard" class="dropdown-item" (click)="isNavMenuOpen = false">
             <span class="material-symbols-outlined">space_dashboard</span> Dashboard
           </a>
-          <a routerLink="/transactions" class="dropdown-item">
+          <a routerLink="/transactions" class="dropdown-item" (click)="isNavMenuOpen = false">
             <span class="material-symbols-outlined">receipt_long</span> Transactions
           </a>
-          <a routerLink="/accounts" class="dropdown-item">
+          <a routerLink="/accounts" class="dropdown-item" (click)="isNavMenuOpen = false">
             <span class="material-symbols-outlined">account_balance</span> Accounts
           </a>
-          <a routerLink="/categories" class="dropdown-item">
+          <a routerLink="/categories" class="dropdown-item" (click)="isNavMenuOpen = false">
             <span class="material-symbols-outlined">category</span> Categories
           </a>
+
           <div class="dropdown-divider"></div>
-          <a routerLink="/past-12-months" class="dropdown-item">
+
+          <a routerLink="/past-12-months" class="dropdown-item" (click)="isNavMenuOpen = false">
             <span class="material-symbols-outlined">calendar_month</span> Past 12 Months
           </a>
-          <a routerLink="/forecast" class="dropdown-item">
+          <a routerLink="/forecast" class="dropdown-item" (click)="isNavMenuOpen = false">
             <span class="material-symbols-outlined">trending_up</span> Forecast
           </a>
-          <a routerLink="/goals" class="dropdown-item">
+          <a routerLink="/goals" class="dropdown-item" (click)="isNavMenuOpen = false">
             <span class="material-symbols-outlined">track_changes</span> Goals
           </a>
-          <a routerLink="/budgets" class="dropdown-item">
+          <a routerLink="/budgets" class="dropdown-item" (click)="isNavMenuOpen = false">
             <span class="material-symbols-outlined">pie_chart</span> Budgets
           </a>
         </div>
       }
     </div>
 
-    <!-- Divisória visual entre o logo e a saudação -->
     <div class="divider"></div>
 
     <div class="header-greeting">
-      <h1 class="greeting">{{ userName | greeting }}</h1>
+      <h1 class="greeting">{{ (currentUser?.firstName || 'User') | greeting }}</h1>
       <span class="current-date">{{ currentDate | date:'EEEE, MMMM d, y' }}</span>
     </div>
   </div>
 
   <div class="header-right">
 
-<!-- Seletor de Perfis (Agora a usar as classes padronizadas) -->
     <div class="dropdown-container">
       <button class="dropdown-trigger" (click)="toggleProfileMenu($event)">
         <span class="material-symbols-outlined icon-small">account_tree</span>
-        <span class="trigger-text">{{ activeProfile }}</span>
+        <span class="trigger-text">{{ activeProfile?.name || 'Select Profile' }}</span>
         <span class="material-symbols-outlined icon-small">expand_more</span>
       </button>
 
@@ -69,17 +70,16 @@
           </div>
           <div class="dropdown-divider"></div>
 
-          @for (profile of availableProfiles; track profile) {
+          @for (profile of availableProfiles; track profile.id) {
             <button
               class="dropdown-item"
               (click)="selectProfile(profile)"
-              [class.active-item]="profile === activeProfile">
+              [class.active-item]="profile.id === activeProfile?.id">
 
               <span class="material-symbols-outlined">
-                {{ profile === activeProfile ? 'check_circle' : 'radio_button_unchecked' }}
+                {{ profile.id === activeProfile?.id ? 'check_circle' : 'radio_button_unchecked' }}
               </span>
-              <span>{{ profile }}</span>
-
+              <span>{{ profile.name }}</span>
             </button>
           }
         </div>
@@ -107,8 +107,8 @@
       @if (isUserMenuOpen) {
         <div class="dropdown-menu glass-strong">
           <div class="dropdown-header">
-            <span class="full-name">{{ userName + ' ' + userSurname }}</span>
-            <span class="email">{{ userEmail }}</span>
+            <span class="full-name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</span>
+            <span class="email">{{ currentUser?.email }}</span>
           </div>
           <div class="dropdown-divider"></div>
 
@@ -120,9 +120,10 @@
           </a>
 
           <div class="dropdown-divider"></div>
-          <a (click)="logout()" class="dropdown-item">
+
+          <button (click)="logout()" class="dropdown-item">
             <span class="material-symbols-outlined">logout</span> Logout
-          </a>
+          </button>
         </div>
       }
     </div>

@@ -1,120 +1,140 @@
-import { Component, HostListener } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, OnInit, OnDestroy, HostListener, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { RouterModule, Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
+
 import { GreetingPipe } from '../../utils/pipes/greeting-pipe';
 import { Logo } from '../logo/logo';
 import { Auth } from '../../services/auth';
-import { inject } from '@angular/core';
-import { User } from '@supabase/supabase-js';
+import { ProfileService } from '../../services/profile';
+import { AuthUser } from '../../models/authUser';
+import { Profile } from '../../models/profile';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [RouterModule, CommonModule, DatePipe, GreetingPipe, Logo],
   templateUrl: './header.html',
-  styleUrls: ['./header.css']
+  styleUrls: ['./header.css'],
+  // CRITICAL: Since we use markForCheck(), we must explicitly tell Angular to use OnPush.
+  // This optimizes performance and prevents silent UI update failures.
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Header {
-  Auth = Auth; // Para usar os métodos de autenticação no template
-  userName: string = '';
-  userSurname: string = '';
-  userInitials: string = '';
-  userEmail: string = '';
+export class Header implements OnInit, OnDestroy {
+  // Services
   private authService = inject(Auth);
+  private profileService = inject(ProfileService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
+  // User and Profile Data
+  currentUser: AuthUser | null = null;
+  userInitials: string = '';
+  currentDate = new Date();
+  activeProfile: Profile | null = null;
+  availableProfiles: Profile[] = [];
+
+  // UI States for menus and theme
+  isUserMenuOpen = false;
+  isProfileMenuOpen = false;
+  isNavMenuOpen = false;
+  isDarkMode = false;
+
+  private destroy$ = new Subject<void>();
 
   ngOnInit() {
-    // Obter o utilizador atual do serviço de autenticação e atualizar o estado do header
-    this.authService.getCurrentUser().then((user: User | null) => {
-      if (user) {
-        this.authService.updateUserState(user);
-      }
-    });
+    // Listen to auth changes
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user) => {
+        this.currentUser = user;
+        if (user) {
+          const first = user.firstName?.charAt(0) || '';
+          const last = user.lastName?.charAt(0) || '';
+          this.userInitials = (first + last).toUpperCase() || user.email.charAt(0).toUpperCase();
+        }
+        this.cdr.markForCheck();
+      });
 
-    // Fica à escuta de mudanças no estado do utilizador para atualizar o header em tempo real
-    this.authService.currentUser$.subscribe((user: User | null) => {
-      // Atualiza os dados do utilizador no header sempre que houver uma mudança (login, logout, atualização de perfil)
-      if (user && user.user_metadata) {
-        this.userName = user.user_metadata['first_name'] || '';
-        this.userSurname = user.user_metadata['last_name'] || '';
-        this.userEmail = user.email || '';
-        this.userInitials = `${this.userName.charAt(0)}${this.userSurname.charAt(0)}`;
-      }
-    });
+    // Listen to available profiles list
+    this.profileService.allProfiles$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(profiles => {
+        this.availableProfiles = profiles;
+        this.cdr.markForCheck();
+      });
+
+    // Listen to active profile changes
+    this.profileService.currentProfile$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(profile => {
+        this.activeProfile = profile;
+        this.cdr.markForCheck();
+      });
   }
 
-  // Data atual para exibir no header
-  currentDate = new Date();
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-  // Perfis disponíveis e perfil ativo
-  // TODO: Estes dados devem ser obtidos a partir de um serviço de utilizadores real, permitindo que o utilizador tenha múltiplos perfis e possa alternar entre eles
-  activeProfile: string = 'Personal';
-  availableProfiles: string[] = ['Personal', 'Freelance', 'Business'];
-
-  // Estados para controlar a visibilidade dos menus dropdown
-  isUserMenuOpen: boolean = false;
-  isProfileMenuOpen: boolean = false;
-  isNavMenuOpen: boolean = false;
-  isDarkMode: boolean = false;
-
+  // Toggles between light and dark mode by applying a CSS class to the body
   toggleTheme() {
     this.isDarkMode = !this.isDarkMode;
-
-    // Adiciona ou remove a classe 'dark' no body, que ativa as tuas variáveis do Figma
-    if (this.isDarkMode) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
+    document.body.classList.toggle('dark', this.isDarkMode);
   }
 
-  changeProfile(event: Event) {
-    const selectElement = event.target as HTMLSelectElement;
-    this.activeProfile = selectElement.value;
-    // No futuro: this.apiService.loadTransactionsForProfile(this.activeProfile);
+  // Allows the user to select a different profile, updating the active profile and closing the menu
+  selectProfile(profile: Profile) {
+    this.profileService.switchProfile(profile);
+    this.isProfileMenuOpen = false;
   }
 
+  // Toggles the profile menu and ensures others are closed
   toggleProfileMenu(event: Event) {
-    event.stopPropagation(); // Impede o clique de chegar ao HostListener
+    event.stopPropagation();
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
-    this.isUserMenuOpen = false; // Fecha o outro menu se estiver aberto
-    this.isNavMenuOpen = false; // Fecha o menu de navegação se estiver aberto
+    this.closeOtherMenus('profile');
   }
 
+  // Toggles the user menu and ensures others are closed
   toggleUserMenu(event: Event) {
-    event.stopPropagation(); // Impede o clique de chegar ao HostListener
+    event.stopPropagation();
     this.isUserMenuOpen = !this.isUserMenuOpen;
-    this.isProfileMenuOpen = false; // Fecha o outro menu se estiver aberto
-    this.isNavMenuOpen = false; // Fecha o menu de navegação se estiver aberto
+    this.closeOtherMenus('user');
   }
 
+  // Toggles the navigation menu and ensures others are closed
   toggleNavMenu(event: Event) {
     event.stopPropagation();
     this.isNavMenuOpen = !this.isNavMenuOpen;
-    this.isProfileMenuOpen = false;
-    this.isUserMenuOpen = false;
+    this.closeOtherMenus('nav');
   }
 
-  selectProfile(profile: string) {
-    this.activeProfile = profile;
-    this.isProfileMenuOpen = false;
-    this.isNavMenuOpen = false;
+  // Closes menus other than the specified one to improve user experience
+  private closeOtherMenus(except: string) {
+    if (except !== 'profile') this.isProfileMenuOpen = false;
+    if (except !== 'user') this.isUserMenuOpen = false;
+    if (except !== 'nav') this.isNavMenuOpen = false;
+
+    // As we are mutating variables that affect the UI state, we need to signal Angular
+    this.cdr.markForCheck();
   }
 
-  // Fecha os menus dropdown quando o utilizador clicar fora deles
+  // Closes all open menus when the user clicks outside of any menu
   @HostListener('document:click')
   onDocumentClick() {
-    this.isProfileMenuOpen = false;
-    this.isUserMenuOpen = false;
-    this.isNavMenuOpen = false;
+    if (this.isProfileMenuOpen || this.isUserMenuOpen || this.isNavMenuOpen) {
+      this.isProfileMenuOpen = false;
+      this.isUserMenuOpen = false;
+      this.isNavMenuOpen = false;
+      this.cdr.markForCheck(); // Signal UI update for menu closures
+    }
   }
 
-  logout() {
-    const authService = new Auth();
-    authService.signOut().then(() => {
-      // Redireciona para a página de login após o logout
-      this.authService.updateUserState(null); // Limpa o estado do utilizador
-      window.location.href = '/auth/login';
-    });
+  // Logs the user out, clearing the session and redirecting to the login page
+  async logout() {
+    await this.authService.signOut();
+    this.router.navigate(['/auth/login']);
   }
 }
