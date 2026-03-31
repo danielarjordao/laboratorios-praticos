@@ -7,6 +7,8 @@ import { GreetingPipe } from '../../utils/pipes/greeting-pipe';
 import { Logo } from '../logo/logo';
 import { Auth } from '../../services/auth';
 import { ProfileService } from '../../services/profile';
+import { SettingsService } from '../../services/settings';
+import { PreferencesService } from '../../services/preferences';
 import { AuthUser } from '../../models/authUser';
 import { Profile } from '../../models/profile';
 
@@ -21,10 +23,11 @@ import { Profile } from '../../models/profile';
 export class Header implements OnInit, OnDestroy {
   private readonly authService = inject(Auth);
   private readonly profileService = inject(ProfileService);
+  private readonly settingsService = inject(SettingsService);
+  private readonly preferences = inject(PreferencesService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
-  private readonly darkThemeClass = 'dark';
 
   currentUser: AuthUser | null = null;
   userInitials = '';
@@ -36,9 +39,10 @@ export class Header implements OnInit, OnDestroy {
   isProfileMenuOpen = false;
   isNavMenuOpen = false;
   isDarkMode = false;
+  private settingsLoadedForUserId: string | null = null;
 
   ngOnInit(): void {
-    this.syncThemeFromBody();
+    this.syncThemeWithPreferences();
     this.subscribeToUser();
     this.subscribeToProfiles();
     this.subscribeToActiveProfile();
@@ -52,7 +56,15 @@ export class Header implements OnInit, OnDestroy {
   // Alterna entre tema claro e escuro.
   toggleTheme(): void {
     this.isDarkMode = !this.isDarkMode;
-    this.applyTheme();
+    this.preferences.setTheme(this.isDarkMode ? 'dark' : 'light');
+
+    if (this.currentUser?.id) {
+      this.settingsService.upsertThemePreference(this.currentUser.id, this.isDarkMode ? 'dark' : 'light')
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          error: err => console.error('Failed to persist theme preference:', err),
+        });
+    }
   }
 
   // Seleciona um perfil e fecha menus abertos.
@@ -103,6 +115,14 @@ export class Header implements OnInit, OnDestroy {
     }
   }
 
+  // Sincroniza o estado do botao de tema quando ajustes mudam o tema global.
+  @HostListener('document:app-theme-changed')
+  onThemeChanged(): void {
+    this.isDarkMode = this.preferences.current.theme === 'dark'
+      || (this.preferences.current.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    this.cdr.markForCheck();
+  }
+
   // Encerra sessao e redireciona para login.
   async logout(): Promise<void> {
     await this.authService.signOut();
@@ -110,15 +130,11 @@ export class Header implements OnInit, OnDestroy {
     this.router.navigate(['/auth/login']);
   }
 
-  // Sincroniza o tema interno com o estado do body.
-  private syncThemeFromBody(): void {
-    this.isDarkMode = document.body.classList.contains(this.darkThemeClass);
-    this.applyTheme();
-  }
-
-  // Aplica o tema atual ao body.
-  private applyTheme(): void {
-    document.body.classList.toggle(this.darkThemeClass, this.isDarkMode);
+  // Sincroniza estado local do botao com o tema global.
+  private syncThemeWithPreferences(): void {
+    const currentTheme = this.preferences.current.theme;
+    this.isDarkMode = currentTheme === 'dark'
+      || (currentTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   }
 
   // Escuta alteracoes do usuario autenticado.
@@ -128,6 +144,28 @@ export class Header implements OnInit, OnDestroy {
       .subscribe(user => {
         this.currentUser = user;
         this.userInitials = this.getUserInitials(user);
+
+        if (!user?.id) {
+          this.settingsLoadedForUserId = null;
+        }
+
+        if (user?.id && this.settingsLoadedForUserId !== user.id) {
+          this.settingsLoadedForUserId = user.id;
+          this.settingsService.getUserSettings(user.id)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: settings => {
+                this.preferences.applyFromSettings(settings.theme, settings.currency, settings.language);
+                this.syncThemeWithPreferences();
+                this.cdr.markForCheck();
+              },
+              error: () => {
+                this.syncThemeWithPreferences();
+                this.cdr.markForCheck();
+              },
+            });
+        }
+
         this.cdr.markForCheck();
       });
   }
