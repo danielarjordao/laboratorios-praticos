@@ -1,5 +1,6 @@
 import { supabase } from '../config/supabase.js';
 import type { CreateProfileDTO, ProfileResponse } from '../models/profileModel.js';
+import { getNowIso } from '../utils/dateHelpers.js';
 
 // Cria a estrutura inicial de categorias e subcategorias para um novo perfil.
 const createDefaultCategories = async (profileId: string) => {
@@ -55,22 +56,23 @@ export const createProfile = async (data: CreateProfileDTO): Promise<ProfileResp
 };
 
 export const readProfiles = async (user_id: string): Promise<ProfileResponse[]> => {
-    // Tenta buscar os perfis existentes
+    // Busca os perfis existentes e ativos do utilizador.
     const { data: profiles, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', user_id);
+        .eq('user_id', user_id)
+        .is('deleted_at', null);
 
     if (fetchError) {
-        throw new Error(`Erro ao buscar perfis: ${fetchError.message}`);
+        throw new Error(`Error fetching profiles: ${fetchError.message}`);
     }
 
-    // Se já existem perfis, devolve-os
+    // Se já existem perfis, devolve-os.
     if (profiles && profiles.length > 0) {
         return profiles;
     }
 
-    // Se não existem perfis, cria um perfil padrão para este novo utilizador
+    // Se não existem perfis, cria um perfil padrão para o novo utilizador.
     console.log(`[ProfileService] No profiles found for user_id ${user_id}. Creating default profile and categories.`);
 
     const { data: newProfile, error: createError } = await supabase
@@ -88,19 +90,19 @@ export const readProfiles = async (user_id: string): Promise<ProfileResponse[]> 
 
     try {
         await createDefaultCategories(newProfile.id);
-     } catch (catError) {
+    } catch (catError) {
         console.error(`[ProfileService] Warning: Failed to create default categories for new profile (${newProfile.id}):`, catError);
         // Não lança o erro aqui para não impedir o login. O utilizador já tem perfil.
     }
 
-    // Devolve o novo perfil dentro de um array
+    // Mantém o contrato de retorno em lista.
     return [newProfile];
 };
 
 export const updateProfile = async (id: string, updates: Partial<CreateProfileDTO>): Promise<ProfileResponse> => {
     const { data, error } = await supabase
         .from('profiles')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...updates, updated_at: getNowIso() })
         .eq('id', id)
         .select()
         .single();
@@ -112,7 +114,7 @@ export const updateProfile = async (id: string, updates: Partial<CreateProfileDT
 export const deleteProfile = async (id: string): Promise<{ success: boolean }> => {
     const { error } = await supabase
         .from('profiles')
-        .update({ deleted_at: new Date().toISOString() })
+        .update({ deleted_at: getNowIso() })
         .eq('id', id);
 
     if (error) throw new Error(`Error deleting profile: ${error.message}`);
