@@ -3,8 +3,9 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-logo',
+  standalone: true,
   imports: [RouterLink],
   templateUrl: './logo.html',
-  styleUrl: './logo.css',
+  styleUrls: ['./logo.css'],
 })
 export class Logo {}

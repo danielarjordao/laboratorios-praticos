@@ -2,7 +2,14 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  width: 192px; /* Mantém o alinhamento com a sidebar */
+  width: 192px;
+  text-decoration: none;
+}
+
+.logo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: 8px;
 }
 
 .icon-logo {
@@ -22,8 +29,12 @@
   color: var(--primary);
 }
 
-/* Esconde o texto do logo em telas menores */
 @media (max-width: 768px) {
-  .logo { width: auto; }
-  .logo-text { display: none; }
+  .logo {
+    width: auto;
+  }
+
+  .logo-text {
+    display: none;
+  }
 }
