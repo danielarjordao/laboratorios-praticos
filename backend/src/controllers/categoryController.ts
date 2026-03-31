@@ -1,16 +1,18 @@
 import type { Request, Response } from 'express';
 import * as categoryService from '../services/categoryService.js';
 import type { CreateCategoryDTO } from '../models/categoryModel.js';
-import { getErrorMessage, isValidNonEmptyString, sendBadRequest } from '../utils/controllerHelpers.js';
+import { getErrorMessage, sendBadRequest } from '../utils/controllerHelpers.js';
+import { validateCreateCategory, validateProfileIdQuery, validateCategoryId } from '../utils/validators/categoryValidator.js';
 
 // Cria uma categoria após validar os campos obrigatórios do payload.
 export const createCategory = async (req: Request, res: Response): Promise<void> => {
     try {
         const body = req.body as CreateCategoryDTO;
 
-        // Validação de Defesa dos campos obrigatórios.
-        if (!body.name || !body.profile_id || !body.type) {
-            sendBadRequest(res, 'Missing required fields: name, profile_id, type.');
+        // Validação dos campos obrigatórios: name, profile_id, type.
+        const validation = validateCreateCategory(body);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
@@ -36,12 +38,14 @@ export const readCategories = async (req: Request, res: Response): Promise<void>
     try {
         const { profile_id } = req.query;
 
-        if (!isValidNonEmptyString(profile_id)) {
-            sendBadRequest(res, 'Invalid profile ID.');
+        // Validação do parâmetro obrigatório profile_id.
+        const validation = validateProfileIdQuery(profile_id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
-        const categories = await categoryService.readCategories(profile_id);
+        const categories = await categoryService.readCategories(profile_id as string);
         res.status(200).json({ status: 'success', data: categories });
     } catch (error: unknown) {
         const message = getErrorMessage(error, 'Error');
@@ -55,13 +59,14 @@ export const updateCategory = async (req: Request, res: Response): Promise<void>
         const { id } = req.params;
         const body = req.body as Partial<CreateCategoryDTO>;
 
-        // Validação de Defesa do ID
-        if (!isValidNonEmptyString(id)) {
-            sendBadRequest(res, 'Invalid category ID.');
+        // Validação do parâmetro obrigatório id.
+        const validation = validateCategoryId(id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
-        const updatedCategory = await categoryService.updateCategory(id, body);
+        const updatedCategory = await categoryService.updateCategory(id as string, body);
         res.status(200).json({ status: 'success', data: updatedCategory });
     } catch (error: unknown) {
         const message = getErrorMessage(error, 'An unknown error occurred');
@@ -76,13 +81,14 @@ export const deleteCategory = async (req: Request, res: Response): Promise<void>
     try {
         const { id } = req.params;
 
-        // Validação de Defesa do ID
-        if (!isValidNonEmptyString(id)) {
-            sendBadRequest(res, 'Invalid category ID.');
+        // Validação do parâmetro obrigatório id.
+        const validation = validateCategoryId(id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
-        await categoryService.deleteCategory(id);
+        await categoryService.deleteCategory(id as string);
         res.status(200).json({ status: 'success', message: 'Category removed.' });
     } catch (error: unknown) {
         const message = getErrorMessage(error, 'Error');
