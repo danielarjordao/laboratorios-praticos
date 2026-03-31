@@ -1,43 +1,5 @@
 import { supabase } from '../config/supabase.js';
-
-export interface CreateInstallmentDTO {
-    profile_id: string;
-    account_id: string;
-    category_id: string;
-    total_amount: number;
-    installments: number;
-    start_date: string;
-    description: string;
-}
-
-// Interface para o que a base de dados devolve
-export interface TransactionResponse {
-    id: string;
-    account_id: string;
-    transfer_account_id: string | null;
-    category_id: string;
-    installment_plan_id: string | null;
-    installment_number: number | null;
-    type: string;
-    amount: number;
-    date: string;
-    effective_date: string | null;
-    description: string;
-    status: string;
-    created_at: string;
-    updated_at: string;
-    deleted_at: string | null;
-}
-
-export interface InstallmentPlanResponse {
-    id: string;
-    profile_id: string;
-    description: string;
-    total_parts: number;
-    created_at: string;
-    updated_at: string;
-    transactions?: TransactionResponse[];
-}
+import type { CreateInstallmentDTO, InstallmentPlanResponse } from '../models/installmentModel.js';
 
 // Função pura para gerar os payloads das transações com base nos dados de entrada e no ID do plano de parcelamento criado
 const generateInstallmentPayloads = (data: CreateInstallmentDTO, planId: string) => {
