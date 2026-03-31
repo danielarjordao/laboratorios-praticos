@@ -1,30 +1,32 @@
 import { supabase } from '../config/supabase.js';
 import type { CategoryResponse, CreateCategoryDTO } from '../models/categoryModel.js';
+import { getNowIso } from '../utils/dateHelpers.js';
+
+// Normaliza os dados de criação de categoria com valores padrão.
+const buildCreateCategoryPayload = (categoryData: CreateCategoryDTO) => ({
+    name: categoryData.name,
+    type: categoryData.type?.toUpperCase() || 'EXPENSE',
+    icon: categoryData.icon || 'tag',
+    color: categoryData.color || '#808080',
+    profile_id: categoryData.profile_id
+});
 
 // Cria um novo registo de categoria.
 export const createCategory = async (categoryData: CreateCategoryDTO): Promise<CategoryResponse> => {
-    const { name, icon, color, profile_id, type } = categoryData;
-
     const { data, error } = await supabase
         .from('categories')
-        .insert([{
-            name,
-            type: type?.toUpperCase() || 'EXPENSE',
-            icon: icon || 'tag',
-            color: color || '#808080',
-            profile_id
-        }])
+        .insert([buildCreateCategoryPayload(categoryData)])
         .select()
         .single();
 
     if (error) {
-        throw new Error(`Database error: ${error.message}`);
+        throw new Error(`Error creating category: ${error.message}`);
     }
 
     return data as CategoryResponse;
 };
 
-// Função para listar as categorias de um perfil específico.
+// Lista as categorias de um perfil específico.
 export const readCategories = async (profile_id: string): Promise<CategoryResponse[]> => {
     const { data, error } = await supabase
         .from('categories')
@@ -33,34 +35,36 @@ export const readCategories = async (profile_id: string): Promise<CategoryRespon
         .is('deleted_at', null);
 
     if (error) {
-        throw new Error(`Database error: ${error.message}`);
+        throw new Error(`Error fetching categories: ${error.message}`);
     }
 
     return data as CategoryResponse[];
 };
 
-// Função para atualizar uma categoria existente.
+// Atualiza os dados de uma categoria existente.
 export const updateCategory = async (id: string, data: Partial<CreateCategoryDTO>): Promise<CategoryResponse> => {
     const { data: category, error } = await supabase
         .from('categories')
-        .update({ ...data, updated_at: new Date().toISOString() })
+        .update({ ...data, updated_at: getNowIso() })
         .eq('id', id)
         .select()
         .single();
 
-    if (error)
-        throw new Error(error.message);
+    if (error) {
+        throw new Error(`Error updating category: ${error.message}`);
+    }
 
     return category as CategoryResponse;
 };
 
-// Função para deletar uma categoria (soft delete).
+// Remove uma categoria de forma lógica (soft delete).
 export const deleteCategory = async (id: string): Promise<void> => {
     const { error } = await supabase
         .from('categories')
-        .update({ deleted_at: new Date().toISOString() })
+        .update({ deleted_at: getNowIso() })
         .eq('id', id);
 
-    if (error)
+    if (error) {
         throw new Error(`Error deleting category: ${error.message}`);
+    }
 };
