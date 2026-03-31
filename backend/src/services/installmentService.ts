@@ -1,7 +1,27 @@
 import { supabase } from '../config/supabase.js';
 import type { CreateInstallmentDTO, InstallmentPlanResponse } from '../models/installmentModel.js';
+import { getNowIso } from '../utils/dateHelpers.js';
 
-// Função pura para gerar os payloads das transações com base nos dados de entrada e no ID do plano de parcelamento criado
+// Cria o plano mestre de parcelamento.
+const createMasterInstallmentPlan = async (data: CreateInstallmentDTO): Promise<InstallmentPlanResponse> => {
+    const { data: plan, error: planError } = await supabase
+        .from('installment_plans')
+        .insert([{
+            profile_id: data.profile_id,
+            description: data.description,
+            total_parts: data.installments
+        }])
+        .select()
+        .single();
+
+    if (planError) {
+        throw new Error(`Error creating master plan: ${planError.message}`);
+    }
+
+    return plan as InstallmentPlanResponse;
+};
+
+// Gera os payloads das transações com base na entrada e no ID do plano criado.
 const generateInstallmentPayloads = (data: CreateInstallmentDTO, planId: string) => {
     const installmentAmount = Number((data.total_amount / data.installments).toFixed(2));
     const transactionsToInsert = [];
@@ -35,22 +55,10 @@ const generateInstallmentPayloads = (data: CreateInstallmentDTO, planId: string)
     return transactionsToInsert;
 };
 
-// Service principal para criar um plano de parcelamento e suas transações associadas
+// Cria um plano de parcelamento e suas transações associadas.
 export const createInstallmentPlan = async (data: CreateInstallmentDTO): Promise<InstallmentPlanResponse> => {
-    // Cria o plano de parcelamento
-    const { data: plan, error: planError } = await supabase
-        .from('installment_plans')
-        .insert([{
-            profile_id: data.profile_id,
-            description: data.description,
-            total_parts: data.installments
-        }])
-        .select()
-        .single();
-
-    if (planError) {
-        throw new Error(`Error creating master plan: ${planError.message}`);
-    }
+    // Cria o plano mestre de parcelamento.
+    const plan = await createMasterInstallmentPlan(data);
 
     // Gera os payloads das transações com base no plano criado
     const transactionsToInsert = generateInstallmentPayloads(data, plan.id);
@@ -69,7 +77,7 @@ export const createInstallmentPlan = async (data: CreateInstallmentDTO): Promise
     return plan;
 };
 
-// GET: Listar todos os planos de um perfil, incluindo as suas transações
+// Lista os planos de um perfil, incluindo as transações associadas.
 export const readInstallmentPlans = async (profileId: string): Promise<InstallmentPlanResponse[]> => {
     const { data, error } = await supabase
         .from('installment_plans')
@@ -83,13 +91,13 @@ export const readInstallmentPlans = async (profileId: string): Promise<Installme
     return data;
 };
 
-// UPDATE: Atualizar apenas a descrição do plano mestre
+// Atualiza a descrição do plano mestre.
 export const updateInstallmentPlan = async (id: string, description: string): Promise<InstallmentPlanResponse> => {
     const { data, error } = await supabase
         .from('installment_plans')
         .update({
             description,
-            updated_at: new Date().toISOString()
+            updated_at: getNowIso()
         })
         .eq('id', id)
         .is('deleted_at', null)
@@ -100,9 +108,9 @@ export const updateInstallmentPlan = async (id: string, description: string): Pr
     return data;
 };
 
-// DELETE: Soft Delete do plano e das transações PENDENTES associadas
+// Remove o plano e as transações pendentes associadas de forma lógica.
 export const deleteInstallmentPlan = async (id: string): Promise<{ success: boolean }> => {
-    const now = new Date().toISOString();
+    const now = getNowIso();
 
     // Cancela o plano
     const { error: planError } = await supabase
@@ -120,8 +128,9 @@ export const deleteInstallmentPlan = async (id: string): Promise<{ success: bool
         .eq('status', 'PENDING')
         .is('deleted_at', null);
 
-    if (txError)
-		throw new Error(`Error deleting pending transactions: ${txError.message}`);
+    if (txError) {
+        throw new Error(`Error deleting pending transactions: ${txError.message}`);
+    }
 
     return { success: true };
 };
