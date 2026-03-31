@@ -1,25 +1,35 @@
 import { supabase } from '../config/supabase.js';
 import type { AccountResponse, CreateAccountDTO } from '../models/accountModel.js';
+import { getNowIso } from '../utils/dateHelpers.js';
+
+// Normaliza os dados de criação de conta com valores padrão.
+const buildCreateAccountPayload = (accountData: CreateAccountDTO) => ({
+    ...accountData,
+    type: accountData.type || 'CHECKING',
+    balance: accountData.balance ?? accountData.initial_balance ?? 0
+});
+
+// Calcula o próximo saldo com base na operação financeira.
+const calculateNextBalance = (currentBalance: number, amount: number, operation: 'CREDIT' | 'DEBIT'): number => {
+    return operation === 'CREDIT' ? currentBalance + amount : currentBalance - amount;
+};
 
 // Cria uma nova conta bancária no sistema.
 export const createAccount = async (accountData: CreateAccountDTO): Promise<AccountResponse> => {
     const { data, error } = await supabase
         .from('accounts')
-        .insert([{
-            ...accountData,
-            type: accountData.type || 'CHECKING',
-            balance: accountData.balance ?? accountData.initial_balance ?? 0
-        }])
+        .insert([buildCreateAccountPayload(accountData)])
         .select()
         .single();
 
-    if (error)
-        throw new Error(`Database error: ${error.message}`);
+    if (error) {
+        throw new Error(`Error creating account: ${error.message}`);
+    }
 
     return data as AccountResponse;
 };
 
-// Função para listar todas as contas de um perfil.
+// Lista todas as contas de um perfil.
 export const readAccounts = async (profile_id: string): Promise<AccountResponse[]> => {
     const { data, error } = await supabase
         .from('accounts')
@@ -28,36 +38,38 @@ export const readAccounts = async (profile_id: string): Promise<AccountResponse[
         .is('deleted_at', null);
 
     if (error) {
-        throw new Error(`Database error: ${error.message}`);
+        throw new Error(`Error fetching accounts: ${error.message}`);
     }
 
     return data as AccountResponse[];
 };
 
-// Função para atualizar os detalhes de uma conta existente.
+// Atualiza os dados de uma conta existente.
 export const updateAccount = async (id: string, data: Partial<CreateAccountDTO>): Promise<AccountResponse> => {
     const { data: account, error } = await supabase
         .from('accounts')
-        .update({ ...data, updated_at: new Date().toISOString() })
+        .update({ ...data, updated_at: getNowIso() })
         .eq('id', id)
         .select()
         .single();
 
-    if (error)
-        throw new Error(error.message);
+    if (error) {
+        throw new Error(`Error updating account: ${error.message}`);
+    }
 
     return account as AccountResponse;
 };
 
-// Função para deletar uma conta (soft delete).
+// Remove uma conta de forma lógica (soft delete).
 export const deleteAccount = async (id: string): Promise<void> => {
     const { error } = await supabase
         .from('accounts')
-        .update({ deleted_at: new Date().toISOString() })
+        .update({ deleted_at: getNowIso() })
         .eq('id', id);
 
-    if (error)
+    if (error) {
         throw new Error(`Error deleting account: ${error.message}`);
+    }
 };
 
 // Atualiza o saldo de uma conta de forma matemática.
@@ -71,14 +83,7 @@ export const updateAccountBalance = async (accountId: string, amount: number, op
 
     if (accError) throw new Error(`Failed to fetch account balance: ${accError.message}`);
 
-    let newBalance = Number(account.balance);
-
-    // Calcula o novo saldo (Soma se for CREDIT, subtrai se for DEBIT)
-    if (operation === 'CREDIT') {
-        newBalance += amount;
-    } else {
-        newBalance -= amount;
-    }
+    const newBalance = calculateNextBalance(Number(account.balance), amount, operation);
 
     // Grava o novo valor na base de dados
     const { error: updateError } = await supabase
@@ -86,6 +91,7 @@ export const updateAccountBalance = async (accountId: string, amount: number, op
         .update({ balance: newBalance })
         .eq('id', accountId);
 
-    if (updateError)
+    if (updateError) {
         throw new Error(`Failed to update account balance: ${updateError.message}`);
+    }
 };
