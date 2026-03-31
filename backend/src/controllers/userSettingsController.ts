@@ -1,15 +1,18 @@
 import type { Request, Response } from 'express';
 import * as userSettingsService from '../services/userSettingsService.js';
 import type { CreateUserSettingsDTO } from '../models/userSettingsModel.js';
-import { getErrorMessage, isValidNonEmptyString, sendBadRequest } from '../utils/controllerHelpers.js';
+import { getErrorMessage, sendBadRequest } from '../utils/controllerHelpers.js';
+import { validateCreateUserSettings, validateUserIdQuery, validateUserIdParam } from '../utils/validators/userSettingsValidator.js';
 
 // Cria as configurações iniciais do utilizador.
 export const createUserSettings = async (req: Request, res: Response): Promise<void> => {
     try {
         const body = req.body as CreateUserSettingsDTO;
 
-        if (!body.user_id) {
-            sendBadRequest(res, 'Missing required field: user_id.');
+        // Validação do campo obrigatório user_id.
+        const validation = validateCreateUserSettings(body);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
@@ -26,12 +29,14 @@ export const readUserSettings = async (req: Request, res: Response): Promise<voi
     try {
         const { user_id } = req.query;
 
-        if (!isValidNonEmptyString(user_id)) {
-            sendBadRequest(res, 'user_id is required in query parameters.');
+        // Validação do parâmetro obrigatório user_id.
+        const validation = validateUserIdQuery(user_id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
-        const settings = await userSettingsService.readUserSettings(user_id);
+        const settings = await userSettingsService.readUserSettings(user_id as string);
         res.status(200).json({ status: 'success', data: settings });
     } catch (error: unknown) {
         const message = getErrorMessage(error, 'Unknown error');
@@ -42,8 +47,15 @@ export const readUserSettings = async (req: Request, res: Response): Promise<voi
 // Atualiza as configurações de um utilizador pelo user_id na rota.
 export const updateUserSettings = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { user_id } = req.params as { user_id: string }; // Atualizamos usando o user_id na URL
+        const { user_id } = req.params as { user_id: string };
         const body = req.body as Partial<CreateUserSettingsDTO>;
+
+        // Validação do parâmetro obrigatório user_id.
+        const validation = validateUserIdParam(user_id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
+            return;
+        }
 
         const updated = await userSettingsService.updateUserSettings(user_id, body);
         res.status(200).json({ status: 'success', data: updated });
