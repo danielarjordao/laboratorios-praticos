@@ -1,1 +1,112 @@
-<p>settings works!</p>
+<div class="page-container">
+
+  <header class="page-header">
+    <div class="header-titles">
+      <h1>Preferences</h1>
+      <p>Customize your experience, language, and regional settings.</p>
+    </div>
+  </header>
+
+  @if (isLoading) {
+    <div class="loading-state">Loading your preferences...</div>
+  } @else {
+    <div class="settings-content">
+
+      @if (errorMessage) {
+        <div class="error-state">{{ errorMessage }}</div>
+      }
+
+      @if (successMessage) {
+        <div class="success-state">{{ successMessage }}</div>
+      }
+
+      <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" class="settings-form">
+
+        <!-- Cartão de Aparência -->
+        <section class="settings-card">
+          <header class="card-header">
+            <span class="material-symbols-outlined icon-bg">palette</span>
+            <div>
+              <h3>Appearance</h3>
+              <p class="text-muted">Choose how the app looks to you.</p>
+            </div>
+          </header>
+
+          <div class="form-group">
+            <label for="theme">Theme</label>
+            <select id="theme" formControlName="theme" class="input-minimal">
+              <option value="light">Light Mode</option>
+              <option value="dark">Dark Mode</option>
+              <option value="system">System Default</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Cartão de Região e Idioma -->
+        <section class="settings-card">
+          <header class="card-header">
+            <span class="material-symbols-outlined icon-bg">language</span>
+            <div>
+              <h3>Region & Language</h3>
+              <p class="text-muted">Set your local currency and language.</p>
+            </div>
+          </header>
+
+          <div class="form-row">
+            <div class="form-group span-1">
+              <label for="currency">Main Currency</label>
+              <select id="currency" formControlName="currency" class="input-minimal">
+                <option value="EUR">Euro (€)</option>
+                <option value="USD">US Dollar ($)</option>
+                <option value="BRL">Real (R$)</option>
+                <option value="GBP">British Pound (£)</option>
+              </select>
+            </div>
+
+            <div class="form-group span-1">
+              <label for="language">Language</label>
+              <select id="language" formControlName="language" class="input-minimal">
+                <option value="en-US">English (US)</option>
+                <option value="pt-PT">Português (Portugal)</option>
+                <option value="pt-BR">Português (Brasil)</option>
+              </select>
+              <small class="field-note">Temporarily locked. Locale follows selected currency.</small>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cartão de Notificações -->
+        <section class="settings-card">
+          <header class="card-header">
+            <span class="material-symbols-outlined icon-bg">notifications</span>
+            <div>
+              <h3>Notifications</h3>
+              <p class="text-muted">Manage your email and push alerts.</p>
+            </div>
+          </header>
+
+          <div class="form-group toggle-group">
+            <label for="notifications" class="toggle-label">
+              <span>Receive recurring transaction alerts</span>
+              <div class="toggle-switch">
+                <input type="checkbox" id="notifications" formControlName="receive_notifications">
+                <span class="slider"></span>
+              </div>
+            </label>
+            <small class="field-note">Notifications are temporarily locked and will be enabled in a future update.</small>
+          </div>
+        </section>
+
+        <footer class="form-actions">
+          <button type="submit" class="btn-primary btn-large" [disabled]="settingsForm.invalid || isSaving">
+            <span class="material-symbols-outlined">
+              {{ isSaving ? 'sync' : 'save' }}
+            </span>
+            {{ isSaving ? 'Saving...' : 'Save Preferences' }}
+          </button>
+        </footer>
+
+      </form>
+    </div>
+  }
+</div>
