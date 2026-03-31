@@ -1,24 +1,5 @@
 import { supabase } from '../config/supabase.js';
-
-export interface CreateRecurringDTO {
-    profile_id: string;
-    account_id: string;
-    category_id?: string;
-    type: string;
-    amount: number;
-    frequency: string;
-    interval_value?: number;
-    start_date: string;
-    next_run_date: string;
-    end_date?: string;
-    description?: string;
-}
-
-export interface RecurringResponse extends CreateRecurringDTO {
-    id: string;
-    created_at: string;
-    updated_at: string;
-}
+import type { CreateRecurringDTO, RecurringResponse } from '../models/recurringModel.js';
 
 export const createRecurring = async (data: CreateRecurringDTO): Promise<RecurringResponse> => {
     const { data: recurring, error } = await supabase

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import * as recurringService from '../services/recurringService.js';
-import type { CreateRecurringDTO } from '../services/recurringService.js';
+import type { CreateRecurringDTO } from '../models/recurringModel.js';
 
 export const createRecurring = async (req: Request, res: Response): Promise<void> => {
     try {
