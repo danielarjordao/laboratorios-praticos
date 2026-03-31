@@ -42,7 +42,7 @@
           <footer class="card-balance">
             <span class="balance-label">Current Balance</span>
             <h2 class="balance-amount" [class.negative-balance]="(account.balance || 0) < 0">
-              {{ account.balance | currency:'EUR' }}
+              {{ formatCurrency(account.balance) }}
             </h2>
           </footer>
 

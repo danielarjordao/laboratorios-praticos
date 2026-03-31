@@ -5,6 +5,7 @@ import { Subject, finalize, takeUntil } from 'rxjs';
 import { AccountService } from '../../services/account';
 import { Account } from '../../models/account';
 import { ProfileService } from '../../services/profile';
+import { PreferencesService } from '../../services/preferences';
 
 type AccountForm = FormGroup<{
   name: FormControl<string>;
@@ -22,6 +23,7 @@ type AccountForm = FormGroup<{
 export class Accounts implements OnInit, OnDestroy {
   private readonly accountService = inject(AccountService);
   private readonly profileService = inject(ProfileService);
+  private readonly preferences = inject(PreferencesService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
 
@@ -41,6 +43,12 @@ export class Accounts implements OnInit, OnDestroy {
   accountForm: AccountForm = this.createAccountForm();
 
   ngOnInit(): void {
+    this.preferences.preferences$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.cdr.detectChanges();
+      });
+
     this.profileService.currentProfile$
       .pipe(takeUntil(this.destroy$))
       .subscribe(profile => {
@@ -58,6 +66,11 @@ export class Accounts implements OnInit, OnDestroy {
         this.loadAccounts();
         this.cdr.detectChanges();
       });
+  }
+
+  // Formata saldo com locale e moeda ativos.
+  formatCurrency(value: number | null | undefined): string {
+    return this.preferences.formatCurrency(value);
   }
 
   ngOnDestroy(): void {
