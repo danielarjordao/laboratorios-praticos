@@ -15,31 +15,31 @@
           </div>
           <div class="dropdown-divider"></div>
 
-          <a routerLink="/dashboard" class="dropdown-item" (click)="isNavMenuOpen = false">
+          <a routerLink="/dashboard" class="dropdown-item" (click)="closeAllMenus()">
             <span class="material-symbols-outlined">space_dashboard</span> Dashboard
           </a>
-          <a routerLink="/transactions" class="dropdown-item" (click)="isNavMenuOpen = false">
+          <a routerLink="/transactions" class="dropdown-item" (click)="closeAllMenus()">
             <span class="material-symbols-outlined">receipt_long</span> Transactions
           </a>
-          <a routerLink="/accounts" class="dropdown-item" (click)="isNavMenuOpen = false">
+          <a routerLink="/accounts" class="dropdown-item" (click)="closeAllMenus()">
             <span class="material-symbols-outlined">account_balance</span> Accounts
           </a>
-          <a routerLink="/categories" class="dropdown-item" (click)="isNavMenuOpen = false">
+          <a routerLink="/categories" class="dropdown-item" (click)="closeAllMenus()">
             <span class="material-symbols-outlined">category</span> Categories
           </a>
 
           <div class="dropdown-divider"></div>
 
-          <a routerLink="/past-12-months" class="dropdown-item" (click)="isNavMenuOpen = false">
+          <a routerLink="/past-12-months" class="dropdown-item" (click)="closeAllMenus()">
             <span class="material-symbols-outlined">calendar_month</span> Past 12 Months
           </a>
-          <a routerLink="/forecast" class="dropdown-item" (click)="isNavMenuOpen = false">
+          <a routerLink="/forecast" class="dropdown-item" (click)="closeAllMenus()">
             <span class="material-symbols-outlined">trending_up</span> Forecast
           </a>
-          <a routerLink="/goals" class="dropdown-item" (click)="isNavMenuOpen = false">
+          <a routerLink="/goals" class="dropdown-item" (click)="closeAllMenus()">
             <span class="material-symbols-outlined">track_changes</span> Goals
           </a>
-          <a routerLink="/budgets" class="dropdown-item" (click)="isNavMenuOpen = false">
+          <a routerLink="/budgets" class="dropdown-item" (click)="closeAllMenus()">
             <span class="material-symbols-outlined">pie_chart</span> Budgets
           </a>
         </div>
@@ -127,7 +127,7 @@
 
           <div class="dropdown-divider"></div>
 
-          <button (click)="logout()" class="dropdown-item">
+          <button (click)="logout()" class="dropdown-item logout">
             <span class="material-symbols-outlined">logout</span> Logout
           </button>
         </div>
