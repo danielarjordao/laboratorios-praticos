@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import * as userSettingsService from '../services/userSettingsService.js';
-import type { CreateUserSettingsDTO } from '../services/userSettingsService.js';
+import type { CreateUserSettingsDTO } from '../models/userSettingsModel.js';
 
 export const createUserSettings = async (req: Request, res: Response): Promise<void> => {
     try {

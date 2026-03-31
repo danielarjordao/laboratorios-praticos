@@ -1,23 +1,5 @@
 import { supabase } from '../config/supabase.js';
-
-export interface CreateUserSettingsDTO {
-    user_id: string;
-    theme?: string;
-    currency?: string;
-    language?: string;
-    receive_notifications?: boolean;
-}
-
-export interface UserSettingsResponse {
-    id: string;
-    user_id: string;
-    theme: string;
-    currency: string;
-    language: string;
-    receive_notifications: boolean;
-    created_at: string;
-    updated_at: string;
-}
+import type { CreateUserSettingsDTO, UserSettingsResponse } from '../models/userSettingsModel.js';
 
 // Normalmente, cria-se as configurações ao mesmo tempo que o Profile/User
 export const createUserSettings = async (data: CreateUserSettingsDTO): Promise<UserSettingsResponse> => {
