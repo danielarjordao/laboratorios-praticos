@@ -1,7 +1,7 @@
 import { supabase } from '../config/supabase.js';
 import type { CreateTagDTO, TagResponse } from '../models/tagModel.js';
 
-// Criar nova Tag
+// Cria uma nova tag.
 export const createTag = async (tagData: CreateTagDTO): Promise<TagResponse> => {
     const { data, error } = await supabase
         .from('tags')
@@ -16,7 +16,7 @@ export const createTag = async (tagData: CreateTagDTO): Promise<TagResponse> => 
     return data as TagResponse;
 };
 
-// Listar Tags de um perfil
+// Lista as tags de um perfil.
 export const readTags = async (profile_id: string): Promise<TagResponse[]> => {
     const { data, error } = await supabase
         .from('tags')
@@ -29,7 +29,7 @@ export const readTags = async (profile_id: string): Promise<TagResponse[]> => {
     return data as TagResponse[];
 };
 
-// Atualizar Tag
+// Atualiza os dados de uma tag.
 export const updateTag = async (id: string, data: Partial<CreateTagDTO>): Promise<TagResponse> => {
     const { data: updatedTag, error } = await supabase
         .from('tags')
@@ -47,7 +47,7 @@ export const updateTag = async (id: string, data: Partial<CreateTagDTO>): Promis
     return updatedTag as TagResponse;
 };
 
-// Soft Delete de Tag
+// Remove uma tag de forma lógica (soft delete).
 export const deleteTag = async (id: string): Promise<void> => {
     const { error } = await supabase
         .from('tags')
@@ -58,7 +58,7 @@ export const deleteTag = async (id: string): Promise<void> => {
         throw new Error(`Error deleting tag: ${error.message}`);
 };
 
-// Função para linkar tags a uma transação
+// Associa tags a uma transação.
 export const linkTagsToTransaction = async (transactionId: string, tagIds: string[]): Promise<void> => {
     if (!tagIds || tagIds.length === 0) return;
 
