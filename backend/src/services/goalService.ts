@@ -1,21 +1,5 @@
 import { supabase } from '../config/supabase.js';
-
-export interface CreateGoalDTO {
-    profile_id: string;
-    title: string;
-    target_amount: number;
-    deadline?: string;
-}
-
-export interface GoalResponse {
-    id: string;
-    profile_id: string;
-    title: string;
-    target_amount: number;
-    deadline: string | null;
-    created_at: string;
-    updated_at: string;
-}
+import type { CreateGoalDTO, GoalResponse } from '../models/goalModel.js';
 
 // POST: Cria um novo objetivo para um perfil específico
 export const createGoal = async (data: CreateGoalDTO): Promise<GoalResponse> => {
