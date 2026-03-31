@@ -136,27 +136,57 @@ export class Transactions implements OnInit, OnDestroy {
   }
 
   exportToCsv(): void {
-    // Mantém a tua lógica de exportação inalterada
-    if (!this.transactions.length) return;
-    const headers = ['Date', 'Description', 'Category', 'Account', 'Type', 'Status', 'Amount'];
-    const csvData = this.transactions.map(tx => [
-      tx.date,
-      `"${(tx.description || '').replace(/"/g, '""')}"`,
-      `"${tx.categories?.name || '---'}"`,
-      `"${tx.origin_account?.name || '---'}"`,
-      tx.type,
-      tx.status,
-      tx.amount
-    ].join(';'));
+    if (this.transactions.length === 0) return;
 
-    const csvString = [headers.join(';'), ...csvData].join('\n');
-    const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' });
+    // 1. Definir os cabeçalhos do CSV
+    const headers = [
+      'Data',
+      'Descrição',
+      'Tipo',
+      'Categoria',
+      'Conta Origem',
+      'Conta Destino',
+      'Valor',
+      'Status',
+      'Tags'
+    ];
+
+    // 2. Mapear os dados das transações
+    const csvRows = this.transactions.map(tx => {
+      // Tratamento das Tags: junta os nomes por vírgula
+      const tagsNames = tx.transaction_tags
+        ? tx.transaction_tags.map((tt: any) => tt.tags.name).join('; ')
+        : '';
+
+      return [
+        tx.date,
+        `"${tx.description || ''}"`, // Aspas para evitar quebras se houver vírgulas no texto
+        tx.type,
+        `"${tx.categories?.name || 'Sem Categoria'}"`,
+        `"${tx.origin_account?.name || ''}"`,
+        `"${tx.destination_account?.name || ''}"`,
+        tx.amount,
+        tx.status,
+        `"${tagsNames}"`
+      ].join(';');
+    });
+
+    // 3. Juntar cabeçalho e linhas
+    const csvContent = [headers.join(';'), ...csvRows].join('\n');
+
+    // 4. Criar o ficheiro e disparar o download
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = url;
-    link.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+
+    const timestamp = new Date().toISOString().split('T')[0];
+    link.setAttribute('href', url);
+    link.setAttribute('download', `transacoes_${timestamp}.csv`);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
   }
 
   openNewTransactionForm(): void {
