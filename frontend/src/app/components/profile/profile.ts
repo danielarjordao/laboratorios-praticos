@@ -1,45 +1,42 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Subject, finalize, takeUntil } from 'rxjs';
+import { ProfileService } from '../../services/profile';
 import { Auth } from '../../services/auth';
-import { Subject, takeUntil } from 'rxjs';
-
-type ProfileForm = FormGroup<{
-  firstName: FormControl<string>;
-  lastName: FormControl<string>;
-  password: FormControl<string>;
-}>;
+import { Profile } from '../../models/profile';
 
 @Component({
-  selector: 'app-profile',
+  selector: 'app-profiles',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile.html',
   styleUrls: ['./profile.css']
 })
-export class Profile implements OnInit, OnDestroy {
-  private authService = inject(Auth);
-  private destroy$ = new Subject<void>();
+export class Profiles implements OnInit, OnDestroy {
+  private readonly profileService = inject(ProfileService);
+  private readonly authService = inject(Auth);
+  private readonly destroy$ = new Subject<void>();
 
-  // Formulario principal do perfil.
-  profileForm: ProfileForm = this.createProfileForm();
-
-  successMessage = '';
-  errorMessage = '';
+  // Estado dos Dados
+  profiles: Profile[] = [];
+  activeProfileId: string | undefined;
   isLoading = false;
-  isReadOnly = true;
+  isSubmitting = false;
+  errorMessage = '';
+
+  // Estado do Modal
+  isModalOpen = false;
+  isEditMode = false;
+  currentProfileId: string | null = null;
+
+  // Formulário Reativo
+  profileForm = new FormGroup({
+    name: new FormControl('', [Validators.required, Validators.minLength(2)])
+  });
 
   ngOnInit(): void {
-    this.authService.currentUser$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        if (!user) {
-          return;
-        }
-
-        this.applyUserData(user.firstName, user.lastName);
-        this.applyCurrentFormMode();
-      });
+    this.subscribeToProfiles();
   }
 
   ngOnDestroy(): void {
@@ -47,142 +44,125 @@ export class Profile implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // Ativa o modo de edicao.
-  enableEditing(): void {
-    this.isReadOnly = false;
-    this.applyCurrentFormMode();
-    this.clearMessages();
+  // Ouve o estado global dos perfis (já gerido pelo teu ProfileService)
+  private subscribeToProfiles(): void {
+    this.isLoading = true;
+
+    this.profileService.allProfiles$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (profiles) => {
+          this.profiles = profiles;
+          this.errorMessage = '';
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Falha ao carregar perfis:', err);
+          this.errorMessage = 'Failed to load profiles.';
+          this.isLoading = false;
+        }
+      });
+
+    this.profileService.currentProfile$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(profile => {
+        this.activeProfileId = profile?.id;
+      });
   }
 
-  // Volta para leitura e limpa mensagens.
-  cancelEditing(): void {
-    this.isReadOnly = true;
-    this.applyCurrentFormMode();
-    this.clearMessages();
+  // Gestão do Modal
+  openModal(profile?: Profile): void {
+    this.isModalOpen = true;
+
+    if (profile) {
+      this.isEditMode = true;
+      this.currentProfileId = profile.id;
+      this.profileForm.patchValue({
+        name: profile.name
+      });
+    } else {
+      this.isEditMode = false;
+      this.currentProfileId = null;
+      this.profileForm.reset();
+    }
   }
 
-  // Envia alteracoes do perfil para o Auth.
+  closeModal(): void {
+    this.isModalOpen = false;
+    this.profileForm.reset();
+  }
+
+  // Operações CRUD
   async onSubmit(): Promise<void> {
-    if (!this.canSubmitProfile()) {
-      return;
-    }
-
-    this.startLoading();
-
-    const payload = this.getSubmitPayload();
-
-    if (!payload) {
-      this.finishLoading();
-      return;
-    }
-
-    try {
-      const result = await this.authService.updateProfile(
-        payload.firstName,
-        payload.lastName,
-        payload.password,
-      );
-
-      if (result.success) {
-        this.handleSuccessfulUpdate();
-        return;
-      }
-
-      this.errorMessage = result.error || 'Failed to update profile.';
-    } catch (err: unknown) {
-      this.errorMessage = 'An unexpected error occurred.';
-      console.error('Profile update error:', err);
-    } finally {
-      this.finishLoading();
-    }
-  }
-
-  // Cria o formulario com validacoes padrao.
-  private createProfileForm(): ProfileForm {
-    return new FormGroup({
-      firstName: new FormControl('', {
-        nonNullable: true,
-        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
-      }),
-      lastName: new FormControl('', {
-        nonNullable: true,
-        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
-      }),
-      password: new FormControl('', {
-        nonNullable: true,
-        validators: [Validators.minLength(6)],
-      }),
-    });
-  }
-
-  // Sincroniza os dados vindos do usuario autenticado.
-  private applyUserData(firstName?: string, lastName?: string): void {
-    this.profileForm.patchValue({
-      firstName: firstName || '',
-      lastName: lastName || '',
-    });
-  }
-
-  // Aplica o estado de leitura/edicao no formulario.
-  private applyCurrentFormMode(): void {
-    if (this.isReadOnly) {
-      this.profileForm.disable();
-      return;
-    }
-
-    this.profileForm.enable();
-  }
-
-  // Limpa mensagens exibidas na tela.
-  private clearMessages(): void {
-    this.successMessage = '';
-    this.errorMessage = '';
-  }
-
-  // Verifica se o envio pode continuar.
-  private canSubmitProfile(): boolean {
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
-      return false;
+      return;
     }
 
-    return true;
-  }
+    const formValue = this.profileForm.getRawValue();
+    const profileName = (formValue.name || '').trim();
 
-  // Inicia estado de carregamento da submissao.
-  private startLoading(): void {
-    this.isLoading = true;
-    this.clearMessages();
-  }
-
-  // Finaliza estado de carregamento da submissao.
-  private finishLoading(): void {
-    this.isLoading = false;
-  }
-
-  // Prepara dados para envio mantendo senha opcional.
-  private getSubmitPayload(): { firstName: string; lastName: string; password?: string } | null {
-    const { firstName, lastName, password } = this.profileForm.getRawValue();
-
-    if (!firstName || !lastName) {
-      this.errorMessage = 'First name and last name are required.';
-      return null;
+    if (!profileName) {
+      this.profileForm.controls.name.setErrors({ required: true });
+      return;
     }
 
-    const trimmedPassword = password.trim();
+    // Assume que tens o current user no Auth service para associar ao criar
+    const currentUser = await this.authService.getCurrentUser();
+    if (!currentUser && !this.isEditMode) return;
 
-    return {
-      firstName,
-      lastName,
-      password: trimmedPassword ? trimmedPassword : undefined,
-    };
+    this.isSubmitting = true;
+    this.errorMessage = '';
+
+    if (this.isEditMode && this.currentProfileId) {
+      this.profileService.updateProfile(this.currentProfileId, { name: profileName })
+        .pipe(finalize(() => this.isSubmitting = false))
+        .subscribe({
+          next: () => this.closeModal(),
+          error: (err) => {
+            console.error('Erro ao atualizar perfil:', err);
+            this.errorMessage = 'Failed to update profile.';
+          }
+        });
+    } else {
+      this.profileService.createProfile({ name: profileName, user_id: currentUser!.id })
+        .pipe(finalize(() => this.isSubmitting = false))
+        .subscribe({
+          next: () => this.closeModal(),
+          error: (err) => {
+            console.error('Erro ao criar perfil:', err);
+            this.errorMessage = 'Failed to create profile.';
+          }
+        });
+    }
   }
 
-  // Atualiza UI apos sucesso da operacao.
-  private handleSuccessfulUpdate(): void {
-    this.successMessage = 'Profile updated successfully!';
-    this.profileForm.controls.password.reset('');
-    this.isReadOnly = true;
-    this.applyCurrentFormMode();
+  onDelete(id: string, event: Event): void {
+    event.stopPropagation();
+
+    if (this.profiles.length === 1) {
+      alert('Não podes eliminar o teu último perfil.');
+      return;
+    }
+
+    if (confirm('Tem a certeza que deseja eliminar este perfil e todos os dados associados?')) {
+      this.profileService.deleteProfile(id).subscribe({
+        next: () => {
+          // Se apagou o perfil ativo, muda para outro automaticamente
+          if (this.activeProfileId === id && this.profiles.length > 0) {
+            const nextProfile = this.profiles.find(p => p.id !== id);
+            if (nextProfile) this.profileService.switchProfile(nextProfile);
+          }
+        },
+        error: (err) => console.error('Erro ao eliminar perfil:', err)
+      });
+    }
+  }
+
+  // Define o perfil clicado como ativo (igual ao Header)
+  setActiveProfile(profile: Profile): void {
+    if (this.activeProfileId !== profile.id) {
+      this.profileService.switchProfile(profile);
+    }
   }
 }

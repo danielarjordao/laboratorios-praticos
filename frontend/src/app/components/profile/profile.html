@@ -1,71 +1,87 @@
 <div class="page-container">
-  <div class="profile-card">
-    <div class="header-row">
-      <h2>My Profile</h2>
+
+  <header class="page-header">
+    <div class="header-titles">
+      <h1>My Profiles</h1>
+      <p>Manage your workspaces. Each profile has its own accounts, categories, and transactions.</p>
     </div>
+    <button class="btn-primary" (click)="openModal()" [disabled]="isSubmitting">
+      <span class="material-symbols-outlined">add</span>
+      New Profile
+    </button>
+  </header>
 
-    <p class="subtitle">
-      {{ isReadOnly ? 'Review your personal details.' : 'Update your personal details and password.' }}
-    </p>
+  @if (errorMessage) {
+    <div class="error-state">{{ errorMessage }}</div>
+  }
 
-    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="form-layout">
+  @if (isLoading) {
+    <div class="loading-state">Loading profiles...</div>
+  } @else if (profiles.length === 0) {
+    <div class="empty-state">No profiles found. Create your first profile.</div>
+  } @else {
+    <div class="profiles-grid">
+      @for (profile of profiles; track profile.id) {
+        <article
+          class="profile-card"
+          [class.active-profile]="profile.id === activeProfileId"
+          (click)="setActiveProfile(profile)">
 
-      <div class="name-row">
-        <div class="form-group">
-          <label for="firstName">First Name</label>
-          <input type="text" id="firstName" formControlName="firstName" autocomplete="given-name">
-        </div>
+          <header class="card-header">
+            <div class="profile-info">
+              <span class="material-symbols-outlined icon-bg">
+                {{ profile.id === activeProfileId ? 'workspace_premium' : 'folder_shared' }}
+              </span>
+              <div class="profile-details">
+                <h3>{{ profile.name }}</h3>
+                @if (profile.id === activeProfileId) {
+                  <span class="badge badge-active">Active Now</span>
+                }
+              </div>
+            </div>
 
-        <div class="form-group">
-          <label for="lastName">Last Name</label>
-          <input type="text" id="lastName" formControlName="lastName" autocomplete="family-name">
-        </div>
-      </div>
+            <div class="card-actions">
+              <button class="btn-icon" (click)="openModal(profile); $event.stopPropagation()" aria-label="Edit Profile">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <button class="btn-icon-destructive" (click)="onDelete(profile.id, $event)" aria-label="Delete Profile">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </header>
 
-      <!-- Mostra a senha apenas em modo de edicao -->
-      @if (!isReadOnly) {
-        <div class="form-group">
-          <label for="password">New Password</label>
-          <input type="password" id="password" formControlName="password" placeholder="Leave blank to keep current password" autocomplete="new-password">
-        </div>
+        </article>
       }
-
-      @if (successMessage) {
-        <div class="success-message">
-          <span class="material-symbols-outlined">check_circle</span>
-          {{ successMessage }}
-        </div>
-      }
-
-      @if (errorMessage) {
-        <div class="error-message">
-          <span class="material-symbols-outlined">error</span>
-          {{ errorMessage }}
-        </div>
-      }
-
-      <div class="form-actions">
-        <!-- Modo somente leitura -->
-        @if (isReadOnly) {
-          <button type="button" class="btn-primary" (click)="enableEditing()">
-            <span class="material-symbols-outlined">edit</span>
-            Edit Profile
-          </button>
-        }
-
-        <!-- Modo edicao -->
-        @if (!isReadOnly) {
-          <button type="button" class="btn-secondary" (click)="cancelEditing()">
-            Cancel
-          </button>
-
-          <button type="submit" class="btn-primary" [disabled]="profileForm.invalid || isLoading">
-            <span class="material-symbols-outlined">save</span>
-            {{ isLoading ? 'Saving...' : 'Save Changes' }}
-          </button>
-        }
-      </div>
-
-    </form>
-  </div>
+    </div>
+  }
 </div>
+
+@if (isModalOpen) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content modal-small" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h3>{{ isEditMode ? 'Edit Profile' : 'New Profile' }}</h3>
+        <button class="btn-close-modal" (click)="closeModal()" aria-label="Close Modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+
+        <div class="form-group">
+          <label for="name">Profile Name</label>
+          <input id="name" type="text" formControlName="name" class="input-minimal" placeholder="Ex: Personal Finances">
+        </div>
+
+        <footer class="modal-footer">
+          <button type="button" class="btn-outline" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="profileForm.invalid || isSubmitting">
+            <span class="material-symbols-outlined">save</span>
+            {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Save') }}
+          </button>
+        </footer>
+
+      </form>
+    </div>
+  </div>
+}
