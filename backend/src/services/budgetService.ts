@@ -1,5 +1,6 @@
 import { supabase } from '../config/supabase.js';
 import type { BudgetResponse, CreateBudgetDTO } from '../models/budgetModel.js';
+import { getNowIso } from '../utils/dateHelpers.js';
 
 export const createBudget = async (data: CreateBudgetDTO): Promise<BudgetResponse> => {
     const { data: existingBudget, error: checkError } = await supabase
@@ -28,7 +29,7 @@ export const createBudget = async (data: CreateBudgetDTO): Promise<BudgetRespons
 };
 
 export const readBudgetsByMonth = async (profileId: string, monthDate: string): Promise<Array<BudgetResponse & { categories: { name: string } }>> => {
-    // monthDate deve ser o primeiro dia do mês no formato 'YYYY-MM-DD'
+    // monthDate deve ser o primeiro dia do mês no formato YYYY-MM-DD.
     const { data: budgets, error } = await supabase
         .from('budgets')
         .select('*, categories(name)')
@@ -40,13 +41,13 @@ export const readBudgetsByMonth = async (profileId: string, monthDate: string): 
     return budgets;
 };
 
-// PATCH: Atualizar o valor do limite
+// Atualiza o valor limite de um orçamento.
 export const updateBudget = async (id: string, limitAmount: number): Promise<BudgetResponse> => {
     const { data, error } = await supabase
         .from('budgets')
         .update({
             limit_amount: limitAmount,
-            updated_at: new Date().toISOString()
+            updated_at: getNowIso()
         })
         .eq('id', id)
         .select()
@@ -56,11 +57,11 @@ export const updateBudget = async (id: string, limitAmount: number): Promise<Bud
     return data;
 };
 
-// DELETE: Soft delete do orçamento
+// Remove um orçamento de forma lógica (soft delete).
 export const deleteBudget = async (id: string): Promise<{ success: boolean }> => {
     const { error } = await supabase
         .from('budgets')
-        .update({ deleted_at: new Date().toISOString() })
+        .update({ deleted_at: getNowIso() })
         .eq('id', id);
 
     if (error) throw new Error(`Error deleting budget: ${error.message}`);
