@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import * as categoryService from '../services/categoryService.js';
-import type { CreateCategoryDTO } from '../services/categoryService.js';
+import type { CreateCategoryDTO } from '../models/categoryModel.js';
 
 // Controlador de Categorias.
 export const createCategory = async (req: Request, res: Response): Promise<void> => {

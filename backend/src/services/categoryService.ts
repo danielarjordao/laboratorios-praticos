@@ -1,21 +1,5 @@
 import { supabase } from '../config/supabase.js';
-
-// Interface para os dados que entram (Data Transfer Object)
-export interface CreateCategoryDTO {
-    name: string;
-    icon?: string;
-    color?: string; // <- ADICIONADO: Suporte para cor nas categorias
-    profile_id: string;
-    type: 'INCOME' | 'EXPENSE';
-    parent_id?: string;
-}
-
-// Interface para o que a base de dados devolve
-export interface CategoryResponse extends CreateCategoryDTO {
-    id: string;
-    created_at: string;
-    updated_at: string;
-}
+import type { CategoryResponse, CreateCategoryDTO } from '../models/categoryModel.js';
 
 // Cria um novo registo de categoria.
 export const createCategory = async (categoryData: CreateCategoryDTO): Promise<CategoryResponse> => {
