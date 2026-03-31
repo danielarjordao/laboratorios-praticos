@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, from, map, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Transaction, BackendResponseTransactions, TransactionFilters } from '../models/transaction';
+import { Transaction, BackendResponseTransactions, TransactionFilters, TransactionWithDetails } from '../models/transaction';
 import { Auth } from './auth';
 
 @Injectable({
@@ -13,78 +13,85 @@ export class TransactionService {
   private authService = inject(Auth);
   private apiUrl = `${environment.apiUrl}/transactions`;
 
-  // Fetches transactions. Relies purely on the filters provided by the component.
-  getTransactions(filters?: TransactionFilters): Observable<{ data: Transaction[]; total: number }> {
+  // Executa uma chamada HTTP anexando token de autenticação quando disponível.
+  private withAuthHeaders<T>(requestFactory: (headers: HttpHeaders) => Observable<T>): Observable<T> {
     return from(this.authService.getAccessToken()).pipe(
       switchMap(token => {
         let headers = new HttpHeaders();
         if (token) headers = headers.set('Authorization', `Bearer ${token}`);
 
-        let params = new HttpParams();
-
-        // Dynamically append filters. The component MUST provide the profile_id here.
-        if (filters) {
-          Object.entries(filters).forEach(([key, value]) => {
-            // Check for undefined, null, and empty string to keep URL clean
-            if (value !== undefined && value !== null && value !== '') {
-              params = params.set(key, value.toString());
-            }
-          });
-        }
-
-        return this.http.get<BackendResponseTransactions>(this.apiUrl, { headers, params }).pipe(
-          map(response => ({
-            data: Array.isArray(response.data) ? response.data : [],
-            total: response.totalRecords || 0
-          }))
-        );
+        return requestFactory(headers);
       })
     );
   }
 
-  // Creates a new transaction
-  createTransaction(data: Partial<Transaction>): Observable<Transaction> {
-    return from(this.authService.getAccessToken()).pipe(
-      switchMap(token => {
-        let headers = new HttpHeaders();
-        if (token) headers = headers.set('Authorization', `Bearer ${token}`);
+  // Constrói query params de forma dinâmica, removendo valores vazios.
+  private buildHttpParams(filters?: TransactionFilters): HttpParams {
+    let params = new HttpParams();
 
+    if (!filters) {
+      return params;
+    }
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, value.toString());
+      }
+    });
+
+    return params;
+  }
+
+  // Busca transações com base nos filtros informados pela página.
+  getTransactions(filters?: TransactionFilters): Observable<{ data: Transaction[]; total: number }> {
+    return this.withAuthHeaders((headers) => {
+      const params = this.buildHttpParams(filters);
+
+      return this.http.get<BackendResponseTransactions>(this.apiUrl, { headers, params }).pipe(
+        map(response => ({
+          data: Array.isArray(response.data) ? response.data : [],
+          total: response.totalRecords || 0
+        }))
+      );
+    });
+  }
+
+  // Cria uma nova transação.
+  createTransaction(data: Partial<Transaction>): Observable<Transaction> {
+    return this.withAuthHeaders((headers) => {
         return this.http.post<{ status: string, data: Transaction }>(this.apiUrl, data, { headers }).pipe(
           map(response => response.data)
         );
-      })
+      }
     );
   }
 
-  // Updates an existing transaction
+  // Atualiza uma transação existente.
   updateTransaction(id: string, data: Partial<Transaction>): Observable<Transaction> {
-    return from(this.authService.getAccessToken()).pipe(
-      switchMap(token => {
-        let headers = new HttpHeaders();
-        if (token) headers = headers.set('Authorization', `Bearer ${token}`);
-
+    return this.withAuthHeaders((headers) => {
         return this.http.patch<{ status: string, data: Transaction }>(`${this.apiUrl}/${id}`, data, { headers }).pipe(
           map(response => response.data)
         );
-      })
+      }
     );
   }
 
-  // Deletes a transaction
+  // Remove uma transação.
   deleteTransaction(id: string): Observable<boolean> {
-    return from(this.authService.getAccessToken()).pipe(
-      switchMap(token => {
-        let headers = new HttpHeaders();
-        if (token) headers = headers.set('Authorization', `Bearer ${token}`);
-
+    return this.withAuthHeaders((headers) => {
         return this.http.delete<{ status: string }>(`${this.apiUrl}/${id}`, { headers }).pipe(
           map(response => response.status === 'success')
         );
-      })
+      }
     );
   }
 
-  getTransactionById(id: string): Observable<Transaction> {
-    return this.http.get<Transaction>(`${this.apiUrl}/${id}`);
+  // Busca uma transação específica pelo ID.
+  getTransactionById(id: string): Observable<TransactionWithDetails> {
+    return this.withAuthHeaders((headers) => {
+      return this.http.get<{ status: string, data: TransactionWithDetails }>(`${this.apiUrl}/${id}`, { headers }).pipe(
+        map(response => response.data)
+      );
+    });
   }
 }

@@ -187,6 +187,18 @@
   flex-shrink: 0;
 }
 
+.tx-icon-income {
+  background: var(--income);
+}
+
+.tx-icon-expense {
+  background: var(--expense);
+}
+
+.tx-icon-transfer {
+  background: var(--muted-foreground);
+}
+
 .tx-info {
   display: flex;
   flex-direction: column;

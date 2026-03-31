@@ -10,7 +10,7 @@ import { CategoryService } from '../../services/category';
 import { TagService } from '../../services/tag';
 import { ProfileService } from '../../services/profile';
 
-import { Transaction } from '../../models/transaction';
+import { Transaction, TransactionWithDetails } from '../../models/transaction';
 import { Account } from '../../models/account';
 import { Category } from '../../models/category';
 import { Tag } from '../../models/tag';
@@ -100,10 +100,7 @@ export class TransactionForm implements OnInit, OnDestroy {
       this.transactionForm.disable();
 
       this.transactionService.getTransactionById(this.transactionId).subscribe({
-        next: (response: any) => {
-          console.log('📦 A aceder ao nível correto:', response.data);
-
-          const txData = response.data; // O objeto real está aqui dentro!
+        next: (txData: TransactionWithDetails) => {
 
           // O input date aceita o formato YYYY-MM-DD que já vem do teu backend
           const formattedDate = txData.date;
@@ -121,13 +118,13 @@ export class TransactionForm implements OnInit, OnDestroy {
 
           // Tratamento das Tags
           if (txData.transaction_tags) {
-            const tagIds = txData.transaction_tags.map((tt: any) => tt.tags.id);
+            const tagIds = txData.transaction_tags.map((tt) => tt.tags.id);
             this.transactionForm.get('tags')?.setValue(tagIds);
           }
 
           this.cdr.detectChanges();
         },
-        error: (err) => console.error('❌ Erro no Fetch:', err)
+        error: (err) => console.error('Error fetching transaction details:', err)
       });
     }
   }

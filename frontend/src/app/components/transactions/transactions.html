@@ -100,8 +100,8 @@
         <div class="tx-card" (click)="openTransactionDetails(tx.id)">
 
           <div class="tx-card-left">
-            <!-- Icon/Emoji -->
-            <div class="tx-icon" [style.background-color]="tx.categories?.color || 'var(--muted-foreground)'">
+            <!-- Ícone da transação -->
+            <div class="tx-icon" [ngClass]="getTransactionIconClass(tx)">
               <span class="material-symbols-outlined">{{ tx.categories?.icon || 'receipt_long' }}</span>
             </div>
 
