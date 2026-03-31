@@ -69,7 +69,7 @@ h2 {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #15803d; /* Um verde escuro seguro */
+  color: #15803d;
   background-color: #dcfce7;
   padding: 12px;
   border-radius: 6px;
@@ -85,12 +85,6 @@ h2 {
   padding: 12px;
   border-radius: 6px;
   font-size: 0.9rem;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
 }
 
 .btn-primary {
@@ -156,6 +150,17 @@ h2 {
   .name-row {
     grid-template-columns: 1fr;
   }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    justify-content: center;
+  }
+
   .page-container {
     padding: 16px;
   }

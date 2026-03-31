@@ -1,8 +1,14 @@
-import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Auth } from '../../services/auth';
 import { Subject, takeUntil } from 'rxjs';
+
+type ProfileForm = FormGroup<{
+  firstName: FormControl<string>;
+  lastName: FormControl<string>;
+  password: FormControl<string>;
+}>;
 
 @Component({
   selector: 'app-profile',
@@ -13,15 +19,10 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class Profile implements OnInit, OnDestroy {
   private authService = inject(Auth);
-  private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
 
-  // Reactive form for user profile editing
-  profileForm = new FormGroup({
-    firstName: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
-    lastName: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]),
-    password: new FormControl('', [Validators.minLength(6)])
-  });
+  // Formulario principal do perfil.
+  profileForm: ProfileForm = this.createProfileForm();
 
   successMessage = '';
   errorMessage = '';
@@ -29,22 +30,15 @@ export class Profile implements OnInit, OnDestroy {
   isReadOnly = true;
 
   ngOnInit(): void {
-    // Listens to auth changes to fill the form with current data
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
-        if (user) {
-          this.profileForm.patchValue({
-            firstName: user.firstName || '',
-            lastName: user.lastName || ''
-          });
-
-          if (this.isReadOnly) {
-            this.profileForm.disable();
-          }
-
-          this.cdr.markForCheck(); // Soft UI update
+        if (!user) {
+          return;
         }
+
+        this.applyUserData(user.firstName, user.lastName);
+        this.applyCurrentFormMode();
       });
   }
 
@@ -53,60 +47,142 @@ export class Profile implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // Unlocks the form for editing
+  // Ativa o modo de edicao.
   enableEditing(): void {
     this.isReadOnly = false;
-    this.profileForm.enable();
-    this.successMessage = '';
-    this.errorMessage = '';
+    this.applyCurrentFormMode();
+    this.clearMessages();
   }
 
-  // Locks the form and discards unsaved changes
+  // Volta para leitura e limpa mensagens.
   cancelEditing(): void {
     this.isReadOnly = true;
-    this.profileForm.disable();
-    this.successMessage = '';
-    this.errorMessage = '';
-
-    // Values will be naturally reset by the currentUser$ subscription
+    this.applyCurrentFormMode();
+    this.clearMessages();
   }
 
-  /**
-   * Handles profile update submission to the Auth service
-   */
+  // Envia alteracoes do perfil para o Auth.
   async onSubmit(): Promise<void> {
-    if (this.profileForm.invalid) {
-      this.profileForm.markAllAsTouched();
+    if (!this.canSubmitProfile()) {
       return;
     }
 
-    this.isLoading = true;
-    this.successMessage = '';
-    this.errorMessage = '';
+    this.startLoading();
 
-    const { firstName, lastName, password } = this.profileForm.getRawValue();
+    const payload = this.getSubmitPayload();
+
+    if (!payload) {
+      this.finishLoading();
+      return;
+    }
 
     try {
       const result = await this.authService.updateProfile(
-        firstName as string,
-        lastName as string,
-        password || undefined
+        payload.firstName,
+        payload.lastName,
+        payload.password,
       );
 
       if (result.success) {
-        this.successMessage = 'Profile updated successfully!';
-        this.profileForm.get('password')?.reset();
-        this.isReadOnly = true;
-        this.profileForm.disable();
-      } else {
-        this.errorMessage = result.error || 'Failed to update profile.';
+        this.handleSuccessfulUpdate();
+        return;
       }
-    } catch (err) {
+
+      this.errorMessage = result.error || 'Failed to update profile.';
+    } catch (err: unknown) {
       this.errorMessage = 'An unexpected error occurred.';
       console.error('Profile update error:', err);
     } finally {
-      this.isLoading = false;
-      this.cdr.markForCheck(); // Important: signal UI to reflect loading/message state changes
+      this.finishLoading();
     }
+  }
+
+  // Cria o formulario com validacoes padrao.
+  private createProfileForm(): ProfileForm {
+    return new FormGroup({
+      firstName: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
+      }),
+      lastName: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
+      }),
+      password: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.minLength(6)],
+      }),
+    });
+  }
+
+  // Sincroniza os dados vindos do usuario autenticado.
+  private applyUserData(firstName?: string, lastName?: string): void {
+    this.profileForm.patchValue({
+      firstName: firstName || '',
+      lastName: lastName || '',
+    });
+  }
+
+  // Aplica o estado de leitura/edicao no formulario.
+  private applyCurrentFormMode(): void {
+    if (this.isReadOnly) {
+      this.profileForm.disable();
+      return;
+    }
+
+    this.profileForm.enable();
+  }
+
+  // Limpa mensagens exibidas na tela.
+  private clearMessages(): void {
+    this.successMessage = '';
+    this.errorMessage = '';
+  }
+
+  // Verifica se o envio pode continuar.
+  private canSubmitProfile(): boolean {
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
+      return false;
+    }
+
+    return true;
+  }
+
+  // Inicia estado de carregamento da submissao.
+  private startLoading(): void {
+    this.isLoading = true;
+    this.clearMessages();
+  }
+
+  // Finaliza estado de carregamento da submissao.
+  private finishLoading(): void {
+    this.isLoading = false;
+  }
+
+  // Prepara dados para envio mantendo senha opcional.
+  private getSubmitPayload(): { firstName: string; lastName: string; password?: string } | null {
+    const { firstName, lastName, password } = this.profileForm.getRawValue();
+
+    if (!firstName || !lastName) {
+      this.errorMessage = 'First name and last name are required.';
+      return null;
+    }
+
+    const trimmedPassword = password.trim();
+
+    return {
+      firstName,
+      lastName,
+      password: trimmedPassword ? trimmedPassword : undefined,
+    };
+  }
+
+  // Atualiza UI apos sucesso da operacao.
+  private handleSuccessfulUpdate(): void {
+    this.successMessage = 'Profile updated successfully!';
+    this.profileForm.controls.password.reset('');
+    this.isReadOnly = true;
+    this.applyCurrentFormMode();
   }
 }
