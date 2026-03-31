@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone, inject } from '@angular/core';
 import { createClient, SupabaseClient, User as SupabaseUser } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -9,21 +9,29 @@ import { AuthOperationResult, AuthUser, ProfileUpdatePayload } from '../models/a
 })
 export class Auth {
   private readonly supabase: SupabaseClient;
+  private readonly ngZone = inject(NgZone);
 
   private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
   public readonly currentUser$: Observable<AuthUser | null> = this.currentUserSubject.asObservable();
+
+  // Emite usuario atual dentro da zona do Angular.
+  private emitCurrentUser(user: AuthUser | null): void {
+    this.ngZone.run(() => {
+      this.currentUserSubject.next(user);
+    });
+  }
 
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
 
     // Carrega a sessao inicial da aplicacao.
     this.supabase.auth.getSession().then(({ data }) => {
-      this.currentUserSubject.next(this.mapToAuthUser(data.session?.user));
+      this.emitCurrentUser(this.mapToAuthUser(data.session?.user));
     });
 
     // Escuta mudancas de autenticacao para manter estado sincronizado.
     this.supabase.auth.onAuthStateChange((_event, session) => {
-      this.currentUserSubject.next(this.mapToAuthUser(session?.user));
+      this.emitCurrentUser(this.mapToAuthUser(session?.user));
     });
   }
 
