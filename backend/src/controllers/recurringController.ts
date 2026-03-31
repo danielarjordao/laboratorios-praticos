@@ -1,16 +1,18 @@
 import type { Request, Response } from 'express';
 import * as recurringService from '../services/recurringService.js';
 import type { CreateRecurringDTO } from '../models/recurringModel.js';
-import { getErrorMessage, isValidNonEmptyString, sendBadRequest } from '../utils/controllerHelpers.js';
+import { getErrorMessage, sendBadRequest } from '../utils/controllerHelpers.js';
+import { validateCreateRecurring, validateProfileIdQuery, validateRecurringId } from '../utils/validators/recurringValidator.js';
 
 // Cria uma nova transação recorrente.
 export const createRecurring = async (req: Request, res: Response): Promise<void> => {
     try {
         const body = req.body as CreateRecurringDTO;
 
-        // Validação básica (Fail-Fast)
-        if (!body.profile_id || !body.account_id || !body.amount || !body.frequency || !body.start_date || !body.next_run_date || !body.type) {
-            sendBadRequest(res, 'Missing required fields for recurring transaction.');
+        // Validação dos campos obrigatórios.
+        const validation = validateCreateRecurring(body);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
@@ -27,12 +29,14 @@ export const readRecurring = async (req: Request, res: Response): Promise<void> 
     try {
         const { profile_id } = req.query;
 
-        if (!isValidNonEmptyString(profile_id)) {
-            sendBadRequest(res, 'profile_id is required');
+        // Validação do parâmetro obrigatório profile_id.
+        const validation = validateProfileIdQuery(profile_id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
-        const recurringList = await recurringService.getRecurringByProfile(profile_id);
+        const recurringList = await recurringService.getRecurringByProfile(profile_id as string);
         res.status(200).json({ status: 'success', data: recurringList });
     } catch (error: unknown) {
         const message = getErrorMessage(error, 'Unknown error');
@@ -46,6 +50,13 @@ export const updateRecurring = async (req: Request, res: Response): Promise<void
         const { id } = req.params as { id: string };
         const body = req.body as Partial<CreateRecurringDTO>;
 
+        // Validação do parâmetro obrigatório id.
+        const validation = validateRecurringId(id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
+            return;
+        }
+
         const updated = await recurringService.updateRecurring(id, body);
         res.status(200).json({ status: 'success', data: updated });
     } catch (error: unknown) {
@@ -58,6 +69,14 @@ export const updateRecurring = async (req: Request, res: Response): Promise<void
 export const deleteRecurring = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params as { id: string };
+
+        // Validação do parâmetro obrigatório id.
+        const validation = validateRecurringId(id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
+            return;
+        }
+
         await recurringService.deleteRecurring(id);
         res.status(200).json({ status: 'success', message: 'Recurring transaction deleted successfully' });
     } catch (error: unknown) {
