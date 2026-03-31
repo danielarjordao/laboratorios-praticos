@@ -1,60 +1,93 @@
 <div class="page-container">
-  <div class="page-header">
-    <h2>Transactions</h2>
+
+  <!-- Header with Actions -->
+  <div class="header-section">
+    <div>
+      <h2 class="page-title">Transactions</h2>
+      <p class="page-subtitle">Manage all your financial movements</p>
+    </div>
+
     <div class="header-actions">
-      <!-- Export button -->
-      <button class="btn-secondary" (click)="exportToCsv()" [disabled]="transactions.length === 0 || isLoading">
+      <!-- Ícone e texto perfeitamente alinhados -->
+      <button class="btn-outline" (click)="exportToCsv()" [disabled]="transactions.length === 0 || isLoading">
         <span class="material-symbols-outlined">download</span>
-        Export CSV
+        <span>Export CSV</span>
       </button>
+
       <button class="btn-primary" (click)="openNewTransactionForm()">
         <span class="material-symbols-outlined">add</span>
       </button>
     </div>
   </div>
 
-  <!-- Filters Area -->
-  <form [formGroup]="filterForm" class="filters-row">
-    <div class="form-group">
-      <label for="search">Search</label>
-      <input type="text" id="search" formControlName="search" placeholder="Search description...">
-    </div>
-    <div class="form-group">
-      <label for="month">Month</label>
-      <select id="month" formControlName="month">
-        <option [ngValue]="1">January</option>
-        <option [ngValue]="2">February</option>
-        <option [ngValue]="3">March</option>
-        <option [ngValue]="4">April</option>
-        <option [ngValue]="5">May</option>
-        <option [ngValue]="6">June</option>
-        <option [ngValue]="7">July</option>
-        <option [ngValue]="8">August</option>
-        <option [ngValue]="9">September</option>
-        <option [ngValue]="10">October</option>
-        <option [ngValue]="11">November</option>
-        <option [ngValue]="12">December</option>
-      </select>
-    </div>
+  <!-- Minimal Filters Toolbar (Glass effect) -->
+  <div class="glass-toolbar">
+    <form [formGroup]="filterForm" class="toolbar-main">
 
-    <div class="form-group">
-      <label for="year">Year</label>
-      <input type="number" id="year" formControlName="year" min="2000" max="2100">
-    </div>
+      <!-- Search -->
+      <div class="search-wrapper">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input type="text" formControlName="search" placeholder="Search by description..." class="input-search">
+      </div>
 
-    <div class="form-group">
-      <label for="type">Type</label>
-      <select id="type" formControlName="type">
-        <option value="">All Types</option>
+      <!-- Type Filter -->
+      <select formControlName="type" class="select-minimal">
+        <option value="">All types</option>
         <option value="INCOME">Income</option>
         <option value="EXPENSE">Expense</option>
-        <option value="TRANSFER">Transfer</option>
+        <option value="TRANSFER">Transfers</option>
       </select>
-    </div>
-  </form>
 
-  <!-- Data Table Area -->
-  <div class="table-card">
+      <!-- Tag Filter -->
+      <select formControlName="tagId" class="select-minimal">
+        <option value="">All tags</option>
+        @for (tag of tags; track tag.id) {
+          <option [value]="tag.id">{{ tag.name }}</option>
+        }
+      </select>
+
+      <!-- More Filters Toggle -->
+      <button type="button" class="btn-icon-outline" (click)="toggleFilters()" [class.active]="showFilters">
+        <span class="material-symbols-outlined">tune</span>
+      </button>
+    </form>
+
+    <!-- Extended Filters (Animated/Conditional) -->
+    @if (showFilters) {
+      <form [formGroup]="filterForm" class="toolbar-extended">
+        <div class="filter-group">
+          <label>Month</label>
+          <select formControlName="month" class="select-minimal">
+            <option [ngValue]="1">January</option>
+            <option [ngValue]="2">February</option>
+            <option [ngValue]="3">March</option>
+            <option [ngValue]="4">April</option>
+            <option [ngValue]="5">May</option>
+            <option [ngValue]="6">June</option>
+            <option [ngValue]="7">July</option>
+            <option [ngValue]="8">August</option>
+            <option [ngValue]="9">September</option>
+            <option [ngValue]="10">October</option>
+            <option [ngValue]="11">November</option>
+            <option [ngValue]="12">December</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Year</label>
+          <input type="number" formControlName="year" class="input-minimal" min="2000" max="2100">
+        </div>
+      </form>
+    }
+  </div>
+
+  <!-- Results Count -->
+  <div class="results-count">
+    Showing {{ transactions.length }} of {{ totalRecords }} transactions
+  </div>
+
+  <!-- Transaction List (Spotify-like Cards) -->
+  <div class="transaction-list">
     @if (isLoading) {
       <div class="state-message">Loading transactions...</div>
     } @else if (errorMessage) {
@@ -62,59 +95,80 @@
     } @else if (transactions.length === 0) {
       <div class="state-message">No transactions found for the selected period.</div>
     } @else {
-      <!-- Transactions Table -->
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th class="align-right">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (tx of transactions; track tx.id) {
-            <tr>
-              <td>{{ tx.date | date:'dd/MM/yyyy' }}</td>
-              <td>{{ tx.description || '---' }}</td>
-              <td>
-                <!-- Colored badge -->
-                <span class="badge" [ngClass]="'badge-' + tx.type.toLowerCase()">
-                  {{ tx.type }}
-                </span>
-              </td>
-              <td>{{ tx.status || 'COMPLETED' }}</td>
-              <td class="align-right"
-                  [ngClass]="{'text-success': tx.type === 'INCOME', 'text-danger': tx.type === 'EXPENSE'}">
-                {{ tx.type === 'EXPENSE' ? '-' : '' }}{{ tx.amount | currency }}
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-      <div class="pagination-footer">
-        <span class="pagination-info">
-          Showing {{ transactions.length }} of {{ totalRecords }} transactions
-        </span>
 
-        <div class="pagination-controls">
-          <button class="btn-secondary"
-                  [disabled]="filterForm.value.page === 1"
-                  (click)="filterForm.patchValue({ page: (filterForm.value.page || 1) - 1 })">
-            Previous
-          </button>
+      @for (tx of transactions; track tx.id) {
+        <div class="tx-card" (click)="openTransactionDetails(tx.id)">
 
-          <span class="pagination-page">
-            Page {{ filterForm.value.page }} of {{ Math.ceil(totalRecords / (filterForm.value.limit || 10)) }}
-          </span>
+          <div class="tx-card-left">
+            <!-- Icon/Emoji -->
+            <div class="tx-icon" [style.background-color]="tx.categories?.color || 'var(--muted-foreground)'">
+              <span class="material-symbols-outlined">{{ tx.categories?.icon || 'receipt_long' }}</span>
+            </div>
 
-          <button class="btn-secondary"
-                  [disabled]="(filterForm.value.page || 1) * (filterForm.value.limit || 10) >= totalRecords"
-                  (click)="filterForm.patchValue({ page: (filterForm.value.page || 1) + 1 })">
-            Next
-          </button>
+            <!-- Transaction Info -->
+            <div class="tx-info">
+              <div class="tx-header-row">
+                <h4 class="tx-description">{{ tx.description || 'No Description' }}</h4>
+                @if (tx.status === 'PENDING') {
+                  <div class="tx-pending-badge">
+                    <span class="dot-pulse"></span>
+                    Pending
+                  </div>
+                }
+              </div>
+
+              <div class="tx-meta-row">
+                <!-- Date -->
+                <div class="meta-item">
+                  <span class="material-symbols-outlined meta-icon">calendar_today</span>
+                  <span>{{ tx.date | date:'dd MMM yyyy' }}</span>
+                </div>
+
+                <!-- Category Badge -->
+                @if (tx.categories?.name && tx.type !== 'TRANSFER') {
+                  <div class="category-badge">
+                    {{ tx.categories?.name }}
+                  </div>
+                }
+
+                <!-- Tags -->
+                @if (tx.transaction_tags && tx.transaction_tags.length > 0) {
+                  @for (tt of tx.transaction_tags; track tt.tags.id) {
+                    <div class="tag-badge">#{{ tt.tags.name }}</div>
+                  }
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Account & Amount -->
+          <div class="tx-card-right">
+            <p class="tx-amount" [ngClass]="{'text-income': tx.type === 'INCOME', 'text-expense': tx.type === 'EXPENSE', 'text-transfer': tx.type === 'TRANSFER'}">
+              {{ tx.type === 'EXPENSE' ? '-' : (tx.type === 'INCOME' ? '+' : '') }}{{ tx.amount | currency:'EUR' }}
+            </p>
+            <p class="tx-account-name">
+              {{ tx.type === 'TRANSFER' ? tx.origin_account?.name + ' → ' + tx.destination_account?.name : tx.origin_account?.name || 'Account' }}
+            </p>
+          </div>
+
         </div>
+      }
+
+      <!-- Pagination Footer -->
+      <div class="pagination-footer">
+        <button class="btn-outline"
+                [disabled]="filterForm.value.page === 1"
+                (click)="filterForm.patchValue({ page: (filterForm.value.page || 1) - 1 })">
+          Previous
+        </button>
+        <span class="pagination-page">
+          Page {{ filterForm.value.page }} of {{ Math.ceil(totalRecords / (filterForm.value.limit || 10)) }}
+        </span>
+        <button class="btn-outline"
+                [disabled]="(filterForm.value.page || 1) * (filterForm.value.limit || 10) >= totalRecords"
+                (click)="filterForm.patchValue({ page: (filterForm.value.page || 1) + 1 })">
+          Next
+        </button>
       </div>
     }
   </div>

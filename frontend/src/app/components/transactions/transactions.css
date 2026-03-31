@@ -1,20 +1,31 @@
-/* Layout Principal */
+/* Layout Global */
 .page-container {
-  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  width: 100%;
+  padding: 24px 16px;
 }
 
-.page-header {
+/* Header */
+.header-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
+}
+
+.page-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  margin-top: 4px;
 }
 
 .header-actions {
@@ -22,202 +33,320 @@
   gap: 12px;
 }
 
-/* Botões */
-.btn-primary, .btn-secondary {
+/* Toolbar Glass Effect */
+.glass-toolbar {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.toolbar-main {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
+  flex-wrap: wrap; /* Garante que não quebra em ecrãs pequenos */
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  font-size: 20px;
+}
+
+.input-search {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  border-radius: 8px;
+  border: 1px solid var(--input);
+  background: var(--input-background);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.input-search:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--accent);
+}
+
+.select-minimal, .input-minimal {
   padding: 10px 16px;
   border-radius: 8px;
-  font-weight: 500;
+  border: 1px solid var(--input);
+  background: var(--input-background);
   font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-  border: none;
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-}
-
-.btn-secondary {
-  background-color: transparent;
   color: var(--foreground);
+  min-width: 140px;
+}
+
+.btn-icon-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
   border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.btn-secondary:hover:not(:disabled) {
-  background-color: var(--background);
+.btn-icon-outline:hover, .btn-icon-outline.active {
+  background: var(--muted);
+  color: var(--foreground);
 }
 
-.btn-secondary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Área de Filtros */
-.filters-row {
-  display: flex;
+/* Extended Filters */
+.toolbar-extended {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
-  flex-wrap: wrap;
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 20px;
-  border-radius: 12px;
-  backdrop-filter: blur(12px); /* Efeito Glass partilhado */
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  animation: slideDown 0.3s ease-out forwards;
 }
 
-.form-group {
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.filter-group label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.results-count {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+/* Transaction List (Spotify Cards) */
+.transaction-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1;
-  min-width: 180px;
+  gap: 12px;
 }
 
-.form-group label {
-  color: var(--muted-foreground);
-  font-weight: 600;
-}
-
-.form-group select,
-.form-group input {
-  padding: 10px 12px;
-  border: 1px solid var(--input);
-  border-radius: 8px;
-  background-color: var(--input-background);
-  color: var(--foreground);
-  font-family: inherit;
-  font-size: 0.875rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.form-group select:focus,
-.form-group input:focus {
-  border-color: var(--primary);
-}
-
-/* Tabela de Dados */
-.table-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  backdrop-filter: blur(12px);
-  overflow-x: auto; /* Permite scroll horizontal em ecrãs pequenos */
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.data-table th,
-.data-table td {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-
-.data-table th {
-  background-color: var(--muted);
-  color: var(--muted-foreground);
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.data-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.data-table tbody tr:hover {
-  background-color: var(--muted);
-}
-
-.align-right {
-  text-align: right;
-}
-
-/* Badges e Cores de Estado */
-.badge {
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: capitalize;
-  display: inline-block;
-}
-
-.badge-income {
-  background-color: rgba(0, 191, 191, 0.15); /* var(--primary) */
-  color: var(--income);
-}
-
-.badge-expense {
-  background-color: rgba(255, 138, 114, 0.15); /* var(--salmon) */
-  color: var(--expense);
-}
-
-.badge-transfer {
-  background-color: var(--muted);
-  color: var(--foreground);
-}
-
-.text-success {
-  color: var(--income);
-  font-weight: 700;
-}
-
-.text-danger {
-  color: var(--expense);
-  font-weight: 700;
-}
-
-/* Estados Vazios ou de Carregamento */
-.state-message {
-  padding: 64px 24px;
-  text-align: center;
-  color: var(--muted-foreground);
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.error-text {
-  color: var(--destructive);
-}
-
-/* Pagination controls */
-.pagination-footer {
+.tx-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background: var(--card); /* Mantém o tema consistente com a tabela */
-  border-top: 1px solid var(--border);
-  border-radius: 0 0 12px 12px; /* Arredonda apenas os cantos inferiores se estiver colado à tabela */
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-.pagination-info {
-  color: var(--muted-foreground);
-  font-size: 0.875rem;
+.tx-card:hover {
+  background: var(--background);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.pagination-controls {
+.tx-card-left {
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
 }
 
-.pagination-page {
-  font-size: 0.875rem;
-  font-weight: 500;
+.tx-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white; /* Mantém branco para garantir contraste com as cores das categorias */
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.tx-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tx-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tx-description {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
   color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Pending Dot usando as tuas cores quentes */
+.tx-pending-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--deep-saffron);
+  font-weight: 500;
+}
+
+.dot-pulse {
+  width: 8px;
+  height: 8px;
+  background-color: var(--deep-saffron);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 147, 0, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(255, 147, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 147, 0, 0); }
+}
+
+.tx-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+.meta-icon {
+  font-size: 14px;
+}
+
+.category-badge, .tag-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.category-badge {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+}
+
+.tag-badge {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.tx-card-right {
+  text-align: right;
+  flex-shrink: 0;
+  padding-left: 16px;
+}
+
+.tx-amount {
+  margin: 0 0 4px 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Usando as tuas cores semânticas para dinheiro */
+.text-income { color: var(--income); }
+.text-expense { color: var(--expense); }
+.text-transfer { color: var(--muted-foreground); }
+
+.tx-account-name {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+/* Paginação e Botões */
+.pagination-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--muted);
+}
+
+.btn-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Corrige alinhamento de ícones perdidos dentro de botões e spans */
+.material-symbols-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
