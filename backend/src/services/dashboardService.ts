@@ -1,14 +1,5 @@
 import { supabase } from '../config/supabase.js';
-
-export interface MonthlySummaryResponse {
-    total_income: number;
-    total_expense: number;
-    monthly_balance: number;
-    period: {
-        month: number;
-        year: number;
-    };
-}
+import type { MonthlySummaryResponse } from '../models/dashboardModel.js';
 
 // Função para obter o resumo mensal de receitas, despesas e saldo para um perfil específico.
 export const readMonthlySummary = async (
