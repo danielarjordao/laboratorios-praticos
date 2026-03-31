@@ -57,7 +57,7 @@
   <div class="header-right">
 
     <div class="dropdown-container">
-      <button class="dropdown-trigger" (click)="toggleProfileMenu($event)">
+      <button class="dropdown-trigger" (click)="toggleProfileMenu($event)" [disabled]="availableProfiles.length === 0">
         <span class="material-symbols-outlined icon-small">account_tree</span>
         <span class="trigger-text">{{ activeProfile?.name || 'Select Profile' }}</span>
         <span class="material-symbols-outlined icon-small">expand_more</span>
@@ -70,17 +70,23 @@
           </div>
           <div class="dropdown-divider"></div>
 
-          @for (profile of availableProfiles; track profile.id) {
-            <button
-              class="dropdown-item"
-              (click)="selectProfile(profile)"
-              [class.active-item]="profile.id === activeProfile?.id">
+          @if (availableProfiles.length === 0) {
+            <div class="dropdown-item dropdown-empty">No profiles available</div>
+          }
 
-              <span class="material-symbols-outlined">
-                {{ profile.id === activeProfile?.id ? 'check_circle' : 'radio_button_unchecked' }}
-              </span>
-              <span>{{ profile.name }}</span>
-            </button>
+          @if (availableProfiles.length > 0) {
+            @for (profile of availableProfiles; track profile.id) {
+              <button
+                class="dropdown-item"
+                (click)="selectProfile(profile)"
+                [class.active-item]="profile.id === activeProfile?.id">
+
+                <span class="material-symbols-outlined">
+                  {{ profile.id === activeProfile?.id ? 'check_circle' : 'radio_button_unchecked' }}
+                </span>
+                <span>{{ profile.name }}</span>
+              </button>
+            }
           }
         </div>
       }
@@ -112,10 +118,10 @@
           </div>
           <div class="dropdown-divider"></div>
 
-          <a routerLink="/profile" class="dropdown-item">
+          <a routerLink="/profile" class="dropdown-item" (click)="closeAllMenus()">
             <span class="material-symbols-outlined">person</span> My Profile
           </a>
-          <a routerLink="/settings" class="dropdown-item">
+          <a routerLink="/settings" class="dropdown-item" (click)="closeAllMenus()">
             <span class="material-symbols-outlined">tune</span> Preferences
           </a>
 

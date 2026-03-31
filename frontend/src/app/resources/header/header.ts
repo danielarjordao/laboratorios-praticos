@@ -16,56 +16,140 @@ import { Profile } from '../../models/profile';
   imports: [RouterModule, CommonModule, DatePipe, GreetingPipe, Logo],
   templateUrl: './header.html',
   styleUrls: ['./header.css'],
-  // CRITICAL: Since we use markForCheck(), we must explicitly tell Angular to use OnPush.
-  // This optimizes performance and prevents silent UI update failures.
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Header implements OnInit, OnDestroy {
-  // Services
-  private authService = inject(Auth);
-  private profileService = inject(ProfileService);
-  private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
+  private readonly authService = inject(Auth);
+  private readonly profileService = inject(ProfileService);
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroy$ = new Subject<void>();
+  private readonly darkThemeClass = 'dark';
 
-  // User and Profile Data
   currentUser: AuthUser | null = null;
-  userInitials: string = '';
+  userInitials = '';
   currentDate = new Date();
   activeProfile: Profile | null = null;
   availableProfiles: Profile[] = [];
 
-  // UI States for menus and theme
   isUserMenuOpen = false;
   isProfileMenuOpen = false;
   isNavMenuOpen = false;
-  isDarkMode = true;
+  isDarkMode = false;
 
-  private destroy$ = new Subject<void>();
+  ngOnInit(): void {
+    this.syncThemeFromBody();
+    this.subscribeToUser();
+    this.subscribeToProfiles();
+    this.subscribeToActiveProfile();
+  }
 
-  ngOnInit() {
-    document.body.classList.toggle('dark', this.isDarkMode);
-    // Listen to auth changes
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // Alterna entre tema claro e escuro.
+  toggleTheme(): void {
+    this.isDarkMode = !this.isDarkMode;
+    this.applyTheme();
+  }
+
+  // Seleciona um perfil e fecha menus abertos.
+  selectProfile(profile: Profile): void {
+    if (this.activeProfile?.id !== profile.id) {
+      this.profileService.switchProfile(profile);
+      this.activeProfile = profile;
+    }
+
+    this.closeAllMenus();
+    this.cdr.markForCheck();
+  }
+
+  // Alterna menu de perfis.
+  toggleProfileMenu(event: Event): void {
+    event.stopPropagation();
+    this.isProfileMenuOpen = !this.isProfileMenuOpen;
+    this.closeOtherMenus('profile');
+  }
+
+  // Alterna menu do usuario.
+  toggleUserMenu(event: Event): void {
+    event.stopPropagation();
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+    this.closeOtherMenus('user');
+  }
+
+  // Alterna menu de navegacao mobile.
+  toggleNavMenu(event: Event): void {
+    event.stopPropagation();
+    this.isNavMenuOpen = !this.isNavMenuOpen;
+    this.closeOtherMenus('nav');
+  }
+
+  // Fecha menus em navegacoes por link.
+  closeAllMenus(): void {
+    this.isProfileMenuOpen = false;
+    this.isUserMenuOpen = false;
+    this.isNavMenuOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  // Fecha menus ao clicar fora.
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.isProfileMenuOpen || this.isUserMenuOpen || this.isNavMenuOpen) {
+      this.closeAllMenus();
+    }
+  }
+
+  // Encerra sessao e redireciona para login.
+  async logout(): Promise<void> {
+    await this.authService.signOut();
+    this.closeAllMenus();
+    this.router.navigate(['/auth/login']);
+  }
+
+  // Sincroniza o tema interno com o estado do body.
+  private syncThemeFromBody(): void {
+    this.isDarkMode = document.body.classList.contains(this.darkThemeClass);
+    this.applyTheme();
+  }
+
+  // Aplica o tema atual ao body.
+  private applyTheme(): void {
+    document.body.classList.toggle(this.darkThemeClass, this.isDarkMode);
+  }
+
+  // Escuta alteracoes do usuario autenticado.
+  private subscribeToUser(): void {
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((user) => {
+      .subscribe(user => {
         this.currentUser = user;
-        if (user) {
-          const first = user.firstName?.charAt(0) || '';
-          const last = user.lastName?.charAt(0) || '';
-          this.userInitials = (first + last).toUpperCase() || user.email.charAt(0).toUpperCase();
-        }
+        this.userInitials = this.getUserInitials(user);
         this.cdr.markForCheck();
       });
+  }
 
-    // Listen to available profiles list
+  // Escuta lista de perfis disponiveis.
+  private subscribeToProfiles(): void {
     this.profileService.allProfiles$
       .pipe(takeUntil(this.destroy$))
       .subscribe(profiles => {
         this.availableProfiles = profiles;
+
+        if (profiles.length === 0) {
+          this.activeProfile = null;
+          this.isProfileMenuOpen = false;
+        }
+
         this.cdr.markForCheck();
       });
+  }
 
-    // Listen to active profile changes
+  // Escuta mudancas do perfil ativo.
+  private subscribeToActiveProfile(): void {
     this.profileService.currentProfile$
       .pipe(takeUntil(this.destroy$))
       .subscribe(profile => {
@@ -74,72 +158,37 @@ export class Header implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  // Toggles between light and dark mode by applying a CSS class to the body
-  toggleTheme() {
-    this.isDarkMode = !this.isDarkMode;
-    if (this.isDarkMode) {
-      document.body.classList.toggle('dark', this.isDarkMode);
-    } else {
-      document.body.classList.remove('dark');
+  // Fecha menus diferentes do menu selecionado.
+  private closeOtherMenus(except: 'profile' | 'user' | 'nav'): void {
+    if (except !== 'profile') {
+      this.isProfileMenuOpen = false;
     }
-  }
 
-  // Allows the user to select a different profile, updating the active profile and closing the menu
-  selectProfile(profile: Profile) {
-    this.profileService.switchProfile(profile);
-    this.isProfileMenuOpen = false;
-  }
+    if (except !== 'user') {
+      this.isUserMenuOpen = false;
+    }
 
-  // Toggles the profile menu and ensures others are closed
-  toggleProfileMenu(event: Event) {
-    event.stopPropagation();
-    this.isProfileMenuOpen = !this.isProfileMenuOpen;
-    this.closeOtherMenus('profile');
-  }
+    if (except !== 'nav') {
+      this.isNavMenuOpen = false;
+    }
 
-  // Toggles the user menu and ensures others are closed
-  toggleUserMenu(event: Event) {
-    event.stopPropagation();
-    this.isUserMenuOpen = !this.isUserMenuOpen;
-    this.closeOtherMenus('user');
-  }
-
-  // Toggles the navigation menu and ensures others are closed
-  toggleNavMenu(event: Event) {
-    event.stopPropagation();
-    this.isNavMenuOpen = !this.isNavMenuOpen;
-    this.closeOtherMenus('nav');
-  }
-
-  // Closes menus other than the specified one to improve user experience
-  private closeOtherMenus(except: string) {
-    if (except !== 'profile') this.isProfileMenuOpen = false;
-    if (except !== 'user') this.isUserMenuOpen = false;
-    if (except !== 'nav') this.isNavMenuOpen = false;
-
-    // As we are mutating variables that affect the UI state, we need to signal Angular
     this.cdr.markForCheck();
   }
 
-  // Closes all open menus when the user clicks outside of any menu
-  @HostListener('document:click')
-  onDocumentClick() {
-    if (this.isProfileMenuOpen || this.isUserMenuOpen || this.isNavMenuOpen) {
-      this.isProfileMenuOpen = false;
-      this.isUserMenuOpen = false;
-      this.isNavMenuOpen = false;
-      this.cdr.markForCheck(); // Signal UI update for menu closures
+  // Calcula iniciais do usuario para avatar.
+  private getUserInitials(user: AuthUser | null): string {
+    if (!user) {
+      return '';
     }
-  }
 
-  // Logs the user out, clearing the session and redirecting to the login page
-  async logout() {
-    await this.authService.signOut();
-    this.router.navigate(['/auth/login']);
+    const first = user.firstName?.charAt(0) || '';
+    const last = user.lastName?.charAt(0) || '';
+    const initials = `${first}${last}`.trim().toUpperCase();
+
+    if (initials) {
+      return initials;
+    }
+
+    return user.email.charAt(0).toUpperCase();
   }
 }

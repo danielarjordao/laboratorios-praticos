@@ -106,6 +106,11 @@
   border-color: var(--primary);
 }
 
+.dropdown-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .trigger-text {
   font-size: 0.875rem;
   font-weight: 500;
@@ -208,6 +213,15 @@ button.dropdown-item {
   font-size: 1.2rem;
   color: var(--muted-foreground);
   transition: color 0.2s ease;
+}
+
+.dropdown-empty {
+  color: var(--muted-foreground);
+  cursor: default;
+}
+
+.dropdown-empty:hover {
+  background-color: transparent;
 }
 
 /* Destaque para o perfil que está ativo */
