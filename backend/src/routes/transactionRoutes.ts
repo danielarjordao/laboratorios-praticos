@@ -3,20 +3,24 @@ import * as transactionController from '../controllers/transactionController.js'
 
 const router = Router();
 
-// Rota POST aponta para a função no Controller
+// Rota POST: Cria uma nova transação
+// URL: POST /api/v1/transactions
 router.post('/', transactionController.createTransaction);
 
-// Rota GET: Lista todas as transações (ex: /api/v1/transactions?profile_id=XXX)
+// Rota GET: Lista todas as transações de um perfil
+// URL: GET /api/v1/transactions?profile_id=XXX
 router.get('/', transactionController.readTransactions);
 
-// Rota GET com parâmetro de ID para obter detalhes de uma transação específica
+// Rota GET: Obtém os detalhes de uma transação específica
+// URL: GET /api/v1/transactions/:id
 router.get('/:id', transactionController.readTransactionById);
 
-// Rota PATCH com parâmetro de ID
+// Rota PATCH: Atualiza os detalhes de uma transação existente
+// URL: PATCH /api/v1/transactions/:id
 router.patch('/:id', transactionController.updateTransaction);
 
-// Rota DELETE com parâmetro de ID
+// Rota DELETE: Deleta uma transação
+// URL: DELETE /api/v1/transactions/:id
 router.delete('/:id', transactionController.deleteTransaction);
 
-// Exporta o router para ser usado no server.ts
 export default router;
