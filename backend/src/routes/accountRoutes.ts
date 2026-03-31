@@ -8,6 +8,7 @@ const router = Router();
 router.post('/', accountController.createAccount);
 
 // Rota GET: Lista todas as contas de um perfil
+// URL: GET /api/v1/accounts?profile_id=XXX
 router.get('/', accountController.readAccounts);
 
 // Rota PATCH: Atualiza os detalhes de uma conta existente
