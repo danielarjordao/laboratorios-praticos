@@ -1,16 +1,18 @@
 import type { Request, Response } from 'express';
 import * as accountService from '../services/accountService.js';
 import type { CreateAccountDTO } from '../models/accountModel.js';
-import { getErrorMessage, isValidNonEmptyString, sendBadRequest } from '../utils/controllerHelpers.js';
+import { getErrorMessage, sendBadRequest } from '../utils/controllerHelpers.js';
+import { validateCreateAccount, validateProfileIdQuery, validateAccountId } from '../utils/validators/accountValidator.js';
 
 // Cria uma nova conta após validar os campos obrigatórios do payload.
 export const createAccount = async (req: Request, res: Response): Promise<void> => {
     try {
         const body = req.body as CreateAccountDTO;
 
-        // Regra de entrada: profile_id e name são obrigatórios para criar a conta.
-        if (!body.profile_id || !body.name) {
-            sendBadRequest(res, 'Missing required fields: profile_id, name.');
+        // Validação de campos obrigatórios: profile_id e name.
+        const validation = validateCreateAccount(body);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
@@ -36,13 +38,14 @@ export const readAccounts = async (req: Request, res: Response): Promise<void> =
     try {
         const { profile_id } = req.query;
 
-        // Garante que profile_id veio corretamente na query string.
-        if (!isValidNonEmptyString(profile_id)) {
-            sendBadRequest(res, 'Invalid profile ID.');
+        // Validação do parâmetro obrigatório profile_id.
+        const validation = validateProfileIdQuery(profile_id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
-        const accounts = await accountService.readAccounts(profile_id);
+        const accounts = await accountService.readAccounts(profile_id as string);
         res.status(200).json({ status: 'success', data: accounts });
     } catch (error: unknown) {
         const message = getErrorMessage(error, 'Error');
@@ -56,13 +59,14 @@ export const updateAccount = async (req: Request, res: Response): Promise<void> 
         const { id } = req.params;
         const body = req.body as Partial<CreateAccountDTO>;
 
-        // Impede atualização sem identificador válido.
-        if (!isValidNonEmptyString(id)) {
-            sendBadRequest(res, 'Invalid account ID.');
+        // Validação do parâmetro obrigatório id.
+        const validation = validateAccountId(id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
-        const updatedAccount = await accountService.updateAccount(id, body);
+        const updatedAccount = await accountService.updateAccount(id as string, body);
         res.status(200).json({ status: 'success', data: updatedAccount });
     } catch (error: unknown) {
         const message = getErrorMessage(error, 'Error');
@@ -75,13 +79,14 @@ export const deleteAccount = async (req: Request, res: Response): Promise<void> 
     try {
         const { id } = req.params;
 
-        // Valida o identificador antes de delegar a operação ao serviço.
-        if (!isValidNonEmptyString(id)) {
-            sendBadRequest(res, 'Invalid account ID.');
+        // Validação do parâmetro obrigatório id.
+        const validation = validateAccountId(id);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
-        await accountService.deleteAccount(id);
+        await accountService.deleteAccount(id as string);
         res.status(200).json({ status: 'success', message: 'Account removed.' });
     } catch (error: unknown) {
         const message = getErrorMessage(error, 'Error');
