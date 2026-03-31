@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Subject, finalize, takeUntil } from 'rxjs';
@@ -22,6 +22,7 @@ type AccountForm = FormGroup<{
 export class Accounts implements OnInit, OnDestroy {
   private readonly accountService = inject(AccountService);
   private readonly profileService = inject(ProfileService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
 
   // Estado de dados.
@@ -49,11 +50,13 @@ export class Accounts implements OnInit, OnDestroy {
           this.accounts = [];
           this.errorMessage = 'Select a profile to load accounts.';
           this.isLoading = false;
+          this.cdr.detectChanges();
           return;
         }
 
         this.errorMessage = '';
         this.loadAccounts();
+        this.cdr.detectChanges();
       });
   }
 
@@ -85,15 +88,18 @@ export class Accounts implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         finalize(() => {
           this.isLoading = false;
+          this.cdr.detectChanges();
         }),
       )
       .subscribe({
       next: data => {
         this.accounts = data;
+        this.cdr.detectChanges();
       },
       error: err => {
         this.errorMessage = 'Failed to load accounts.';
         console.error('Failed to load accounts:', err);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -171,16 +177,19 @@ export class Accounts implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         finalize(() => {
           this.isSubmitting = false;
+          this.cdr.detectChanges();
         }),
       )
       .subscribe({
       next: () => {
         this.loadAccounts();
         this.closeModal();
+        this.cdr.detectChanges();
       },
       error: err => {
         this.errorMessage = 'Failed to save account.';
         console.error('Failed to save account:', err);
+        this.cdr.detectChanges();
       },
     });
   }
@@ -197,6 +206,7 @@ export class Accounts implements OnInit, OnDestroy {
         error: err => {
           this.errorMessage = 'Failed to delete account.';
           console.error('Failed to delete account:', err);
+          this.cdr.detectChanges();
         },
       });
     }
