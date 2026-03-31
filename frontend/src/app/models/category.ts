@@ -7,3 +7,18 @@ export interface Category {
   color?: string;
   created_at?: string;
 }
+
+export interface CategoryListResponse {
+  status: string;
+  data: Category[];
+}
+
+export interface CategoryResponse {
+  status: string;
+  data: Category;
+}
+
+export interface CategoryDeleteResponse {
+  status: string;
+  message: string;
+}
