@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Subject, finalize, takeUntil } from 'rxjs';
@@ -23,6 +23,7 @@ type CategoryForm = FormGroup<{
 export class Categories implements OnInit, OnDestroy {
   private readonly categoryService = inject(CategoryService);
   private readonly profileService = inject(ProfileService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
 
   // Estado de dados.
@@ -58,11 +59,13 @@ export class Categories implements OnInit, OnDestroy {
           this.categories = [];
           this.errorMessage = 'Select a profile to load categories.';
           this.isLoading = false;
+          this.cdr.detectChanges();
           return;
         }
 
         this.errorMessage = '';
         this.loadCategories();
+        this.cdr.detectChanges();
       });
   }
 
@@ -85,15 +88,18 @@ export class Categories implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         finalize(() => {
           this.isLoading = false;
+          this.cdr.detectChanges();
         }),
       )
       .subscribe({
       next: data => {
         this.categories = data;
+        this.cdr.detectChanges();
       },
       error: err => {
         this.errorMessage = 'Failed to load categories.';
         console.error('Failed to load categories:', err);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -190,16 +196,19 @@ export class Categories implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         finalize(() => {
           this.isSubmitting = false;
+          this.cdr.detectChanges();
         }),
       )
       .subscribe({
       next: () => {
         this.loadCategories();
         this.closeModal();
+        this.cdr.detectChanges();
       },
       error: err => {
         this.errorMessage = 'Failed to save category.';
         console.error('Failed to save category:', err);
+        this.cdr.detectChanges();
       },
     });
   }
@@ -216,6 +225,7 @@ export class Categories implements OnInit, OnDestroy {
         error: err => {
           this.errorMessage = 'Failed to delete category.';
           console.error('Failed to delete category:', err);
+          this.cdr.detectChanges();
         },
       });
     }
