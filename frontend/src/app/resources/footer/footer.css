@@ -1,5 +1,5 @@
 .app-footer {
-  padding: 0.5rem 0.5rem;
+  padding: 0.5rem;
   background-color: var(--background);
   border-top: 1px solid var(--border);
   color: var(--muted-foreground);
@@ -14,7 +14,6 @@
 .footer-links {
   display: flex;
   gap: 1.5rem;
-  cursor: pointer;
 }
 
 .footer-links a {
@@ -25,4 +24,18 @@
 
 .footer-links a:hover {
   color: var(--primary);
+}
+
+.footer-links a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (max-width: 650px) {
+  .footer-content {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
 }
