@@ -15,6 +15,7 @@ import { authGuard } from './guards/auth-guard';
 import { guestGuard } from './guards/guest-guard';
 import { UserInfo } from './components/user-info/user-info';
 import { TransactionForm } from './components/transaction-form/transaction-form';
+import { Profiles } from './components/profile/profile';
 
 const LOGIN_PATH = '/auth/login';
 
@@ -30,6 +31,7 @@ const protectedRoutes: Routes = [
   { path: 'goals', component: Goals },
   { path: 'categories', component: Categories },
   { path: 'budgets', component: Budgets },
+  { path: 'profiles', component: Profiles },
   { path: 'user-info', component: UserInfo },
   { path: 'settings', component: Settings },
 ].map(route => ({
