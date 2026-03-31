@@ -6,3 +6,18 @@ export interface Account {
   balance?: number;
   created_at?: string;
 }
+
+export interface AccountListResponse {
+  status: string;
+  data: Account[];
+}
+
+export interface AccountResponse {
+  status: string;
+  data: Account;
+}
+
+export interface AccountDeleteResponse {
+  status: string;
+  message: string;
+}
