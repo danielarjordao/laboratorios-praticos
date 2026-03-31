@@ -29,21 +29,22 @@
   margin-bottom: 24px;
 }
 
-.modal-header h3 {
-  margin: 0;
-  color: var(--foreground);
-}
-
-.btn-icon {
-  background: none;
-  border: none;
-  color: var(--muted-foreground);
-  cursor: pointer;
+.transaction-form {
+  display: flex;
+  flex-direction: column;
 }
 
 .form-row {
   display: flex;
   gap: 16px;
+}
+
+.form-row-top {
+  margin-bottom: 16px;
+}
+
+.form-row-bottom {
+  margin-bottom: 24px;
 }
 
 .form-group {
@@ -52,6 +53,14 @@
   gap: 8px;
   margin-bottom: 16px;
   flex: 1;
+}
+
+.form-group-double {
+  flex: 2;
+}
+
+.form-group-tags {
+  margin-bottom: 16px;
 }
 
 .form-group label {
@@ -92,6 +101,10 @@
   margin-top: 24px;
   padding-top: 16px;
   border-top: 1px solid var(--border);
+
+.input-full-width {
+  width: 100%;
+}
 }
 
 /* Botões */
@@ -99,16 +112,30 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  border-radius: 8px;
+  color: #fff;
   font-weight: 500;
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
+.error-banner-strong {
+  background: var(--destructive);
+}
+
+.tag-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tag-input-flex {
+  flex: 1;
+}
+
 .btn-primary {
   background-color: var(--primary);
+  align-items: center;
   color: var(--primary-foreground);
   border: none;
 }
@@ -116,142 +143,70 @@
 .btn-primary:hover {
   opacity: 0.9;
 }
-
-.btn-secondary {
+/* Botões gerais */
+.btn-primary,
+.btn-outline,
+.btn-delete,
+.btn-edit-mode {
   background-color: transparent;
   color: var(--foreground);
   border: 1px solid var(--border);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: var(--background);
-}
-
-.btn-secondary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.tags-selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.tag-chip {
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--muted-foreground);
-  font-size: 0.75rem;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.tag-chip.active {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-  border-color: var(--primary);
-}
-
-.modal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end; /* Alinha tudo à direita por padrão */
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-}
-
-/* O botão de Delete deve "empurrar" os outros para a direita */
-.btn-delete {
-  margin-right: auto; /* Esta é a mágica: empurra o resto para o lado oposto */
-  color: var(--expense);
-  border: 1px solid var(--expense);
-  background: transparent;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-delete:hover {
-  background: var(--powder-petal);
+.btn-primary,
+.btn-outline {
+  padding: 10px 24px;
 }
 
 .btn-primary {
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
-  padding: 10px 24px;
-  border-radius: 8px;
   font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
 }
 
 .btn-outline {
   background: transparent;
   color: var(--foreground);
   border: 1px solid var(--border);
-  padding: 10px 24px;
-  border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
 }
 
-/* Garante que o ícone do Edit no Header também herda as cores */
-.btn-edit-top {
-  background: var(--accent);
-  color: var(--accent-foreground);
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  margin-top: 8px;
+.btn-outline:hover:not(:disabled) {
+  background: var(--background);
 }
 
-.header-left-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.btn-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.modal-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--foreground);
-  margin: 0;
+.btn-delete {
+  margin-right: auto;
+  color: var(--expense);
+  border: 1px solid var(--expense);
+  background: transparent;
+  padding: 8px 16px;
+}
+
+.btn-delete:hover {
+  background: var(--powder-petal);
 }
 
 .btn-edit-mode {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   background: var(--accent);
   color: var(--accent-foreground);
   border: none;
   padding: 8px 16px;
-  border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  width: fit-content; /* Não deixa o botão esticar a largura toda */
+  width: fit-content;
 }
 
 .btn-edit-mode:hover {
@@ -274,4 +229,88 @@
 .btn-close-modal:hover {
   background: var(--muted);
   color: var(--foreground);
+}
+
+.tags-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.tag-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag-chip:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.tag-chip-active {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+
+.tag-chip-muted {
+  opacity: 0.3;
+}
+
+.tag-chip:disabled {
+  cursor: default;
+}
+
+.tag-delete-icon {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.icon-sm {
+  font-size: 18px;
+}
+
+.header-left-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .modal-content {
+    max-width: calc(100vw - 24px);
+    padding: 16px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modal-footer {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .btn-delete {
+    margin-right: 0;
+    width: 100%;
+    justify-content: center;
+  }
 }

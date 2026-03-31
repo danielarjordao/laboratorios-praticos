@@ -1,7 +1,7 @@
 <div class="modal-overlay" (click)="goBack()">
   <div class="modal-content" (click)="$event.stopPropagation()">
 
-    <!-- Cabeçalho Dinâmico -->
+    <!-- Cabeçalho dinâmico -->
     <div class="modal-header">
       <div class="header-left-content">
         <h3 class="modal-title">
@@ -10,7 +10,7 @@
 
         @if (isEditMode && isReadOnly) {
           <button type="button" class="btn-edit-mode" (click)="enableEditing()">
-            <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+            <span class="material-symbols-outlined icon-sm">edit</span>
             <span>Edit Transaction</span>
           </button>
         }
@@ -21,26 +21,26 @@
       </button>
     </div>
 
-    <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()" class="transaction-form">
       @if (errorMessage) {
-        <div class="error-banner" style="background: var(--destructive); color: white; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+        <div class="error-banner error-banner-strong">
           {{ errorMessage }}
         </div>
       }
 
-      <div class="form-row" style="display: flex; gap: 16px; margin-bottom: 16px;">
-        <div class="form-group" style="flex: 1;">
-          <label style="display: block; font-size: 0.875rem; color: var(--muted-foreground); margin-bottom: 8px;">Type</label>
-          <select formControlName="type" class="input-minimal" style="width: 100%;">
+      <div class="form-row form-row-top">
+        <div class="form-group">
+          <label>Type</label>
+          <select formControlName="type" class="input-minimal input-full-width">
             <option value="EXPENSE">Expense</option>
             <option value="INCOME">Income</option>
             <option value="TRANSFER">Transfer</option>
           </select>
         </div>
 
-        <div class="form-group" style="flex: 1;">
-          <label style="display: block; font-size: 0.875rem; color: var(--muted-foreground); margin-bottom: 8px;">Date</label>
-          <input type="date" formControlName="date" class="input-minimal" style="width: 100%;">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" formControlName="date" class="input-minimal input-full-width">
         </div>
       </div>
 
@@ -85,35 +85,33 @@
         </div>
       }
 
-      <!-- Seção de Tags com Proteção ReadOnly -->
-      <div class="form-group" style="margin-bottom: 16px;">
-        <label style="display: block; font-size: 0.875rem; color: var(--muted-foreground); margin-bottom: 8px;">Tags</label>
+      <!-- Seção de tags com proteção de leitura -->
+      <div class="form-group form-group-tags">
+        <label>Tags</label>
 
         @if (!isReadOnly) {
-          <div class="tag-input-row" style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <input type="text" [formControl]="newTagCtrl" placeholder="New tag name" (keydown.enter)="$event.preventDefault(); addTag()" class="input-minimal" style="flex: 1;">
+          <div class="tag-input-row">
+            <input type="text" [formControl]="newTagCtrl" placeholder="New tag name" (keydown.enter)="$event.preventDefault(); addTag()" class="input-minimal tag-input-flex">
             <button type="button" class="btn-outline" (click)="addTag()" [disabled]="isCreatingTag || !newTagCtrl.value">
               {{ isCreatingTag ? '...' : 'Add' }}
             </button>
           </div>
         }
 
-        <div class="tags-selector" style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <div class="tags-selector">
           @for (tag of tags; track tag.id) {
             <button
               type="button"
-              class="tag-badge"
-              [style.opacity]="isReadOnly && !transactionForm.get('tags')?.value?.includes(tag.id) ? '0.3' : '1'"
-              [style.background]="transactionForm.get('tags')?.value?.includes(tag.id) ? 'var(--primary)' : 'var(--muted)'"
-              [style.color]="transactionForm.get('tags')?.value?.includes(tag.id) ? 'white' : 'var(--muted-foreground)'"
-              [style.cursor]="isReadOnly ? 'default' : 'pointer'"
+              class="tag-chip"
+              [ngClass]="getTagChipClasses(tag.id)"
+              [disabled]="isReadOnly"
               (click)="toggleTag(tag.id)"
-              style="border: none; padding: 6px 12px; border-radius: 16px; display: flex; align-items: center;">
+            >
 
               {{ tag.name }}
 
               @if (!isReadOnly) {
-                <span class="material-symbols-outlined tag-delete-icon" (click)="removeTag(tag.id, $event)" style="font-size: 14px; margin-left: 6px; opacity: 0.7;">
+                <span class="material-symbols-outlined tag-delete-icon" (click)="removeTag(tag.id, $event)">
                   close
                 </span>
               }
@@ -122,41 +120,40 @@
         </div>
       </div>
 
-      <div class="form-row" style="display: flex; gap: 16px; margin-bottom: 24px;">
-        <div class="form-group" style="flex: 2;">
-          <label style="display: block; font-size: 0.875rem; color: var(--muted-foreground); margin-bottom: 8px;">Description</label>
-          <input type="text" formControlName="description" placeholder="Ex: Supermarket..." class="input-minimal" style="width: 100%;">
+      <div class="form-row form-row-bottom">
+        <div class="form-group form-group-double">
+          <label>Description</label>
+          <input type="text" formControlName="description" placeholder="Ex: Supermarket..." class="input-minimal input-full-width">
         </div>
 
-        <div class="form-group" style="flex: 1;">
-          <label style="display: block; font-size: 0.875rem; color: var(--muted-foreground); margin-bottom: 8px;">Status</label>
-          <select formControlName="status" class="input-minimal" style="width: 100%;">
+        <div class="form-group">
+          <label>Status</label>
+          <select formControlName="status" class="input-minimal input-full-width">
             <option value="COMPLETED">Completed</option>
             <option value="PENDING">Pending</option>
           </select>
         </div>
       </div>
 
-      <!-- Footer com Ações Dinâmicas -->
+      <!-- Footer com ações dinâmicas -->
       <div class="modal-footer">
-  <!-- Se estiver em modo edição e NÃO for ReadOnly, mostra o Delete -->
-  @if (isEditMode && !isReadOnly) {
-    <button type="button" class="btn-delete" (click)="onDelete()">
-      <span class="material-symbols-outlined">delete</span>
-      Delete
-    </button>
-  }
+        @if (isEditMode && !isReadOnly) {
+          <button type="button" class="btn-delete" (click)="onDelete()">
+            <span class="material-symbols-outlined">delete</span>
+            Delete
+          </button>
+        }
 
-  <!-- Botão de fechar/cancelar sempre visível -->
-  <button type="button" class="btn-outline" (click)="goBack()">
-    {{ isReadOnly ? 'Close' : 'Cancel' }}
-  </button>
+        <button type="button" class="btn-outline" (click)="goBack()">
+          {{ isReadOnly ? 'Close' : 'Cancel' }}
+        </button>
 
-  <!-- Botão de Save/Update apenas se não for ReadOnly -->
-  @if (!isReadOnly) {
-    <button type="submit" class="btn-primary" [disabled]="transactionForm.invalid">
-      <span class="material-symbols-outlined">save</span>
-      {{ isEditMode ? 'Update' : 'Save' }}
-    </button>
-  }
-</div>
+        @if (!isReadOnly) {
+          <button type="submit" class="btn-primary" [disabled]="transactionForm.invalid">
+            <span class="material-symbols-outlined">save</span>
+            {{ isEditMode ? 'Update' : 'Save' }}
+          </button>
+        }
+      </div>
+    </form>
+  </div>
