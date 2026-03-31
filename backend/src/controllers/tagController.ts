@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import * as tagService from '../services/tagService.js';
-import type { CreateTagDTO } from '../services/tagService.js';
+import type { CreateTagDTO } from '../models/tagModel.js';
 
 // Cria uma nova Tag validando os campos obrigatórios.
 export const createTag = async (req: Request, res: Response): Promise<void> => {
