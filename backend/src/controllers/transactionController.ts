@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import * as transactionService from '../services/transactionService.js';
-import type { CreateTransactionDTO, TransactionFilters } from '../services/transactionService.js';
+import type { CreateTransactionDTO, TransactionFilters } from '../models/transactionModel.js';
 
 // Cria uma nova transação.
 export const createTransaction = async (req: Request, res: Response): Promise<void> => {

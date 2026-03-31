@@ -1,57 +1,13 @@
 import { supabase } from '../config/supabase.js';
 import * as tagService from './tagService.js';
 import { updateAccountBalance } from './accountService.js';
-
-export interface CreateTransactionDTO {
-    account_id: string;
-    category_id?: string | null;
-    transfer_account_id?: string | null;
-    type: string;
-    amount: number;
-    date: string;
-    description?: string;
-    status?: string;
-    tags?: string[];
-}
-
-export interface TransactionResponse {
-    id: string;
-    account_id: string;
-    transfer_account_id: string | null;
-    category_id: string | null;
-    type: string;
-    amount: number;
-    date: string;
-    effective_date: string;
-    description: string | null;
-    status: string;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface TransactionFilters {
-    month?: number;
-    year?: number;
-    type?: string;
-    categoryId?: string;
-    search?: string;
-    tagId?: string;
-    page?: number;
-    limit?: number;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
-}
-
-export interface TransactionWithDetails extends TransactionResponse {
-    categories: { name: string; icon: string; color?: string; } | null; // <- ADICIONADO: color aqui
-    origin_account: { name: string; } | null;
-    destination_account: { name: string; } | null;
-}
-
-// Esta interface estende o DTO original e adiciona as tags de forma segura
-export interface UpdateTransactionDTO extends Partial<CreateTransactionDTO> {
-    tags?: string[];
-}
+import type {
+    CreateTransactionDTO,
+    TransactionFilters,
+    TransactionResponse,
+    TransactionWithDetails,
+    UpdateTransactionDTO
+} from '../models/transactionModel.js';
 
 // FUNÇÕES AUXILIARES
 
