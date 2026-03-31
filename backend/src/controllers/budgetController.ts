@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express';
 import * as budgetService from '../services/budgetService.js';
 import type { CreateBudgetDTO } from '../models/budgetModel.js';
-import { getErrorMessage, isValidNonEmptyString, sendBadRequest } from '../utils/controllerHelpers.js';
+import { getErrorMessage, sendBadRequest } from '../utils/controllerHelpers.js';
+import { validateReadBudgetsParams, validateUpdateBudgetFields, validateBudgetId } from '../utils/validators/budgetValidator.js';
 
 // Cria um novo orçamento com os dados recebidos no body.
 export const createBudget = async (req: Request, res: Response): Promise<void> => {
@@ -19,15 +20,16 @@ export const readBudgets = async (req: Request, res: Response): Promise<void> =>
     try {
         const { profile_id, month_date } = req.query;
 
-        // Valida parâmetros obrigatórios para evitar consultas ambíguas.
-        if (!isValidNonEmptyString(profile_id) || !isValidNonEmptyString(month_date)) {
-            sendBadRequest(res, 'profile_id and month_date are required');
+        // Validação de parâmetros obrigatórios.
+        const validation = validateReadBudgetsParams(profile_id, month_date);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
         const budgets = await budgetService.readBudgetsByMonth(
-            profile_id,
-            month_date
+            profile_id as string,
+            month_date as string
         );
         res.status(200).json({ status: 'success', data: budgets });
     } catch (error: unknown) {
@@ -42,9 +44,10 @@ export const updateBudget = async (req: Request, res: Response): Promise<void> =
         const { id } = req.params as { id: string };
         const { limit_amount } = req.body;
 
-        // Mantém a mesma regra já existente: limit_amount é obrigatório.
-        if (!limit_amount) {
-            sendBadRequest(res, 'limit_amount is required for update');
+        // Validação do campo obrigatório limit_amount.
+        const validation = validateUpdateBudgetFields(limit_amount);
+        if (!validation.isValid) {
+            sendBadRequest(res, validation.message!);
             return;
         }
 
