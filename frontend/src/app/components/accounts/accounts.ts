@@ -1,12 +1,13 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Subject, finalize, takeUntil } from 'rxjs';
+import { Subject, finalize, take, takeUntil } from 'rxjs';
 import { AccountService } from '../../services/account';
 import { Account } from '../../models/account';
 import { ProfileService } from '../../services/profile';
 import { PreferencesService } from '../../services/preferences';
 import { LoadingIndicator } from '../../resources/loading-indicator/loading-indicator';
+import { ConfirmModalService } from '../../services/confirm-modal';
 
 type AccountForm = FormGroup<{
   name: FormControl<string>;
@@ -25,6 +26,7 @@ export class Accounts implements OnInit, OnDestroy {
   private readonly accountService = inject(AccountService);
   private readonly profileService = inject(ProfileService);
   private readonly preferences = inject(PreferencesService);
+  private readonly confirmModal = inject(ConfirmModalService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
 
@@ -212,17 +214,29 @@ export class Accounts implements OnInit, OnDestroy {
   onDelete(id: string, event: Event): void {
     event.stopPropagation();
 
-    if (confirm('Are you sure you want to delete this account?')) {
-      this.accountService.deleteAccount(id)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-        next: () => this.loadAccounts(),
-        error: err => {
-          this.errorMessage = 'Failed to delete account.';
-          console.error('Failed to delete account:', err);
-          this.cdr.detectChanges();
-        },
+    this.confirmModal.confirm({
+      title: 'Delete account',
+      message: 'Are you sure you want to delete this account?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      isDestructive: true,
+    })
+      .pipe(take(1), takeUntil(this.destroy$))
+      .subscribe(confirmed => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.accountService.deleteAccount(id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+          next: () => this.loadAccounts(),
+          error: err => {
+            this.errorMessage = 'Failed to delete account.';
+            console.error('Failed to delete account:', err);
+            this.cdr.detectChanges();
+          },
+        });
       });
-    }
   }
 }
