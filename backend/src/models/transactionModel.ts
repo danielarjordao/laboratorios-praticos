@@ -30,6 +30,7 @@ export interface TransactionFilters {
     year?: number;
     type?: string;
     categoryId?: string;
+    accountId?: string;
     search?: string;
     tagId?: string;
     page?: number;

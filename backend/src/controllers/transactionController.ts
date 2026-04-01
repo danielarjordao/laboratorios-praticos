@@ -46,6 +46,7 @@ export const readTransactions = async (req: Request, res: Response): Promise<voi
         if (req.query.month) filters.month = Number(req.query.month);
         if (req.query.year) filters.year = Number(req.query.year);
         if (req.query.type) filters.type = String(req.query.type);
+        if (req.query.accountId) filters.accountId = String(req.query.accountId);
         if (req.query.categoryId) filters.categoryId = String(req.query.categoryId);
         if (req.query.search) filters.search = String(req.query.search);
         if (req.query.tagId) filters.tagId = String(req.query.tagId);

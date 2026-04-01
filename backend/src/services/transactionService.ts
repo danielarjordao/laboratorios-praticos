@@ -176,6 +176,7 @@ export const readTransactions = async (profile_id: string, filters?: Transaction
         .is('deleted_at', null);
 
     if (filters?.type) query = query.eq('type', filters.type);
+    if (filters?.accountId) query = query.eq('account_id', filters.accountId);
     if (filters?.categoryId) query = query.eq('category_id', filters.categoryId);
 
     // --- 1. CORREÇÃO DA PESQUISA (Descrição + Tags) ---
