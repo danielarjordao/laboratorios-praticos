@@ -22,22 +22,26 @@
 
     <div class="menu-section">
       <span class="section-title label">Planning</span>
-      <a routerLink="/past-12-months" class="menu-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <a routerLink="/past-12-months" class="menu-item" [class.disabled]="isNavDisabled('/past-12-months')" [attr.aria-disabled]="isNavDisabled('/past-12-months')" [attr.tabindex]="isNavDisabled('/past-12-months') ? -1 : null" (click)="onNavClick($event, '/past-12-months')">
         <span class="material-symbols-outlined icon">calendar_month</span>
         <span class="label">Past 12 Months</span>
       </a>
-      <a routerLink="/forecast" class="menu-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <small class="lock-note label">Temporarily locked</small>
+      <a routerLink="/forecast" class="menu-item" [class.disabled]="isNavDisabled('/forecast')" [attr.aria-disabled]="isNavDisabled('/forecast')" [attr.tabindex]="isNavDisabled('/forecast') ? -1 : null" (click)="onNavClick($event, '/forecast')">
         <span class="material-symbols-outlined icon">trending_up</span>
         <span class="label">Forecast</span>
       </a>
-      <a routerLink="/goals" class="menu-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <small class="lock-note label">Temporarily locked</small>
+      <a routerLink="/goals" class="menu-item" [class.disabled]="isNavDisabled('/goals')" [attr.aria-disabled]="isNavDisabled('/goals')" [attr.tabindex]="isNavDisabled('/goals') ? -1 : null" (click)="onNavClick($event, '/goals')">
         <span class="material-symbols-outlined icon">track_changes</span>
         <span class="label">Goals</span>
       </a>
-      <a routerLink="/budgets" class="menu-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <small class="lock-note label">Temporarily locked</small>
+      <a routerLink="/budgets" class="menu-item" [class.disabled]="isNavDisabled('/budgets')" [attr.aria-disabled]="isNavDisabled('/budgets')" [attr.tabindex]="isNavDisabled('/budgets') ? -1 : null" (click)="onNavClick($event, '/budgets')">
         <span class="material-symbols-outlined icon">pie_chart</span>
         <span class="label">Budgets</span>
       </a>
+      <small class="lock-note label">Temporarily locked</small>
     </div>
   </nav>
 </aside>
