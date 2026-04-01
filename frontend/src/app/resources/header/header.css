@@ -179,6 +179,14 @@
   margin: 4px 0;
 }
 
+.lock-note {
+  display: block;
+  padding: 0 16px 8px 44px;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
 /* Itens de dentro do menu (links e botões) */
 .dropdown-item {
   display: flex;
@@ -207,6 +215,15 @@ button.dropdown-item {
 
 .dropdown-item:hover {
   background-color: var(--muted);
+}
+
+.dropdown-item.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.dropdown-item.disabled:hover {
+  background-color: transparent;
 }
 
 .dropdown-item .material-symbols-outlined {

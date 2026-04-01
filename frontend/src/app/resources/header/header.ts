@@ -39,7 +39,22 @@ export class Header implements OnInit, OnDestroy {
   isProfileMenuOpen = false;
   isNavMenuOpen = false;
   isDarkMode = false;
+  private readonly disabledRoutes = new Set(['/budgets', '/forecast', '/goals', '/past-12-months']);
   private settingsLoadedForUserId: string | null = null;
+
+  isNavDisabled(route: string): boolean {
+    return this.disabledRoutes.has(route);
+  }
+
+  onNavLinkClick(event: Event, route: string): void {
+    if (this.isNavDisabled(route)) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    this.closeAllMenus();
+  }
 
   ngOnInit(): void {
     this.syncThemeWithPreferences();
