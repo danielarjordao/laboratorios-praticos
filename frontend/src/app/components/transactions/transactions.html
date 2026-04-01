@@ -8,10 +8,25 @@
     </div>
 
     <div class="header-actions">
-      <!-- Ícone e texto perfeitamente alinhados -->
       <button class="btn-outline" (click)="exportToCsv()" [disabled]="transactions.length === 0 || isLoading">
         <span class="material-symbols-outlined">download</span>
         <span>Export CSV</span>
+      </button>
+
+      <button class="btn-outline btn-locked" disabled title="Temporarily locked">
+        <span class="material-symbols-outlined">lock</span>
+        <span>Installments
+          <br>
+          <small class="lock-note label">Temporarily locked</small>
+        </span>
+      </button>
+
+      <button class="btn-outline btn-locked" disabled title="Temporarily locked">
+        <span class="material-symbols-outlined">lock</span>
+        <span>Recurring
+          <br>
+          <small class="lock-note label">Temporarily locked</small>
+        </span>
       </button>
 
       <button class="btn-primary" (click)="openNewTransactionForm()">
@@ -24,13 +39,11 @@
   <div class="glass-toolbar">
     <form [formGroup]="filterForm" class="toolbar-main">
 
-      <!-- Search -->
       <div class="search-wrapper">
         <span class="material-symbols-outlined search-icon">search</span>
         <input type="text" formControlName="search" placeholder="Search by description..." class="input-search">
       </div>
 
-      <!-- Type Filter -->
       <select formControlName="type" class="select-minimal">
         <option value="">All types</option>
         <option value="INCOME">Income</option>
@@ -38,7 +51,6 @@
         <option value="TRANSFER">Transfers</option>
       </select>
 
-      <!-- Tag Filter -->
       <select formControlName="tagId" class="select-minimal">
         <option value="">All tags</option>
         @for (tag of tags; track tag.id) {
@@ -46,15 +58,34 @@
         }
       </select>
 
-      <!-- More Filters Toggle -->
       <button type="button" class="btn-icon-outline" (click)="toggleFilters()" [class.active]="showFilters">
         <span class="material-symbols-outlined">tune</span>
       </button>
     </form>
 
-    <!-- Extended Filters (Animated/Conditional) -->
     @if (showFilters) {
       <form [formGroup]="filterForm" class="toolbar-extended">
+
+        <div class="filter-group">
+          <label>Account</label>
+          <select formControlName="accountId" class="select-minimal">
+            <option value="">All accounts</option>
+            @for (acc of accounts; track acc.id) {
+              <option [value]="acc.id">{{ acc.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Category</label>
+          <select formControlName="categoryId" class="select-minimal">
+            <option value="">All categories</option>
+            @for (cat of categories; track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+
         <div class="filter-group">
           <label>Month</label>
           <select formControlName="month" class="select-minimal">

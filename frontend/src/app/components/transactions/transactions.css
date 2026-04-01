@@ -48,7 +48,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  flex-wrap: wrap; /* Garante que não quebra em ecrãs pequenos */
+  flex-wrap: wrap;
 }
 
 .search-wrapper {
@@ -110,6 +110,20 @@
 .btn-icon-outline:hover, .btn-icon-outline.active {
   background: var(--muted);
   color: var(--foreground);
+}
+
+.btn-locked {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  border-style: dashed;
+}
+
+.lock-note {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted-foreground);
+  margin: 2px 0 0 0;
+  line-height: 1.2;
 }
 
 /* Extended Filters */
@@ -182,7 +196,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white; /* Mantém branco para garantir contraste com as cores das categorias */
+  color: white;
   font-size: 24px;
   flex-shrink: 0;
 }
@@ -222,7 +236,6 @@
   text-overflow: ellipsis;
 }
 
-/* Pending Dot usando as tuas cores quentes */
 .tx-pending-badge {
   display: flex;
   align-items: center;

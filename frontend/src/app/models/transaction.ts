@@ -29,13 +29,14 @@ export interface TransactionFilters {
   month?: number;
   year?: number;
   type?: string;
-  categoryId?: string;
   search?: string;
   page?: number;
   limit?: number;
   sortBy?: string;
   sortOrder?: string;
   tagId?: string;
+  categoryId?: string;
+  accountId?: string;
 }
 
 export interface TransactionWithDetails {

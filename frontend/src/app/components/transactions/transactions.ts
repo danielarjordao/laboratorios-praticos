@@ -1,17 +1,35 @@
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
-import { Subject, takeUntil, debounceTime, filter } from 'rxjs';
+import { Subject, takeUntil, debounceTime, filter, pairwise, startWith } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { TransactionService } from '../../services/transaction';
 import { TagService } from '../../services/tag';
+import { CategoryService } from '../../services/category';
+import { AccountService } from '../../services/account';
 import { ProfileService } from '../../services/profile';
 import { PreferencesService } from '../../services/preferences';
 import { LoadingIndicator } from '../../resources/loading-indicator/loading-indicator';
 
 import { TransactionFilters, TransactionWithDetails } from '../../models/transaction';
 import { Tag } from '../../models/tag';
+import { Account } from '../../models/account';
+import { Category } from '../../models/category';
+
+type TransactionsFilterFormValue = {
+  search: string | null;
+  type: string | null;
+  tagId: string | null;
+  categoryId: string | null;
+  accountId: string | null;
+  month: number | null;
+  year: number | null;
+  page: number | null;
+  limit: number | null;
+  sortBy: string | null;
+  sortOrder: string | null;
+};
 
 @Component({
   selector: 'app-transactions',
@@ -24,12 +42,16 @@ export class Transactions implements OnInit, OnDestroy {
   private router = inject(Router);
   private transactionService = inject(TransactionService);
   private tagService = inject(TagService);
+  private accountService = inject(AccountService);
+  private categoryService = inject(CategoryService);
   private profileService = inject(ProfileService);
   private preferences = inject(PreferencesService);
   private cdr = inject(ChangeDetectorRef);
 
   transactions: TransactionWithDetails[] = [];
   tags: Tag[] = [];
+  accounts: Account[] = [];
+  categories: Category[] = [];
   totalRecords: number = 0;
   isLoading: boolean = true;
   errorMessage: string = '';
@@ -58,6 +80,8 @@ export class Transactions implements OnInit, OnDestroy {
     search: new FormControl<string>(''),
     type: new FormControl<string>(''),
     tagId: new FormControl<string>(''),
+    categoryId: new FormControl<string>(''),
+    accountId: new FormControl<string>(''),
     month: new FormControl<number>(new Date().getMonth() + 1),
     year: new FormControl<number>(new Date().getFullYear()),
     page: new FormControl<number>(1),
@@ -88,10 +112,16 @@ export class Transactions implements OnInit, OnDestroy {
     this.filterForm.valueChanges
       .pipe(
         takeUntil(this.destroy$),
-        debounceTime(400)
+        debounceTime(400),
+        startWith(this.filterForm.getRawValue()),
+        pairwise(),
       )
-      .subscribe(() => {
+      .subscribe(([previous, current]) => {
         if (this.currentProfileId) {
+          if (this.shouldResetPage(previous, current) && (current.page ?? 1) !== 1) {
+            this.filterForm.patchValue({ page: 1 }, { emitEvent: false });
+          }
+
           this.loadTransactions();
         }
       });
@@ -115,6 +145,8 @@ export class Transactions implements OnInit, OnDestroy {
   private loadInitialData(profileId: string): void {
     this.loadTags(profileId);
     this.loadTransactions();
+    this.loadCategories(profileId);
+    this.loadAccounts(profileId);
   }
 
   // Constrói filtros da API a partir do estado atual do formulário.
@@ -131,8 +163,24 @@ export class Transactions implements OnInit, OnDestroy {
       limit: formValues.limit ?? 20,
       sortBy: formValues.sortBy || 'date',
       sortOrder: formValues.sortOrder || 'desc',
-      tagId: formValues.tagId || undefined
+      tagId: formValues.tagId || undefined,
+      categoryId: formValues.categoryId || undefined,
+      accountId: formValues.accountId || undefined,
     };
+  }
+
+  // Reinicia a paginação quando filtros de conteúdo mudam.
+  private shouldResetPage(previous: Partial<TransactionsFilterFormValue>, current: Partial<TransactionsFilterFormValue>): boolean {
+    return (previous.search ?? null) !== (current.search ?? null)
+      || (previous.type ?? null) !== (current.type ?? null)
+      || (previous.tagId ?? null) !== (current.tagId ?? null)
+      || (previous.categoryId ?? null) !== (current.categoryId ?? null)
+      || (previous.accountId ?? null) !== (current.accountId ?? null)
+      || (previous.month ?? null) !== (current.month ?? null)
+      || (previous.year ?? null) !== (current.year ?? null)
+      || (previous.sortBy ?? null) !== (current.sortBy ?? null)
+      || (previous.sortOrder ?? null) !== (current.sortOrder ?? null)
+      || (previous.limit ?? null) !== (current.limit ?? null);
   }
 
   loadTransactions(): void {
@@ -166,6 +214,24 @@ export class Transactions implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (err) => console.error('Error fetching tags:', err)
+    });
+  }
+
+  loadCategories(profileId: string): void {
+    this.categoryService.getCategories(profileId).subscribe({
+      next: (categories) => {
+        this.categories = categories;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  loadAccounts(profileId: string): void {
+    this.accountService.getAccounts(profileId).subscribe({
+      next: (accounts) => {
+        this.accounts = accounts;
+        this.cdr.markForCheck();
+      }
     });
   }
 
