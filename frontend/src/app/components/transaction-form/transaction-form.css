@@ -97,67 +97,30 @@
 .modal-footer {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 12px;
   margin-top: 24px;
   padding-top: 16px;
   border-top: 1px solid var(--border);
+}
 
 .input-full-width {
   width: 100%;
 }
-}
 
-/* Botões */
-.btn-primary, .btn-secondary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #fff;
-  font-weight: 500;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.error-banner-strong {
-  background: var(--destructive);
-}
-
-.tag-input-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.tag-input-flex {
-  flex: 1;
-}
-
-.btn-primary {
-  background-color: var(--primary);
-  align-items: center;
-  color: var(--primary-foreground);
-  border: none;
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-}
-/* Botões gerais */
 .btn-primary,
 .btn-outline,
 .btn-delete,
 .btn-edit-mode {
-  background-color: transparent;
-  color: var(--foreground);
-  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espaço entre ícone e texto */
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
   transition: all 0.2s ease;
-}
-
-.btn-primary,
-.btn-outline {
   padding: 10px 24px;
 }
 
@@ -165,7 +128,6 @@
   background: var(--primary);
   color: var(--primary-foreground);
   border: none;
-  font-weight: 600;
 }
 
 .btn-primary:hover {
@@ -189,23 +151,20 @@
 
 .btn-delete {
   margin-right: auto;
+  background: transparent;
   color: var(--expense);
   border: 1px solid var(--expense);
-  background: transparent;
-  padding: 8px 16px;
+  padding: 10px 16px;
 }
 
 .btn-delete:hover {
-  background: var(--powder-petal);
+  background: var(--powder-petal, rgba(239, 68, 68, 0.1));
 }
 
 .btn-edit-mode {
   background: var(--accent);
   color: var(--accent-foreground);
   border: none;
-  padding: 8px 16px;
-  font-size: 0.875rem;
-  font-weight: 600;
   width: fit-content;
 }
 
