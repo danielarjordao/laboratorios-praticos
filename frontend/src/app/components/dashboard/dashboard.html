@@ -10,7 +10,10 @@
   @if (isLoading) {
     <app-loading-indicator message="Loading your overview..."></app-loading-indicator>
   } @else if (errorMessage) {
-    <div class="error-state">{{ errorMessage }}</div>
+    <!--
+    TODO(dashboard-error): Melhorar tratamento de erros, aparece a mensagem em situações como componente carregando antes do backend responder, ou quando o backend retorna um erro. | Done when: implementar tratamento de erros mais robusto e user-friendly, evitando mensagens de erro genéricas e melhorando a experiência do usuário.
+      <div class="error-state">{{ errorMessage }}</div>
+    -->
   } @else {
     <!-- BLOCO 1: CARDS DE RESUMO -->
     <section class="summary-cards">
