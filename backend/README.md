@@ -14,9 +14,9 @@ Bem-vindo ao repositório do backend do Gestor de Finanças Pessoais (MVP). Esta
 
 Para manter este repositório organizado e profissional, todos os detalhes arquiteturais e técnicos foram documentados em ficheiros dedicados na pasta `docs/`:
 
-* **[Endpoints da API (Rotas e Funcionalidades)](docs/api-endpoints.md)**
-* **[Esquema da Base de Dados (Tabelas e Relações)](docs/database-schema.md)**
-* **[Decisões de Arquitetura (Justificações Técnicas)](docs/decisions.md)**
+* **[Endpoints da API (Rotas e Funcionalidades)](../docs/api-endpoints.md)**
+* **[Esquema da Base de Dados (Tabelas e Relações)](../docs/database-schema.md)**
+* **[Decisões de Arquitetura (Justificações Técnicas)](../docs/decisions.md)**
 
 ## Como Executar Localmente
 
