@@ -51,6 +51,11 @@
   flex-wrap: wrap;
 }
 
+.search-group {
+  flex: 1;
+  min-width: 280px;
+}
+
 .search-wrapper {
   position: relative;
   flex: 1;
