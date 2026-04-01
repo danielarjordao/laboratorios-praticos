@@ -1,1 +1,126 @@
-<p>dashboard works!</p>
+<div class="page-container">
+
+  <header class="page-header">
+    <div class="header-titles">
+      <h1>Dashboard</h1>
+      <p>Your financial overview for this month.</p>
+    </div>
+  </header>
+
+  @if (isLoading) {
+    <app-loading-indicator message="Loading your overview..."></app-loading-indicator>
+  } @else if (errorMessage) {
+    <div class="error-state">{{ errorMessage }}</div>
+  } @else {
+    <!-- BLOCO 1: CARDS DE RESUMO -->
+    <section class="summary-cards">
+
+      <!-- Card Saldo Total -->
+      <article class="stat-card">
+        <div class="stat-icon neutral-bg">
+          <span class="material-symbols-outlined">account_balance_wallet</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Total Balance</span>
+          <h2 class="stat-value">{{ formatCurrency(totalBalance) }}</h2>
+        </div>
+      </article>
+
+      <!-- Card Receitas -->
+      <article class="stat-card">
+        <div class="stat-icon income-bg">
+          <span class="material-symbols-outlined">trending_up</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Monthly Income</span>
+          <h2 class="stat-value income-text">{{ formatCurrency(monthlyIncome) }}</h2>
+        </div>
+      </article>
+
+      <!-- Card Despesas -->
+      <article class="stat-card">
+        <div class="stat-icon expense-bg">
+          <span class="material-symbols-outlined">trending_down</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Monthly Expense</span>
+          <h2 class="stat-value expense-text">{{ formatCurrency(monthlyExpense) }}</h2>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- BLOCOS INFERIORES -->
+    <div class="dashboard-grid">
+
+      <!-- BLOCO 2: GRÁFICO (Placeholder por agora) -->
+      <section class="dashboard-panel chart-panel">
+        <header class="panel-header">
+          <h3>Expenses by Category</h3>
+        </header>
+        <div class="panel-content">
+          @if (expenseByCategory.length === 0) {
+            <div class="empty-state">
+              <span class="material-symbols-outlined">pie_chart</span>
+              <p>No expense categories found for this month.</p>
+            </div>
+          } @else {
+            <ul class="category-chart-list">
+              @for (item of expenseByCategory; track item.name) {
+                <li class="category-chart-item">
+                  <div class="category-row-top">
+                    <div class="category-main">
+                      <span class="material-symbols-outlined category-icon">{{ item.icon }}</span>
+                      <span class="category-name">{{ item.name }}</span>
+                    </div>
+
+                    <div class="category-values">
+                      <span class="category-percentage">{{ item.percentage | number:'1.0-0' }}%</span>
+                      <span class="category-amount">{{ formatCurrency(item.amount) }}</span>
+                    </div>
+                  </div>
+
+                  <progress class="category-progress" [value]="item.percentage" max="100"></progress>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </section>
+
+      <!-- BLOCO 3: ATIVIDADE RECENTE -->
+      <section class="dashboard-panel">
+        <header class="panel-header">
+          <h3>Recent Transactions</h3>
+          <a routerLink="/transactions" class="link-btn">View All</a>
+        </header>
+
+        <div class="panel-content">
+          @if (recentTransactions.length === 0) {
+            <p class="empty-text">No transactions this month.</p>
+          } @else {
+            <ul class="transaction-list">
+              @for (tx of recentTransactions; track tx.id) {
+                <li class="transaction-item">
+                  <div class="tx-main">
+                    <span class="material-symbols-outlined tx-icon" [ngClass]="getTransactionIconClass(tx)">
+                      {{ tx.categories?.icon || 'receipt' }}
+                    </span>
+                    <div class="tx-details">
+                      <p class="tx-desc">{{ tx.description || 'No description' }}</p>
+                      <span class="tx-date">{{ tx.date | date:'mediumDate' }}</span>
+                    </div>
+                  </div>
+                  <span class="tx-amount" [class.income-text]="tx.type === 'INCOME'" [class.expense-text]="tx.type === 'EXPENSE'">
+                    {{ tx.type === 'EXPENSE' ? '-' : '+' }}{{ formatCurrency(tx.amount) }}
+                  </span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </section>
+
+    </div>
+  }
+</div>
