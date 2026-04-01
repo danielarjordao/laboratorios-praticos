@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Subject, finalize, takeUntil } from 'rxjs';
+import { Subject, finalize, take, takeUntil } from 'rxjs';
 import { ProfileService } from '../../services/profile';
 import { Auth } from '../../services/auth';
 import { Profile } from '../../models/profile';
 import { LoadingIndicator } from '../../resources/loading-indicator/loading-indicator';
+import { ConfirmModalService } from '../../services/confirm-modal';
 
 @Component({
   selector: 'app-profiles',
@@ -17,6 +18,7 @@ import { LoadingIndicator } from '../../resources/loading-indicator/loading-indi
 export class Profiles implements OnInit, OnDestroy {
   private readonly profileService = inject(ProfileService);
   private readonly authService = inject(Auth);
+  private readonly confirmModal = inject(ConfirmModalService);
   private readonly destroy$ = new Subject<void>();
 
   // Estado dos Dados
@@ -146,18 +148,30 @@ export class Profiles implements OnInit, OnDestroy {
       return;
     }
 
-    if (confirm('Tem a certeza que deseja eliminar este perfil e todos os dados associados?')) {
-      this.profileService.deleteProfile(id).subscribe({
-        next: () => {
-          // Se apagou o perfil ativo, muda para outro automaticamente
-          if (this.activeProfileId === id && this.profiles.length > 0) {
-            const nextProfile = this.profiles.find(p => p.id !== id);
-            if (nextProfile) this.profileService.switchProfile(nextProfile);
-          }
-        },
-        error: (err) => console.error('Erro ao eliminar perfil:', err)
+    this.confirmModal.confirm({
+      title: 'Eliminar perfil',
+      message: 'Tem a certeza que deseja eliminar este perfil e todos os dados associados?',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      isDestructive: true,
+    })
+      .pipe(take(1), takeUntil(this.destroy$))
+      .subscribe(confirmed => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.profileService.deleteProfile(id).subscribe({
+          next: () => {
+            // Se apagou o perfil ativo, muda para outro automaticamente
+            if (this.activeProfileId === id && this.profiles.length > 0) {
+              const nextProfile = this.profiles.find(p => p.id !== id);
+              if (nextProfile) this.profileService.switchProfile(nextProfile);
+            }
+          },
+          error: (err) => console.error('Erro ao eliminar perfil:', err)
+        });
       });
-    }
   }
 
   // Define o perfil clicado como ativo (igual ao Header)
