@@ -71,4 +71,7 @@ export class CategoryService {
       ),
     );
   }
+
+  // TODO(category-service): Adicionar métodos de ordenação e filtragem | Done when: endpoints de ordenação/filtragem estiverem disponíveis no backend.
+  // TODO(category-service): Implementar a funcionalidade de categorias pais e subcategorias | Done when: modelo de categoria hierárquica estiver definido e suportado pelo backend.
 }
