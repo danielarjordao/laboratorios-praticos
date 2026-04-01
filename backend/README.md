@@ -10,34 +10,34 @@ Bem-vindo ao repositório do backend do Gestor de Finanças Pessoais (MVP). Esta
 * **Base de Dados:** PostgreSQL (via Supabase BaaS)
 * **Arquitetura:** Padrão Controller-Service com ES Modules
 
-## Documentação do Projeto
+## Documentação Detalhada
 
-Todos os detalhes técnicos e estruturais foram documentados em ficheiros separados para facilitar a leitura:
+Para manter este repositório organizado e profissional, todos os detalhes arquiteturais e técnicos foram documentados em ficheiros dedicados na pasta `docs/`:
 
-* [Esquema da Base de Dados (Tabelas e Relações)](../docs/database-schema.md)
-* [Endpoints da API (Rotas e Funcionalidades)](../docs/api-endpoints.md)
-* [Decisões de Arquitetura (Justificações Técnicas)](../docs/decisions.md)
+* **[Endpoints da API (Rotas e Funcionalidades)](docs/api-endpoints.md)**
+* **[Esquema da Base de Dados (Tabelas e Relações)](docs/database-schema.md)**
+* **[Decisões de Arquitetura (Justificações Técnicas)](docs/decisions.md)**
 
 ## Como Executar Localmente
 
 ### 1. Clona o repositório e acede à pasta do backend
 
 ```bash
-   cd backend
+git clone [teu-link-do-repo]
+cd backend
 ```
 
 ### 2. Instala as dependências
 
 ```bash
-    npm install
+npm install
 ```
 
 ### 3. Configura as variáveis de ambiente
 
-* Cria um ficheiro `.env` na raiz da pasta `backend`.
-* Adiciona as tuas credenciais do Supabase:
+Cria um ficheiro `.env` na raiz da pasta `backend` e adiciona as tuas credenciais do Supabase:
 
-```bash
+```env
 PORT=3000
 SUPABASE_URL=tua_url_aqui
 SUPABASE_KEY=tua_service_role_key_aqui
