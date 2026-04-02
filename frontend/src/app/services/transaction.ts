@@ -13,6 +13,9 @@ export class TransactionService {
   private authService = inject(Auth);
   private apiUrl = `${environment.apiUrl}/transactions`;
 
+  // Função auxiliar para adicionar headers de autenticação a cada requisição.
+  private savedFilters: Partial<TransactionFilters> = {};
+
   // Executa uma chamada HTTP anexando token de autenticação quando disponível.
   private withAuthHeaders<T>(requestFactory: (headers: HttpHeaders) => Observable<T>): Observable<T> {
     return from(this.authService.getAccessToken()).pipe(
@@ -96,5 +99,13 @@ export class TransactionService {
         map(response => response.data)
       );
     });
+  }
+
+  setSavedFilters(filters: any): void {
+    this.savedFilters = filters;
+  }
+
+  getSavedFilters(): any {
+    return this.savedFilters;
   }
 }
