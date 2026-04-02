@@ -66,23 +66,41 @@
 
         <div class="form-group">
           <label for="name">Account Name</label>
-          <input id="name" type="text" formControlName="name" class="input-minimal" placeholder="Example: Main checking account">
+          <input id="name" type="text" formControlName="name" class="input-minimal" placeholder="Example: Main checking account"
+                 [class.input-error]="isFieldInvalid('name')">
+          @if (isFieldInvalid('name')) {
+            <div class="error-message">
+              Account name is required and must be at least 2 characters.
+            </div>
+          }
         </div>
 
         <div class="form-row">
           <div class="form-group span-1">
             <label for="type">Account Type</label>
-            <select id="type" formControlName="type" class="input-minimal">
+            <select id="type" formControlName="type" class="input-minimal"
+                    [class.input-error]="isFieldInvalid('type')">
               <option value="CHECKING">Checking</option>
               <option value="SAVINGS">Savings</option>
               <option value="CASH">Cash Wallet</option>
               <option value="CREDIT">Credit Card</option>
             </select>
+            @if (isFieldInvalid('type')) {
+              <div class="error-message">
+                Please select an account type.
+              </div>
+            }
           </div>
 
           <div class="form-group span-1">
             <label for="balance">Initial Balance</label>
-            <input id="balance" type="number" formControlName="balance" class="input-minimal" step="0.01">
+            <input id="balance" type="number" formControlName="balance" class="input-minimal" step="0.01"
+                   [class.input-error]="isFieldInvalid('balance')">
+            @if (isFieldInvalid('balance')) {
+              <div class="error-message">
+                Initial balance is required.
+              </div>
+            }
           </div>
         </div>
 

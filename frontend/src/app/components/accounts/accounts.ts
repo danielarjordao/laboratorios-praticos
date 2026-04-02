@@ -8,6 +8,7 @@ import { ProfileService } from '../../services/profile';
 import { PreferencesService } from '../../services/preferences';
 import { LoadingIndicator } from '../../resources/loading-indicator/loading-indicator';
 import { ConfirmModalService } from '../../services/confirm-modal';
+import { checkFieldInvalid } from '../../utils/formUtils';
 
 type AccountForm = FormGroup<{
   name: FormControl<string>;
@@ -27,6 +28,7 @@ export class Accounts implements OnInit, OnDestroy {
   private readonly profileService = inject(ProfileService);
   private readonly preferences = inject(PreferencesService);
   private readonly confirmModal = inject(ConfirmModalService);
+  private readonly checkFieldInvalid = checkFieldInvalid;
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
 
@@ -238,5 +240,9 @@ export class Accounts implements OnInit, OnDestroy {
           },
         });
       });
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    return this.checkFieldInvalid(this.accountForm, fieldName);
   }
 }
