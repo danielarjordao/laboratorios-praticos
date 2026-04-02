@@ -10,6 +10,7 @@ import { CategoryService } from '../../services/category';
 import { TagService } from '../../services/tag';
 import { ProfileService } from '../../services/profile';
 import { ConfirmModalService } from '../../services/confirm-modal';
+import { checkFieldInvalid } from '../../utils/formUtils';
 
 import { Transaction, TransactionWithDetails } from '../../models/transaction';
 import { Account } from '../../models/account';
@@ -30,6 +31,7 @@ export class TransactionForm implements OnInit, OnDestroy {
   private tagService = inject(TagService);
   private profileService = inject(ProfileService);
   private confirmModal = inject(ConfirmModalService);
+  private checkFieldInvalid = checkFieldInvalid;
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
@@ -60,12 +62,15 @@ export class TransactionForm implements OnInit, OnDestroy {
     category_id: new FormControl<string>(''),
     transfer_account_id: new FormControl<string>(''),
     tags: new FormControl<string[]>([]),
-    description: new FormControl<string>(''),
+    description: new FormControl<string>('', [Validators.required, Validators.minLength(2)]),
     status: new FormControl<'PENDING' | 'COMPLETED'>('COMPLETED')
   });
 
   ngOnInit(): void {
     this.setupEditMode();
+
+    const initialType = this.transactionForm.get('type')?.value || 'EXPENSE';
+    this.updateValidationSchema(initialType);
 
     // Observa o perfil ativo para carregar dependências do formulário.
     this.profileService.currentProfile$
@@ -130,12 +135,18 @@ export class TransactionForm implements OnInit, OnDestroy {
       const tagIds = txData.transaction_tags.map((tt) => tt.tags.id);
       this.transactionForm.get('tags')?.setValue(tagIds);
     }
+
+    this.updateValidationSchema(txData.type);
+    this.filterCategoriesByType(txData.type);
   }
 
   // Ativa edição de uma transação já existente.
   enableEditing(): void {
     this.isReadOnly = false;
     this.transactionForm.enable();
+
+    const currentType = this.transactionForm.get('type')?.value || 'EXPENSE';
+    this.updateValidationSchema(currentType);
   }
 
   // Remove a transação atual e retorna para a listagem.
@@ -352,5 +363,9 @@ export class TransactionForm implements OnInit, OnDestroy {
   // Regressa para a listagem de transações.
   goBack(): void {
     this.router.navigate(['/transactions']);
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    return this.checkFieldInvalid(this.transactionForm, fieldName);
   }
 }

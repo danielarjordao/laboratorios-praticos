@@ -47,24 +47,35 @@
       <div class="form-row">
         <div class="form-group">
           <label>Amount</label>
-          <input type="number" formControlName="amount" step="0.01" min="0" placeholder="0.00">
+          <input type="number" formControlName="amount" step="0.01" min="0" placeholder="0.00"
+                 [class.input-error]="isFieldInvalid('amount')">
+          @if (isFieldInvalid('amount')) {
+            <div class="error-message">
+              Amount is required and must be greater than 0.
+            </div>
+          }
         </div>
 
         <div class="form-group">
           <label>Origin Account</label>
-          <select formControlName="account_id">
+          <select formControlName="account_id" [class.input-error]="isFieldInvalid('account_id')">
             <option value="">Select Account</option>
             @for (acc of accounts; track acc.id) {
               <option [value]="acc.id">{{ acc.name }}</option>
             }
           </select>
+          @if (isFieldInvalid('account_id')) {
+            <div class="error-message">
+              Please select an origin account.
+            </div>
+          }
         </div>
       </div>
 
       @if (transactionForm.get('type')?.value === 'TRANSFER') {
         <div class="form-group">
           <label>Destination Account</label>
-          <select formControlName="transfer_account_id">
+          <select formControlName="transfer_account_id" [class.input-error]="isFieldInvalid('transfer_account_id')">
             <option value="">Select Destination</option>
             @for (acc of accounts; track acc.id) {
               <option [value]="acc.id" [disabled]="acc.id === transactionForm.get('account_id')?.value">
@@ -72,16 +83,26 @@
               </option>
             }
           </select>
+          @if (isFieldInvalid('transfer_account_id')) {
+            <div class="error-message">
+              Please select a destination account.
+            </div>
+          }
         </div>
       } @else {
         <div class="form-group">
           <label>Category</label>
-          <select formControlName="category_id">
+          <select formControlName="category_id" [class.input-error]="isFieldInvalid('category_id')">
             <option value="">Select Category</option>
             @for (cat of filteredCategories; track cat.id) {
               <option [value]="cat.id">{{ cat.name }}</option>
             }
           </select>
+          @if (isFieldInvalid('category_id')) {
+            <div class="error-message">
+              Please select a category.
+            </div>
+          }
         </div>
       }
 
@@ -123,8 +144,14 @@
       <div class="form-row form-row-bottom">
         <div class="form-group form-group-double">
           <label>Description</label>
-          <input type="text" formControlName="description" placeholder="Ex: Supermarket..." class="input-minimal input-full-width">
+          <input type="text" formControlName="description" placeholder="Ex: Supermarket..." class="input-minimal input-full-width" [class.input-error]="isFieldInvalid('description')">
+          @if (isFieldInvalid('description')) {
+            <div class="error-message">
+              Description is required and must be at least 2 characters.
+            </div>
+          }
         </div>
+
 
         <div class="form-group">
           <label>Status</label>
