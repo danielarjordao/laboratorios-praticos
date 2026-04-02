@@ -91,11 +91,20 @@ export class Transactions implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
+
+    // Tenta restaurar filtros salvos na sessão para manter estado entre navegações.
+    const previousFilters = this.transactionService.getSavedFilters();
+    if (previousFilters) {
+      this.filterForm.patchValue(previousFilters, { emitEvent: false });
+    }
+
+    // Observa mudanças nas preferências para re-renderizar a página (ex: formatação de moeda).
     this.preferences.preferences$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.cdr.markForCheck();
       });
+
 
     // Observa o perfil atual para carregar dados contextuais da página.
     this.profileService.currentProfile$
@@ -107,6 +116,7 @@ export class Transactions implements OnInit, OnDestroy {
         this.currentProfileId = profile!.id;
         this.loadInitialData(this.currentProfileId);
       });
+
 
     // Observa alterações dos filtros e dispara nova leitura paginada.
     this.filterForm.valueChanges
@@ -135,6 +145,9 @@ export class Transactions implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+
+    const currentFilters = this.filterForm.getRawValue();
+    this.transactionService.setSavedFilters(currentFilters);
   }
 
   toggleFilters(): void {
