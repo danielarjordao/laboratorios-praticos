@@ -12,12 +12,24 @@
       <div class="name-row">
         <div class="form-group">
           <label for="firstName">First Name</label>
-          <input type="text" id="firstName" formControlName="firstName" autocomplete="given-name">
+          <input type="text" id="firstName" formControlName="firstName" autocomplete="given-name" class="input-minimal"
+                 [class.input-error]="isFieldInvalid('firstName')">
+          @if (isFieldInvalid('firstName')) {
+            <div class="error-message">
+              First name is required and must be at least 2 characters.
+            </div>
+          }
         </div>
 
         <div class="form-group">
           <label for="lastName">Last Name</label>
-          <input type="text" id="lastName" formControlName="lastName" autocomplete="family-name">
+          <input type="text" id="lastName" formControlName="lastName" autocomplete="family-name" class="input-minimal"
+                 [class.input-error]="isFieldInvalid('lastName')">
+            @if (isFieldInvalid('lastName')) {
+              <div class="error-message">
+                Last name is required and must be at least 2 characters.
+              </div>
+            }
         </div>
       </div>
 
@@ -25,7 +37,13 @@
       @if (!isReadOnly) {
         <div class="form-group">
           <label for="password">New Password</label>
-          <input type="password" id="password" formControlName="password" placeholder="Leave blank to keep current password" autocomplete="new-password">
+          <input type="password" id="password" formControlName="password" placeholder="Leave blank to keep current password" autocomplete="new-password" class="input-minimal"
+                 [class.input-error]="isFieldInvalid('password')">
+          @if (isFieldInvalid('password')) {
+            <div class="error-message">
+              Password must be at least 6 characters if you want to change it.
+            </div>
+          }
         </div>
       }
 
@@ -48,7 +66,7 @@
         @if (isReadOnly) {
           <button type="button" class="btn-primary" (click)="enableEditing()">
             <span class="material-symbols-outlined">edit</span>
-            Edit User Info
+            Edit Details
           </button>
         }
 
