@@ -145,8 +145,7 @@ export class TransactionForm implements OnInit, OnDestroy {
     this.isReadOnly = false;
     this.transactionForm.enable();
 
-    const currentType = this.transactionForm.get('type')?.value || 'EXPENSE';
-    this.updateValidationSchema(currentType);
+    this.transactionForm.get('type')?.disable();
   }
 
   // Remove a transação atual e retorna para a listagem.
