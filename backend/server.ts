@@ -21,8 +21,19 @@ const port = Number(process.env.PORT) || 3000;
 
 // Configura os middlewares globais da aplicação.
 const setupMiddlewares = (): void => {
-  // Permite requisições de diferentes origens (ex.: frontend Angular).
-  app.use(cors());
+  // Define as origens permitidas (localhost para testes e o domínio de produção)
+  const allowedOrigins = [
+    'http://localhost:4200',
+    // TODO(Deployment): Substituir pelo domínio real da aplicação frontend em produção
+  ];
+
+  // Permite requisições apenas de origens autorizadas.
+  app.use(cors({
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true
+  }));
+
   // Faz o parse automático do corpo JSON das requisições.
   app.use(express.json());
 };
