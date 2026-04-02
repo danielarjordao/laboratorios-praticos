@@ -24,8 +24,10 @@
 }
 
 .btn-primary:disabled {
+  background-color: var(--muted);
+  color: var(--muted-foreground);
   cursor: not-allowed;
-  opacity: 0.65;
+  opacity: 0.7;
 }
 
 .page-header {
@@ -59,12 +61,10 @@
 }
 
 .error-state {
-  margin-bottom: 16px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: var(--destructive-foreground);
-  background: var(--destructive);
-  font-size: 0.9rem;
+  color: var(--destructive);
+  padding: 2px;
+  border-radius: 6px;
+  font-size: 0.85rem;
 }
 
 /* Grelha de Categorias */
@@ -312,4 +312,11 @@
   .icon-selector {
     grid-template-columns: repeat(5, 1fr);
   }
+}
+
+.error-message {
+  color: var(--destructive);
+  padding: 2px;
+  border-radius: 6px;
+  font-size: 0.85rem;
 }

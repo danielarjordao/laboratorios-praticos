@@ -62,21 +62,33 @@
         <div class="form-row">
           <div class="form-group span-2">
             <label for="name">Name</label>
-            <input id="name" type="text" formControlName="name" class="input-minimal" placeholder="Ex: Supermarket">
+            <input id="name" type="text" formControlName="name" class="input-minimal" placeholder="Ex: Supermarket"
+                   [class.input-error]="isFieldInvalid('name')">
+            @if (isFieldInvalid('name')) {
+              <div class="error-message">
+                Category name is required and must be at least 2 characters.
+              </div>
+            }
           </div>
 
           <div class="form-group span-1">
             <label for="type">Type</label>
-            <select id="type" formControlName="type" class="input-minimal">
+            <select id="type" formControlName="type" class="input-minimal"
+                    [class.input-error]="isFieldInvalid('type')">
               <option value="EXPENSE">Expense</option>
               <option value="INCOME">Income</option>
             </select>
+            @if (isFieldInvalid('type')) {
+              <div class="error-message">
+                Please select a category type.
+              </div>
+            }
           </div>
         </div>
 
         <div class="form-group">
           <label>Icon</label>
-          <div class="icon-selector">
+          <div class="icon-selector" [class.input-error]="isFieldInvalid('icon')">
             @for (icon of availableIcons; track icon) {
               <button
                 type="button"
@@ -87,11 +99,17 @@
               </button>
             }
           </div>
+          @if (isFieldInvalid('icon')) {
+            <div class="error-message">
+              Please select an icon.
+            </div>
+          }
         </div>
 
         <div class="form-group">
           <label for="color">Color</label>
-          <input id="color" type="color" formControlName="color" class="color-picker">
+          <input id="color" type="color" formControlName="color" class="color-picker"
+                 [class.input-error]="isFieldInvalid('color')">
         </div>
 
         <footer class="modal-footer">

@@ -7,6 +7,7 @@ import { Category } from '../../models/category';
 import { ProfileService } from '../../services/profile';
 import { LoadingIndicator } from '../../resources/loading-indicator/loading-indicator';
 import { ConfirmModalService } from '../../services/confirm-modal';
+import { checkFieldInvalid } from '../../utils/formUtils';
 
 type CategoryForm = FormGroup<{
   name: FormControl<string>;
@@ -26,6 +27,7 @@ export class Categories implements OnInit, OnDestroy {
   private readonly categoryService = inject(CategoryService);
   private readonly profileService = inject(ProfileService);
   private readonly confirmModal = inject(ConfirmModalService);
+  private readonly checkFieldInvalid = checkFieldInvalid;
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
 
@@ -244,5 +246,9 @@ export class Categories implements OnInit, OnDestroy {
           },
         });
       });
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    return this.checkFieldInvalid(this.categoryForm, fieldName);
   }
 }
