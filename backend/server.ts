@@ -24,7 +24,7 @@ const setupMiddlewares = (): void => {
   // Define as origens permitidas (localhost para testes e o domínio de produção)
   const allowedOrigins = [
     'http://localhost:4200',
-    // TODO(Deployment): Substituir pelo domínio real da aplicação frontend em produção
+    'https://finance-abko2p0xx-danielarjordaos-projects.vercel.app/',
   ];
 
   // Permite requisições apenas de origens autorizadas.
