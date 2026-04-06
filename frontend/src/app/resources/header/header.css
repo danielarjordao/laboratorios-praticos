@@ -1,6 +1,7 @@
 .top-header {
   height: 80px;
   width: 100%;
+  box-sizing: border-box;
   background-color: var(--background);
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -298,6 +299,11 @@ button.dropdown-item.active-item .material-symbols-outlined {
 }
 
 @media (max-width: 768px) {
+  .top-header {
+    padding: 0 12px;
+    max-width: 100%;
+  }
+
   .header-left {
     gap: 8px; /* Aproxima o menu do logo */
   }
@@ -325,7 +331,14 @@ button.dropdown-item.active-item .material-symbols-outlined {
   }
 
   .header-right {
-    gap: 8px; /* Aproxima os botões da direita */
+    gap: 4px; /* Aproxima os botões da direita */
+  }
+
+  .avatar-btn,
+  .icon-btn,
+  .dropdown-trigger {
+    width: 36px;
+    height: 36px;
   }
 
   .btn-primary {
