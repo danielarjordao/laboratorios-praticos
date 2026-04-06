@@ -1,8 +1,7 @@
 /* Layout Global */
 .page-container {
   padding: 24px;
-  max-width: 800px; /* Mais estreito para formulários de leitura agradável */
-  margin: 0 auto;
+  max-width: 800px;
 }
 
 .page-header {
@@ -231,7 +230,7 @@ input:checked + .slider:before {
 @media (max-width: 768px) {
   .page-container {
     padding: 16px;
-    max-width: 460px; /* Limitar largura máxima para telas pequenas */
+    max-width: 460px;
   }
 
   .form-row {

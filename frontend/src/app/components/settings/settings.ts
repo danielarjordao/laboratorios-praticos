@@ -36,10 +36,12 @@ export class Settings implements OnInit, OnDestroy {
   errorMessage = '';
   successMessage = '';
 
+  // Estado do usuário e settings para controle de carregamento e criação/atualização.
   private currentUserId: string | null = null;
   private loadedSettingsUserId: string | null = null;
   settingsForm: SettingsForm = this.createSettingsForm();
 
+  // Sincroniza o tema do formulário com as preferências globais para refletir mudanças feitas no Header.
   ngOnInit(): void {
     this.subscribeToDynamicSettingsPreview();
 
@@ -73,6 +75,7 @@ export class Settings implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  // Limpa as subscrições para evitar memory leaks.
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -203,6 +206,7 @@ export class Settings implements OnInit, OnDestroy {
     });
   }
 
+  // Navega de volta para a página anterior.
   goBack(): void {
     this.location.back();
   }

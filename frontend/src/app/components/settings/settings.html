@@ -10,20 +10,18 @@
       <p>Customize your experience, language, and regional settings.</p>
     </div>
   </header>
-
   @if (isLoading) {
     <app-loading-indicator message="Loading your preferences..."></app-loading-indicator>
   } @else {
     <div class="settings-content">
-
       @if (errorMessage) {
         <div class="error-state">{{ errorMessage }}</div>
       }
-
       @if (successMessage) {
         <div class="success-state">{{ successMessage }}</div>
       }
 
+      <!-- Formulário de configurações, dividido em seções para melhor organização. -->
       <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" class="settings-form">
 
         <!-- Cartão de Aparência -->
@@ -35,7 +33,6 @@
               <p class="text-muted">Choose how the app looks to you.</p>
             </div>
           </header>
-
           <div class="form-group">
             <label for="theme">Theme</label>
             <select id="theme" formControlName="theme" class="input-minimal">
@@ -45,7 +42,6 @@
             </select>
           </div>
         </section>
-
         <!-- Cartão de Região e Idioma -->
         <section class="settings-card">
           <header class="card-header">
@@ -55,7 +51,6 @@
               <p class="text-muted">Set your local currency and language.</p>
             </div>
           </header>
-
           <div class="form-row">
             <div class="form-group span-1">
               <label for="currency">Main Currency</label>
@@ -66,7 +61,6 @@
                 <option value="GBP">British Pound (£)</option>
               </select>
             </div>
-
             <div class="form-group span-1">
               <label for="language">Language</label>
               <select id="language" formControlName="language" class="input-minimal">
@@ -78,7 +72,6 @@
             </div>
           </div>
         </section>
-
         <!-- Cartão de Notificações -->
         <section class="settings-card">
           <header class="card-header">
@@ -88,7 +81,6 @@
               <p class="text-muted">Manage your email and push alerts.</p>
             </div>
           </header>
-
           <div class="form-group toggle-group">
             <label for="notifications" class="toggle-label">
               <span>Receive recurring transaction alerts</span>
@@ -100,7 +92,6 @@
             <small class="field-note">Notifications are temporarily locked and will be enabled in a future update.</small>
           </div>
         </section>
-
         <footer class="form-actions">
           <button type="submit" class="btn-primary btn-large" [disabled]="settingsForm.invalid || isSaving">
             <span class="material-symbols-outlined">
