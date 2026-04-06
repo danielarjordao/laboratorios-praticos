@@ -1,5 +1,4 @@
 <div class="page-container">
-
   <header class="page-header">
     <div class="header-titles">
       <h1>My Accounts</h1>
@@ -10,11 +9,15 @@
       New Account
     </button>
   </header>
-
+  <!-- Estados de erro, loading e vazio -->
   @if (errorMessage) {
     <div class="error-state">{{ errorMessage }}</div>
   }
-
+  <!-- Validações de loading e estados vazios dependem do perfil ativo e da lista de contas -->
+  <!-- 1) Se estiver carregando, mostra indicador de loading. -->
+  <!-- 2) Se não tiver perfil ativo, mostra mensagem para selecionar um perfil. -->
+  <!-- 3) Se tiver perfil ativo mas nenhuma conta, mostra mensagem de "nenhuma conta encontrada". -->
+  <!-- 4) Caso contrário, mostra o grid de contas. -->
   @if (isLoading) {
     <app-loading-indicator message="Loading accounts..."></app-loading-indicator>
   } @else if (!activeProfileId) {
@@ -25,7 +28,6 @@
     <div class="accounts-grid">
       @for (account of accounts; track account.id) {
         <article class="account-card" (click)="openModal(account)">
-
           <header class="card-header">
             <div class="account-info">
               <span class="material-symbols-outlined icon-bg">account_balance</span>
@@ -38,20 +40,20 @@
               <span class="material-symbols-outlined">delete</span>
             </button>
           </header>
-
           <footer class="card-balance">
             <span class="balance-label">Current Balance</span>
             <h2 class="balance-amount" [class.negative-balance]="(account.balance || 0) < 0">
               {{ formatCurrency(account.balance) }}
             </h2>
           </footer>
-
         </article>
       }
     </div>
   }
 </div>
 
+<!-- Modal para criar/editar conta -->
+<!-- Reaproveita o mesmo modal para criação e edição, controlando o modo via isEditMode. -->
 @if (isModalOpen) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
@@ -61,9 +63,7 @@
           <span class="material-symbols-outlined">close</span>
         </button>
       </header>
-
       <form [formGroup]="accountForm" (ngSubmit)="onSubmit()" class="account-form">
-
         <div class="form-group">
           <label for="name">Account Name</label>
           <input id="name" type="text" formControlName="name" class="input-minimal" placeholder="Example: Main checking account"
@@ -74,7 +74,6 @@
             </div>
           }
         </div>
-
         <div class="form-row">
           <div class="form-group span-1">
             <label for="type">Account Type</label>
@@ -91,7 +90,6 @@
               </div>
             }
           </div>
-
           <div class="form-group span-1">
             <label for="balance">Initial Balance</label>
             <input id="balance" type="number" formControlName="balance" class="input-minimal" step="0.01"
@@ -103,7 +101,6 @@
             }
           </div>
         </div>
-
         <footer class="modal-footer">
           <button type="button" class="btn-outline" (click)="closeModal()">Cancel</button>
           <button type="submit" class="btn-primary" [disabled]="accountForm.invalid || isSubmitting">
@@ -111,7 +108,6 @@
             {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Save') }}
           </button>
         </footer>
-
       </form>
     </div>
   </div>

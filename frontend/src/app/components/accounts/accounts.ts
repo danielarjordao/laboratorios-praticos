@@ -47,6 +47,7 @@ export class Accounts implements OnInit, OnDestroy {
   // Formulario de conta.
   accountForm: AccountForm = this.createAccountForm();
 
+  // Inicializa dados e escuta mudanças de perfil e preferências.
   ngOnInit(): void {
     this.preferences.preferences$
       .pipe(takeUntil(this.destroy$))
@@ -78,6 +79,7 @@ export class Accounts implements OnInit, OnDestroy {
     return this.preferences.formatCurrency(value);
   }
 
+  // Limpa subscriptions para evitar memory leaks.
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
