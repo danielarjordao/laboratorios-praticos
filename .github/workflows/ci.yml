@@ -1,11 +1,13 @@
 name: CI Pipeline
 
+# Este workflow é acionado em pull requests e pushes para as branches develop e main.
 on:
   pull_request:
     branches: [ develop, main ]
   push:
     branches: [ develop, main ]
 
+# Define os jobs para o backend e frontend, garantindo que ambos sejam verificados em cada PR ou push.
 jobs:
   backend-checks:
     name: Backend CI
@@ -14,6 +16,8 @@ jobs:
       run:
         working-directory: backend
 
+    # Passos para o job de backend: checkout do código, configuração do Node.js,
+    # instalação de dependências, linting, build (verificação de tipagem) e execução de testes unitários.
     steps:
       - name: Fazer o checkout do código
         uses: actions/checkout@v4
@@ -42,6 +46,8 @@ jobs:
       run:
         working-directory: frontend
 
+    # Passos para o job de frontend: checkout do código, configuração do Node.js,
+    # instalação de dependências, criação de um environment.ts para o CI, linting e build (verificação de tipagem e sintaxe).
     steps:
       - name: Fazer o checkout do código
         uses: actions/checkout@v4
