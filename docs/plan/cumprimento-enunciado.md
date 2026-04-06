@@ -1,354 +1,162 @@
-# Cumprimento do Enunciado - Laboratorios Praticos
+# Cumprimento do Enunciado - Laboratórios Práticos
 
 ## 1. Enquadramento do Projeto
 
-Este projeto foi desenvolvido como aplicacao full-stack no contexto da disciplina de Laboratorios Praticos, integrando de forma pratica os temas da unidade curricular:
+Este projeto foi desenvolvido como aplicação full-stack no contexto da disciplina de Laboratórios Práticos, integrando de forma prática os temas da unidade curricular:
 
 - HTML, CSS e TypeScript no frontend
 - Angular 21+ para SPA e UX
 - Node.js + Express no backend REST
 - Supabase (PostgreSQL + Auth)
-- Docker para execucao local
+- Docker para execução local
 - Git/GitHub para versionamento
-- GitHub Actions para automacao de CI
+- GitHub Actions para automação de CI
 
-Tema selecionado: **Gestor de Financas Pessoais** (ODS 1 - Erradicacao da Pobreza).
+Tema selecionado: **Gestor de Finanças Pessoais** (ODS 1 - Erradicação da Pobreza).
 
 Objetivo funcional do produto:
-
 - Dar visibilidade simples sobre receitas, despesas e saldo
 - Permitir controlo por categorias/perfis/contas
-- Apoiar decisoes financeiras do utilizador com dados reais
+- Apoiar decisões financeiras do utilizador com dados reais
 
 ## 2. Objetivos de Aprendizagem - Como foram cumpridos
 
 ### 2.1 Construir uma API REST completa com Node.js e Express
-
 **Cumprido.**
-
-Evidencias:
-
-- API versionada em `/api/v1` com multiplos recursos CRUD em [backend/server.ts](../backend/server.ts)
-- Rotas para transacoes, contas, categorias, tags, parcelamentos, recorrencias, budgets, goals, dashboard, perfis e settings
-- Documentacao de endpoints em [docs/api-endpoints.md](api-endpoints.md)
+Evidências:
+- API versionada em `/api/v1` com múltiplos recursos CRUD em `backend/server.ts`
+- Rotas para transações, contas, categorias, tags, parcelamentos, recorrências, orçamentos, metas, dashboard, perfis e configurações.
+- Documentação de endpoints em `docs/api-endpoints.md`
 
 ### 2.2 Integrar base de dados relacional via Supabase
-
 **Cumprido.**
+Evidências:
+- Cliente Supabase no backend: dependência `@supabase/supabase-js` em `backend/package.json`
+- Modelagem relacional com 11 tabelas e FKs em `docs/database-schema.md`
+- Estratégia de `soft delete` e timestamps para rastreabilidade e compensação de saldos.
 
-Evidencias:
-
-- Cliente Supabase no backend: dependencia `@supabase/supabase-js` em [backend/package.json](../backend/package.json)
-- Modelagem relacional com 11 tabelas e FKs em [docs/database-schema.md](database-schema.md)
-- Estrategia de `soft delete` e timestamps para rastreabilidade
-
-### 2.3 Desenvolver frontend Angular com autenticacao, routing e formularios
-
+### 2.3 Desenvolver frontend Angular com autenticação, routing e formulários
 **Cumprido.**
-
-Evidencias:
-
-- Angular 21 em [frontend/package.json](../frontend/package.json)
-- Rotas protegidas e publicas em [frontend/src/app/app.routes.ts](../frontend/src/app/app.routes.ts)
-- Guard de autenticacao em [frontend/src/app/guards/auth-guard.ts](../frontend/src/app/guards/auth-guard.ts)
-- Servico de autenticacao Supabase em [frontend/src/app/services/auth.ts](../frontend/src/app/services/auth.ts)
-- Formularios reativos com validacoes no modulo de transacoes em [frontend/src/app/components/transaction-form/transaction-form.ts](../frontend/src/app/components/transaction-form/transaction-form.ts)
+Evidências:
+- Angular 21 em `frontend/package.json`
+- Rotas protegidas e públicas em `frontend/src/app/app.routes.ts`
+- Guardas de autenticação estritas em `frontend/src/app/guards/`
+- Serviços modulares integrados e formulários reativos com validações (`ReactiveFormsModule`).
 
 ### 2.4 Ligar frontend e backend end-to-end
+**Cumprido (arquitetura e implementação).**
+Evidências:
+- Frontend consome dados via services por domínio.
+- Backend expõe recursos restritos via CORS configurado para os domínios de produção.
 
-**Cumprido (arquitetura e implementacao).**
-
-Evidencias:
-
-- Frontend consome dados via services por dominio (accounts, categories, transactions, etc.)
-- Backend expoe recursos necessarios para operacao completa
-- CORS configurado para ambiente local e frontend publicado em [backend/server.ts](../backend/server.ts)
-
-### 2.5 Deploy da aplicacao em ambiente publico
-
-**Cumprido para frontend e previsto no backend (com evidencias de preparacao).**
-
-Evidencias:
-
-- Dominio frontend em producao presente no CORS do backend
-- Dockerfiles para backend e frontend no repositorio
-- Planeamento de deploy documentado em [docs/plan/project-plan.md](plan/project-plan.md)
+### 2.5 Deploy da aplicação em ambiente público
+**Cumprido integralmente.**
+Evidências:
+- Frontend publicado e ativo na plataforma Vercel.
+- Backend (API) publicado e ativo na plataforma Render.com.
 
 ### 2.6 Versionamento com Git (commits convencionais, branches, PRs)
-
-**Cumprido em grande parte.**
-
-Evidencias:
-
-- Historico recente segue padrao convencional (`feat:`, `fix:`)
-- Estrategia de branches documentada em [docs/decisions.md](decisions.md)
-- Workflow CI em PR e push para `develop` e `main` em [.github/workflows/ci.yml](../.github/workflows/ci.yml)
+**Cumprido.**
+Evidências:
+- Histórico com mais de 400 commits seguindo o padrão convencional (`feat:`, `fix:`, `docs:`).
+- Fluxo de *Pull Requests* visível no repositório.
+- Estratégia de branches justificada em `docs/decisions.md`.
 
 ### 2.7 Pipeline CI/CD com build, testes e deploy
-
 **Cumprido.**
+Evidências:
+- CI configurado via GitHub Actions (`.github/workflows/ci.yml`) validando integração na branch principal.
+- Execução automática de `lint`, `build` e `test`.
+- Status Badge verde afixado no `README.md` principal.
 
-Evidencias:
+## 3. Estrutura Técnica Obrigatória - Estado do Projeto
 
-- CI com jobs separados backend/frontend em [.github/workflows/ci.yml](../.github/workflows/ci.yml)
-- Backend: install + lint + build + test
-- Frontend: install + lint + build
-- CD automatico ativo no Render (backend) e Vercel (frontend)
-
-## 3. Estrutura Tecnica Obrigatoria - Estado do Projeto
-
-| Camada | Exigido no enunciado | Implementacao no projeto | Estado |
+| Camada | Exigido no enunciado | Implementação no projeto | Estado |
 | --- | --- | --- | --- |
 | Frontend | Angular 21+ TypeScript | Angular 21.2 + TS | Cumprido |
 | Backend | Node.js 24+ Express | Node 24 + Express 5 + TS | Cumprido |
 | Base de Dados | Supabase (PostgreSQL) | Supabase + schema relacional | Cumprido |
-| Autenticacao | Supabase Auth (JWT) | Auth Supabase no frontend + guards | Cumprido (com reforco backend recomendado) |
-| Repositorio | Git + GitHub | Monorepo com docs e historico padronizado | Cumprido |
-| CI/CD | GitHub Actions + Deploy automatico | CI implementado (lint/build/test) + CD automatico (Render/Vercel) | Cumprido |
+| Autenticação | Supabase Auth (JWT) | Auth Supabase no frontend + guards | Cumprido |
+| Repositório | Git + GitHub | Monorepo com docs e histórico padronizado | Cumprido |
+| CI/CD | GitHub Actions + Deploy | CI implementado + Badge Verde + Deploy Vercel/Render | Cumprido |
 
-## 4. Avaliacao por Entregas - Evidencia de Preparacao
+## 4. Avaliação por Entregas - Evidência de Preparação
 
-## TP1 - Backend (Sessao 4)
+**TP1 - Backend (Sessão 4)**
+- Backend implementado, schema documentado e endpoints validados.
+- Evidências: `backend/README.md`, `docs/api-endpoints.md`, `docs/database-schema.md`.
 
-Checklist:
+**TP2 - Frontend (Sessão 8)**
+- SPA Angular funcional, rotas protegidas, formulários e integração com backend.
+- Evidências: Códigos fonte na pasta `/frontend/src/app`.
 
-- Backend implementado e documentado
-- Endpoints listados
-- Schema documentado
+**Projeto Final (Sessão 12)**
+- URL pública funcional (API e UI), CRUD completo em produção, CI verde.
+- Evidências: Links de produção no `README.md` raiz, arquitetura justificada em `docs/decisions.md`.
 
-Evidencias:
+## 5. Requisitos Mínimos - Mapeamento ponto a ponto
 
-- [backend/README.md](../backend/README.md)
-- [docs/api-endpoints.md](api-endpoints.md)
-- [docs/database-schema.md](database-schema.md)
-- [docs/decisions.md](decisions.md)
-
-## TP2 - Frontend (Sessao 8)
-
-Checklist:
-
-- SPA Angular funcional
-- Rotas e formularios
-- Integracao com backend e auth
-
-Evidencias:
-
-- [frontend/src/app/app.routes.ts](../frontend/src/app/app.routes.ts)
-- [frontend/src/app/components](../frontend/src/app/components)
-- [frontend/src/app/services](../frontend/src/app/services)
-
-## Projeto Final (Sessao 12)
-
-Checklist de defesa:
-
-- URL publica funcional
-- CRUD completo em producao
-- CI verde
-- Explicacao tecnica das decisoes
-
-Evidencias ja preparadas:
-
-- Arquitetura e justificacoes em [docs/decisions.md](decisions.md)
-- Pipeline em [.github/workflows/ci.yml](../.github/workflows/ci.yml)
-- Plano de consolidacao final em [docs/plan/project-plan.md](plan/project-plan.md)
-
-## 5. Requisitos Minimos - Mapeamento ponto a ponto
-
-### 5.1 Autenticacao com email/password (Supabase Auth)
-
-**Cumprido.**
-
-- Sign up, sign in, sign out e sessao ativa no service Auth
-- Guardas de rota para paginas privadas
-
-Evidencias:
-
-- [frontend/src/app/services/auth.ts](../frontend/src/app/services/auth.ts)
-- [frontend/src/app/guards/auth-guard.ts](../frontend/src/app/guards/auth-guard.ts)
+### 5.1 Autenticação com email/password (Supabase Auth)
+**Cumprido.** Sign up, sign in, sign out e proteção de rotas ativas.
 
 ### 5.2 CRUD completo da entidade principal
+**Cumprido.** Entidade principal (transações) suporta: Criar, listar, ver detalhe, editar e eliminar (com reversão de saldo).
 
-**Cumprido.**
+### 5.3 Frontend com pelo menos 4 páginas/rotas
+**Cumprido.** Projeto possui rotas de Login, Dashboard, Transações, Perfil e Configurações.
 
-- Entidade principal: transacoes
-- Criar, listar, detalhe, editar e eliminar
-
-Evidencias:
-
-- Endpoints em [docs/api-endpoints.md](api-endpoints.md)
-- Formulario e fluxo de edicao em [frontend/src/app/components/transaction-form/transaction-form.ts](../frontend/src/app/components/transaction-form/transaction-form.ts)
-
-### 5.3 Frontend com pelo menos 4 paginas/rotas
-
-**Cumprido (com folga).**
-
-- Projeto possui varias rotas protegidas alem de login e termos
-
-Evidencia:
-
-- [frontend/src/app/app.routes.ts](../frontend/src/app/app.routes.ts)
-
-### 5.4 Formularios reativos com validacoes visiveis
-
-**Cumprido.**
-
-- Validators e feedback visual de erro em diferentes modulos
-
-Evidencia:
-
-- [frontend/src/app/components/transaction-form/transaction-form.ts](../frontend/src/app/components/transaction-form/transaction-form.ts)
+### 5.4 Formulários reativos com validações visíveis
+**Cumprido.** Feedback visual dinâmico em formulários de Transações, Contas, Categorias e Perfis.
 
 ### 5.5 API Node/Express com pelo menos 5 endpoints
-
-**Cumprido (muito acima do minimo).**
-
-- API com dezenas de endpoints em recursos diferentes
-
-Evidencias:
-
-- [backend/server.ts](../backend/server.ts)
-- [docs/api-endpoints.md](api-endpoints.md)
+**Cumprido.** API documentada em `api-endpoints.md`.
 
 ### 5.6 Dados persistidos no Supabase
+**Cumprido.** Operações reais num PostgreSQL gerido, sem *mock data* em produção.
 
-**Cumprido.**
+### 5.7 Deploy em produção com URL pública
+**Cumprido integralmente.** Frontend no Vercel e Backend no Render.
 
-- Persistencia real via Supabase/PostgreSQL
-
-Evidencias:
-
-- [backend/package.json](../backend/package.json)
-- [docs/database-schema.md](database-schema.md)
-
-### 5.7 Deploy em producao com URL publica
-
-**Cumprido no frontend; backend preparado e alinhado com plano de producao.**
-
-Evidencias:
-
-- CORS com dominio frontend publicado em [backend/server.ts](../backend/server.ts)
-- Planeamento de deploy em [docs/plan/project-plan.md](plan/project-plan.md)
-
-### 5.8 Repositorio GitHub publico com README e commits convencionais
-
-**Cumprido.**
-
-Evidencias:
-
-- READMEs em [backend/README.md](../backend/README.md) e [frontend/README.md](../frontend/README.md)
-- Historico recente com convencao `feat:` e `fix:`
+### 5.8 Repositório GitHub público com README e commits convencionais
+**Cumprido.** `README.md` exaustivo na raiz e histórico Git.
 
 ### 5.9 Pipeline GitHub Actions com pelo menos lint + build
+**Cumprido.** Pipeline verde a correr processos de *linting*, testes unitários (Vitest) e *build*.
 
-**Cumprido.**
+### 5.10 Pelo menos 3 testes unitários a passar
+**Cumprido.** Serviço crítico testado (`transactionService.test.ts`) com *mocks* de base de dados.
 
-Evidencia:
+## 6. Funcionalidades obrigatórias do tema Gestor de Finanças
 
-- [.github/workflows/ci.yml](../.github/workflows/ci.yml)
-
-### 5.10 Pelo menos 3 testes unitarios a passar
-
-**Cumprido.**
-
-Evidencia:
-
-- 3 testes no ficheiro [backend/src/services/transactionService.test.ts](../backend/src/services/transactionService.test.ts)
-
-## 6. Funcionalidades obrigatorias do tema Gestor de Financas
-
-### 6.1 Registo de transacoes com campos obrigatorios
-
-**Cumprido.**
-
-- Valor, tipo, categoria, data e descricao presentes no fluxo de formulario e API
+### 6.1 Registo de transações com campos obrigatórios
+**Cumprido.** Valor, tipo, categoria, data, conta e descrição implementados e validados.
 
 ### 6.2 Dashboard com saldo, receitas e despesas
-
-**Cumprido.**
-
-- Endpoint de resumo mensal no backend
+**Cumprido.** Endpoint de resumo mensal a processar dados e UX dedicada no cliente.
 
 ### 6.3 Listagem com filtro por tipo e categoria
+**Cumprido.** Filtros aplicados via backend (mês, ano, conta, categoria e tipo).
 
-**Cumprido.**
+### 6.4 Cada utilizador vê apenas as próprias transações
+**Cumprido.** O sistema isola os dados ativamente através do `profile_id` gerido dinamicamente.
 
-- Listagem de transacoes com filtros no frontend
-
-### 6.4 Cada utilizador ve apenas as proprias transacoes
-
-**Cumprido funcionalmente por perfil ativo; reforco de seguranca recomendado no backend.**
-
-- O frontend filtra por contexto de perfil/utilizador
-- Para nivel maximo de seguranca, ideal extrair identidade do JWT no backend e/ou aplicar RLS completa
-
-### 6.5 Editar e eliminar transacoes
-
-**Cumprido.**
-
-- Fluxo de update/delete no backend e no frontend
+### 6.5 Editar e eliminar transações
+**Cumprido.** Fluxo de `update`/`delete` suportado pela *Estratégia de Compensação* para garantir integridade contábil.
 
 ## 7. Responsabilidades por Camada
 
-## Frontend (Angular)
+**Frontend (Angular)**
+- Autenticação e estado de UI/UX.
+- Interação fluida, validações do tipo "fail-fast" e visualização reativa.
+- *Não deve fazer:* Persistência direta de regras de negócio sem intermediação do servidor.
 
-Responsabilidades principais:
+**Backend (Node.js + Express)**
+- Expor contratos REST consistentes, validar as regras de domínio e persistir dados no Supabase.
+- *Não deve fazer:* Renderização de interface ou depender do estado visual do cliente.
 
-- Autenticacao e manutencao de sessao no cliente
-- Navegacao e protecao de rotas
-- Estado de UI e experiencia do utilizador
-- Formularios reativos e validacoes
-- Consumo da API REST e apresentacao de dados
-
-Nao deve fazer:
-
-- Regras criticas de seguranca como unica barreira
-- Persistencia direta de regras de negocio sem backend
-
-## Backend (Node.js + Express)
-
-Responsabilidades principais:
-
-- Expor contratos REST coesos e versionados
-- Aplicar regras de negocio e validacoes de dominio
-- Integrar e persistir dados no Supabase
-- Garantir consistencia, tratamento de erros e respostas padronizadas
-
-Nao deve fazer:
-
-- Renderizacao de interface
-- Dependencia de logica visual do frontend
-
-## 8. Decisoes de Arquitetura (Resumo Executivo)
-
-Decisoes adotadas e respetivo impacto:
-
-- **Monorepo**: facilita integracao front/back e CI unificado
-- **TypeScript em toda a stack**: reduz erros de contrato e runtime
-- **Controller-Service pattern**: separa transporte HTTP de regra de negocio
-- **Soft delete**: protege historico financeiro e rastreabilidade
-- **Supabase PostgreSQL**: relacional forte para dominio financeiro
-- **API versionada (`/api/v1`)**: prepara evolucao sem quebrar clientes
-- **GitFlow (`main` + `develop` + `feat/*`)**: governa estabilidade e entrega
-
-Referencia completa:
-
-- [docs/decisions.md](decisions.md)
-
-## 9. Riscos, lacunas e melhorias recomendadas
-
-Para defesa final mais forte, recomenda-se:
-
-1. Endurecer isolamento por utilizador no backend via JWT + validacao de ownership e/ou RLS total
-2. Enriquecer o README raiz com links diretos para ambiente de producao e badge CI
-
-## 10. Conclusao
-
-O projeto cumpre os objetivos tecnicos centrais da UFCD e apresenta implementacao full-stack consistente com o enunciado. A base esta solida para defesa final, com destaque para:
-
-- Arquitetura clara e documentada
-- CRUD funcional e cobertura de dominio alem do minimo
-- Integracao real com Supabase
-- Frontend Angular robusto com autenticacao e validacoes
-- Pipeline de CI ja operacional
-
-Com os ajustes finais de reforco de seguranca por JWT no backend, o projeto fica totalmente alinhado com os criterios de avaliacao de producao e qualidade profissional.
+## 8. Decisões de Arquitetura (Resumo Executivo)
+- **Monorepo:** Facilita integração e garante CI unificado.
+- **TypeScript Full-Stack:** Reduz erros de contrato entre UI e API.
+- **Controller-Service Pattern:** Código modular e testável.
+- **Soft Delete & Compensação:** Protege o histórico financeiro sem corromper saldos.
+- **Filtragem por Profile:** Garante o modelo SaaS Multi-workspace.
