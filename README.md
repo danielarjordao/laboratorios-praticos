@@ -1,5 +1,7 @@
 # Gestor de Finanças Pessoais (MVP)
 
+[![CI Pipeline](https://github.com/danielarjordao/FinanceApp/actions/workflows/ci.yml/badge.svg)](https://github.com/danielarjordao/FinanceApp/actions/workflows/ci.yml)
+
 Uma ferramenta digital desenvolvida para promover a literacia financeira, permitindo aos utilizadores um controlo rigoroso, rápido e acessível das suas receitas, despesas e saldo. Sem complicação e sem ligações bancárias automáticas — apenas clareza absoluta sobre o próprio dinheiro para apoiar decisões financeiras conscientes.
 
 **Foco do Projeto:** ODS 1 — Erradicação da Pobreza.
