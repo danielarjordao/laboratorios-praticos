@@ -26,6 +26,9 @@ jobs:
       - name: Instalar dependências
         run: npm install
 
+      - name: Executar Lint
+        run: npm run lint
+
       - name: Executar o Build (Verificar tipagem)
         run: npm run build
 
@@ -55,6 +58,9 @@ jobs:
         run: |
           mkdir -p src/environments
           echo "export const environment = { production: true, apiUrl: 'https://api-falsa.com', supabaseUrl: 'https://db-falsa.supabase.co', supabaseKey: 'chave-falsa' };" > src/environments/environment.ts
+
+      - name: Executar Lint
+        run: npm run lint
 
       - name: Executar o Build Angular (Verifica tipagem e sintaxe)
         run: npm run build
