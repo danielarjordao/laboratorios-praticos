@@ -18,6 +18,7 @@ export class SettingsService {
     );
   }
 
+  // Constrói os headers de autenticação para as requisições, incluindo o token de acesso se disponível. Este método é utilizado internamente para garantir que todas as requisições ao backend sejam autenticadas corretamente.
   private buildAuthHeaders(token?: string): HttpHeaders {
     let headers = new HttpHeaders();
     if (token) {
@@ -26,6 +27,7 @@ export class SettingsService {
     return headers;
   }
 
+  // Armazena as configurações no cache para evitar múltiplas requisições ao backend para o mesmo usuário. O cache é invalidado em caso de erro, garantindo que tentativas subsequentes possam recuperar os dados atualizados.
   private setCachedValue(userId: string, value: UserSettings): void {
     this.settingsCache.set(userId, of(value).pipe(shareReplay(1)));
   }
