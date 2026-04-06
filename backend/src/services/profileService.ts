@@ -73,8 +73,6 @@ export const readProfiles = async (user_id: string): Promise<ProfileResponse[]> 
     }
 
     // Se não existem perfis, cria um perfil padrão para o novo utilizador.
-    console.log(`[ProfileService] No profiles found for user_id ${user_id}. Creating default profile and categories.`);
-
     const { data: newProfile, error: createError } = await supabase
         .from('profiles')
         .insert([{
