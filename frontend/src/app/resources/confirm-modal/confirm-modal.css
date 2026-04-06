@@ -31,6 +31,20 @@
   margin-bottom: 16px;
 }
 
+.modal-title {
+  margin: 0;
+}
+
+.modal-body {
+  padding: 16px 0;
+}
+
+.modal-message {
+  margin: 0;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
 .btn-close-modal {
   display: inline-flex;
   align-items: center;
@@ -50,10 +64,11 @@
 }
 
 .modal-footer {
-  margin-top: 8px;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
 }
 
 .btn-outline {

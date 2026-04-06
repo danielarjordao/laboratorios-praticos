@@ -16,6 +16,10 @@ export class ConfirmModalComponent {
 
   options: ConfirmOptions | null = null;
 
+  // Configura o componente para escutar mudanças no estado do modal de confirmação,
+  // atualizando as opções exibidas conforme necessário.
+  // O modal é controlado globalmente pelo ConfirmModalService,
+  // permitindo que qualquer parte da aplicação solicite uma confirmação do usuário.
   constructor() {
     this.confirmService.modalState$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -24,10 +28,11 @@ export class ConfirmModalComponent {
       });
   }
 
+  // Responde à solicitação de confirmação, enviando a resposta (true para confirmar, false para cancelar) de volta ao serviço.
   onConfirm(): void {
     this.confirmService.respond(true);
   }
-
+  
   onCancel(): void {
     this.confirmService.respond(false);
   }
