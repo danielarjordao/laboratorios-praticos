@@ -378,9 +378,9 @@
 
 @media (max-width: 768px) {
   .page-container {
-    padding: 16px 12px; /* Margens menores para telemóvel, mas sem engessar o max-width */
+    padding: 16px 12px;
     gap: 16px;
-    max-width: 460px; /* Limitar largura máxima para telas pequenas */
+    max-width: 460px;
   }
 
   .header-section {

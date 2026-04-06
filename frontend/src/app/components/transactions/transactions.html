@@ -1,18 +1,15 @@
 <div class="page-container">
-
-  <!-- Header with Actions -->
+  <!-- Area de header, com título da página e ações principais -->
   <div class="header-section">
     <div>
       <h2 class="page-title">Transactions</h2>
       <p class="page-subtitle">Manage all your financial movements</p>
     </div>
-
     <div class="header-actions">
       <button class="btn-outline" (click)="exportToCsv()" [disabled]="transactions.length === 0 || isLoading">
         <span class="material-symbols-outlined">download</span>
         <span>Export CSV</span>
       </button>
-
       <!-- TODO(transactions-planning): Implementar ações de parcelamento e recorrência | Done when: botões chamarem fluxos reais com integração backend. -->
       <button class="btn-outline btn-locked" disabled title="Temporarily locked">
         <span class="material-symbols-outlined">lock</span>
@@ -21,7 +18,6 @@
           <small class="lock-note label">Temporarily locked</small>
         </span>
       </button>
-
       <button class="btn-outline btn-locked" disabled title="Temporarily locked">
         <span class="material-symbols-outlined">lock</span>
         <span>Recurring
@@ -29,17 +25,15 @@
           <small class="lock-note label">Temporarily locked</small>
         </span>
       </button>
-
       <button class="btn-primary" (click)="openNewTransactionForm()">
         <span class="material-symbols-outlined">add</span>
       </button>
     </div>
   </div>
 
-  <!-- Minimal Filters Toolbar (Glass effect) -->
+  <!-- Toolbar de filtros -->
   <div class="glass-toolbar">
     <form [formGroup]="filterForm" class="toolbar-main">
-
       <div class="filter-group search-group">
         <label>Search</label>
         <div class="search-wrapper">
@@ -47,7 +41,6 @@
           <input type="text" formControlName="search" placeholder="Search by description..." class="input-search">
         </div>
       </div>
-
       <div class="filter-group">
         <label>Month</label>
         <select formControlName="month" class="select-minimal">
@@ -65,12 +58,10 @@
           <option [ngValue]="12">December</option>
         </select>
       </div>
-
       <div class="filter-group">
         <label>Year</label>
         <input type="number" formControlName="year" class="input-minimal" min="2000" max="2100">
       </div>
-
       <div class="filter-group">
         <label><br></label>
         <button type="button" class="btn-icon-outline" (click)="toggleFilters()" [class.active]="showFilters">
@@ -79,9 +70,9 @@
       </div>
     </form>
 
+    <!-- Filtros avançados, mostrados apenas quando showFilters é true -->
     @if (showFilters) {
       <form [formGroup]="filterForm" class="toolbar-extended">
-
         <div class="filter-group">
           <label>Account</label>
           <select formControlName="accountId" class="select-minimal">
@@ -91,7 +82,6 @@
             }
           </select>
         </div>
-
         <div class="filter-group">
           <label>Category</label>
           <select formControlName="categoryId" class="select-minimal">
@@ -101,7 +91,6 @@
             }
           </select>
         </div>
-
         <div class="filter-group">
           <label>Types</label>
           <select formControlName="type" class="select-minimal">
@@ -111,7 +100,6 @@
             <option value="TRANSFER">Transfers</option>
           </select>
         </div>
-
         <div class="filter-group">
           <label>Tags</label>
           <select formControlName="tagId" class="select-minimal">
@@ -125,12 +113,12 @@
     }
   </div>
 
-  <!-- Results Count -->
+  <!-- Contador de resultados e mensagens de estado (loading, error, vazio) -->
   <div class="results-count">
     Showing {{ transactions.length }} of {{ totalRecords }} transactions
   </div>
 
-  <!-- Transaction List (Spotify-like Cards) -->
+  <!-- Lista de transações -->
   <div class="transaction-list">
     @if (isLoading) {
       <app-loading-indicator message="Loading transactions..."></app-loading-indicator>
@@ -139,18 +127,15 @@
     } @else if (transactions.length === 0) {
       <div class="state-message">No transactions found for the selected period.</div>
     } @else {
-
       @for (tx of transactions; track tx.id) {
         <div class="tx-card" (click)="openTransactionDetails(tx.id)">
-
           <div class="tx-card-left">
             <div class="tx-icon"
                 [ngClass]="getTransactionIconClass(tx)"
                 [style.backgroundColor]="tx.categories?.color || null">
               <span class="material-symbols-outlined">{{ tx.categories?.icon || 'receipt_long' }}</span>
             </div>
-
-            <!-- Transaction Info -->
+            <!-- Informações principais da transação: descrição, data, categoria e tags -->
             <div class="tx-info">
               <div class="tx-header-row">
                 <h4 class="tx-description">{{ tx.description || 'No Description' }}</h4>
@@ -161,21 +146,17 @@
                   </div>
                 }
               </div>
-
               <div class="tx-meta-row">
-                <!-- Date -->
                 <div class="meta-item">
                   <span class="material-symbols-outlined meta-icon">calendar_today</span>
                   <span>{{ tx.date | date:'dd MMM yyyy' }}</span>
                 </div>
-
-                <!-- Category Badge -->
+                <!-- Exibir badge de categoria apenas se a transação tiver uma categoria associada e não for do tipo TRANSFER (que pode não ter categoria ou ter uma categoria genérica) -->
                 @if (tx.categories?.name && tx.type !== 'TRANSFER') {
                   <div class="category-badge">
                     {{ tx.categories?.name }}
                   </div>
                 }
-
                 <!-- Tags -->
                 @if (tx.transaction_tags && tx.transaction_tags.length > 0) {
                   @for (tt of tx.transaction_tags; track tt.tags.id) {
@@ -185,7 +166,6 @@
               </div>
             </div>
           </div>
-
           <!-- Account & Amount -->
           <div class="tx-card-right">
             <p class="tx-amount" [ngClass]="{'text-income': tx.type === 'INCOME', 'text-expense': tx.type === 'EXPENSE', 'text-transfer': tx.type === 'TRANSFER'}">
@@ -198,8 +178,7 @@
 
         </div>
       }
-
-      <!-- Pagination Footer -->
+      <!-- Paginação -->
       <div class="pagination-footer">
         <button class="btn-outline"
                 [disabled]="filterForm.value.page === 1"

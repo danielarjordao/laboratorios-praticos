@@ -17,6 +17,7 @@ import { Tag } from '../../models/tag';
 import { Account } from '../../models/account';
 import { Category } from '../../models/category';
 
+// Tipo específico para os valores do formulário de filtros, facilitando a manipulação e comparação de estados.
 type TransactionsFilterFormValue = {
   search: string | null;
   type: string | null;
@@ -59,6 +60,7 @@ export class Transactions implements OnInit, OnDestroy {
   // Novo estado para o toggle dos filtros avançados
   showFilters: boolean = false;
 
+  // Gerenciamento de estado e ciclo de vida
   private destroy$ = new Subject<void>();
   private currentProfileId: string | null = null;
   Math = Math;
@@ -76,6 +78,7 @@ export class Transactions implements OnInit, OnDestroy {
     'Tags'
   ];
 
+  // Formulário reativo para filtros, com valores iniciais e tipos definidos.
   filterForm = new FormGroup({
     search: new FormControl<string>(''),
     type: new FormControl<string>(''),
@@ -90,6 +93,7 @@ export class Transactions implements OnInit, OnDestroy {
     sortOrder: new FormControl<string>('desc')
   });
 
+  // Inicializa o componente, restaurando filtros salvos e configurando observadores para mudanças de estado.
   ngOnInit(): void {
 
     // Tenta restaurar filtros salvos na sessão para manter estado entre navegações.
@@ -117,7 +121,6 @@ export class Transactions implements OnInit, OnDestroy {
         this.loadInitialData(this.currentProfileId);
       });
 
-
     // Observa alterações dos filtros e dispara nova leitura paginada.
     this.filterForm.valueChanges
       .pipe(
@@ -142,14 +145,16 @@ export class Transactions implements OnInit, OnDestroy {
     return this.preferences.formatCurrency(value);
   }
 
+  // Limpa subscriptions para evitar memory leaks e salva filtros atuais para restauração futura.
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
 
-    const currentFilters = this.filterForm.getRawValue();
-    this.transactionService.setSavedFilters(currentFilters);
+    // Salva filtros já normalizados (sem null) para manter compatibilidade de tipos.
+    this.transactionService.setSavedFilters(this.buildTransactionFilters());
   }
 
+  // Alterna a visibilidade dos filtros avançados.
   toggleFilters(): void {
     this.showFilters = !this.showFilters;
   }
@@ -196,6 +201,7 @@ export class Transactions implements OnInit, OnDestroy {
       || (previous.limit ?? null) !== (current.limit ?? null);
   }
 
+  // Carrega transações do perfil ativo com base nos filtros atuais, atualizando o estado da página conforme necessário.
   loadTransactions(): void {
     if (!this.currentProfileId) return;
 
@@ -220,6 +226,7 @@ export class Transactions implements OnInit, OnDestroy {
     });
   }
 
+  // Carrega tags, categorias e contas para o perfil ativo, garantindo que os filtros avançados estejam sempre atualizados com as opções corretas.
   loadTags(profileId: string): void {
     this.tagService.getTags(profileId).subscribe({
       next: (tags) => {
@@ -274,6 +281,7 @@ export class Transactions implements OnInit, OnDestroy {
     ].join(';');
   }
 
+  // Exporta as transações atuais para um arquivo CSV, utilizando os filtros aplicados e garantindo compatibilidade com Excel (BOM UTF-8).
   exportToCsv(): void {
     if (this.transactions.length === 0) return;
 
@@ -296,10 +304,12 @@ export class Transactions implements OnInit, OnDestroy {
     document.body.removeChild(link);
   }
 
+  // Navega para o formulário de criação de nova transação.
   openNewTransactionForm(): void {
     this.router.navigate(['/transactions/new']);
   }
 
+  // Navega para a página de detalhes/edição da transação selecionada.
   openTransactionDetails(id: string): void {
     this.router.navigate(['/transactions/edit', id]);
   }
