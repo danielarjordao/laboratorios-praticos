@@ -101,11 +101,13 @@ export class TransactionService {
     });
   }
 
-  setSavedFilters(filters: any): void {
+  // Armazena os filtros de transação para permitir reaplicação ao navegar entre páginas.
+  setSavedFilters(filters: Partial<TransactionFilters>): void {
     this.savedFilters = filters;
   }
 
-  getSavedFilters(): any {
+  // Retorna os filtros salvos para restaurar o estado da listagem.
+  getSavedFilters(): Partial<TransactionFilters> {
     return this.savedFilters;
   }
 }
