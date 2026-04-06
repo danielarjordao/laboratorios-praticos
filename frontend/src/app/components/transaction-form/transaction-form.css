@@ -267,7 +267,7 @@
 
 @media (max-width: 768px) {
   .modal-content {
-    max-width: 460px; /* Limitar largura máxima para telas pequenas */
+    max-width: 460px;
     padding: 16px;
   }
 

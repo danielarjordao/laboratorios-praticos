@@ -52,8 +52,10 @@ export class TransactionForm implements OnInit, OnDestroy {
   private currentProfileId: string | null = null;
   private destroy$ = new Subject<void>();
 
+  // Controle para criação rápida de tags dentro do formulário.
   newTagCtrl = new FormControl('');
 
+  // Esquema de validação do formulário, com campos dinâmicos
   transactionForm = new FormGroup({
     type: new FormControl<'INCOME' | 'EXPENSE' | 'TRANSFER'>('EXPENSE', { nonNullable: true, validators: [Validators.required] }),
     amount: new FormControl<number | null>(null, [Validators.required, Validators.min(0.01)]),
@@ -66,6 +68,7 @@ export class TransactionForm implements OnInit, OnDestroy {
     status: new FormControl<'PENDING' | 'COMPLETED'>('COMPLETED')
   });
 
+  // Inicializa o formulário, detecta modo de edição, carrega dados e escuta mudanças de tipo para ajustar validações.
   ngOnInit(): void {
     this.setupEditMode();
 
@@ -93,6 +96,7 @@ export class TransactionForm implements OnInit, OnDestroy {
       });
   }
 
+  // Limpa subscrições para evitar memory leaks.
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
