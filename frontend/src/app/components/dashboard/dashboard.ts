@@ -44,6 +44,7 @@ export class Dashboard implements OnInit, OnDestroy {
   recentTransactions: TransactionWithDetails[] = [];
   expenseByCategory: DashboardExpenseCategory[] = [];
 
+  // Iniciar carregamento dos dados do dashboard quando o perfil ativo mudar ou preferências forem atualizadas.
   ngOnInit(): void {
     this.preferences.preferences$
       .pipe(takeUntil(this.destroy$))
@@ -72,6 +73,7 @@ export class Dashboard implements OnInit, OnDestroy {
       });
   }
 
+  // Limpa subscriptions para evitar memory leaks.
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -154,16 +156,16 @@ export class Dashboard implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // 1. Obter a data atual para os filtros (Ano e Mês corrente)
+    // Obtem a data atual para os filtros (Ano e Mês corrente)
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
 
-    // 2. Preparar os pedidos em paralelo
+    // Prepara os pedidos em paralelo
     const accounts$ = this.accountService.getAccounts(this.currentProfileId);
 
-    // Assumindo que o teu readTransactions aceita filtros.
-    // Ajusta o método no TransactionService se necessário para aceitar month, year e limit.
+    // Busca as transações do mês corrente, limitando a 200 para performance (ajustável conforme necessidade)
+    //  e ordenando por data decrescente para mostrar as mais recentes primeiro.
     const transactions$ = this.transactionService.getTransactions(this.currentProfileId, {
       month: currentMonth,
       year: currentYear,
@@ -172,7 +174,7 @@ export class Dashboard implements OnInit, OnDestroy {
       sortOrder: 'desc'
     });
 
-    // 3. Executar e calcular
+    // Executa e calcula
     forkJoin({
       accounts: accounts$,
       transactionsRes: transactions$
@@ -186,18 +188,18 @@ export class Dashboard implements OnInit, OnDestroy {
       )
       .subscribe({
       next: ({ accounts, transactionsRes }) => {
-        // Calcular Saldo Total (soma de todas as contas)
+        // Calcula Saldo Total (soma de todas as contas)
         this.totalBalance = accounts.reduce((sum, acc) => sum + Number(acc.balance), 0);
 
-        // Processar as transações do mês
+        // Processa as transações do mês
         const txs = transactionsRes.data || [];
-        this.recentTransactions = txs.slice(0, 5); // Garante que só mostramos 5 na tabela
+        this.recentTransactions = txs.slice(0, 5); // Garante que só mostra 5 na tabela
 
-        // Resetar valores
+        // Reseta os valores
         this.monthlyIncome = 0;
         this.monthlyExpense = 0;
 
-        // Somar Receitas e Despesas do mês
+        // Soma Receitas e Despesas do mês
         txs.forEach(tx => {
           if (tx.type === 'INCOME') {
             this.monthlyIncome += Number(tx.amount);
