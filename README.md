@@ -106,7 +106,7 @@ A aplicação abrirá no teu navegador no endereço `http://localhost:4200`.
 
 Para detalhes arquiteturais profundos, consulta os documentos complementares na pasta `/docs`:
 
-  * [Arquitetura e Endpoints da API](https://www.google.com/search?q=./docs/api-endpoints.md)
-  * [Esquema Relacional da Base de Dados](https://www.google.com/search?q=./docs/database-schema.md)
-  * [Decisões e Regras de Negócio](https://www.google.com/search?q=./docs/decisions.md)
+* [Arquitetura e Endpoints da API](./docs/api-endpoints.md)
+* [Esquema Relacional da Base de Dados](./docs/database-schema.md)
+* [Decisões e Regras de Negócio](./docs/decisions.md)
 
