@@ -35,6 +35,7 @@ export class Login implements OnInit {
   // Formulario de autenticacao.
   loginForm: LoginForm = this.createLoginForm();
 
+  // Sincroniza o tema visual com as preferencias do usuario e aplica validacoes de formulario.
   ngOnInit(): void {
     const currentTheme = this.preferences.current.theme;
     // Aplica o tema visual atual.

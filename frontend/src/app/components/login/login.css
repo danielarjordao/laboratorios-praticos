@@ -192,7 +192,7 @@ button[type="submit"]:disabled {
 
   .login-form {
     padding: 24px;
-    max-width: 460px; /* Limitar largura máxima para telas pequenas */
+    max-width: 460px;
   }
 
   .login-form input {

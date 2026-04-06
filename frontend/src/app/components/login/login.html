@@ -2,7 +2,7 @@
   <div class="header-left">
     <app-logo></app-logo>
   </div>
-
+  <!-- O toggle de tema é mantido mesmo na tela de login para permitir que os usuários escolham seu modo preferido desde o início. -->
   <div class="header-right">
     <button class="icon-btn" (click)="toggleTheme()" [title]="isDarkMode ? 'Light mode' : 'Dark mode'">
       <span class="material-symbols-outlined">
@@ -15,10 +15,9 @@
 <div class="login-container">
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
     <h2>{{ isRegistering ? 'Create Account' : 'Welcome Back' }}</h2>
-
+    <!-- O formulário de registro inclui campos adicionais para nome, mas o email e senha são comuns. -->
     @if (isRegistering) {
       <div class="name-row">
-
         <div class="form-group">
           <label for="firstName">First Name</label>
           <input type="text" id="firstName" formControlName="firstName" placeholder="Your name"
@@ -29,7 +28,6 @@
             </div>
           }
         </div>
-
         <div class="form-group">
           <label for="lastName">Last Name</label>
           <input type="text" id="lastName" formControlName="lastName" placeholder="Your surname"
@@ -40,10 +38,8 @@
             </div>
           }
         </div>
-
       </div>
     }
-
     <div class="form-group">
       <label for="email">Email Address</label>
       <input type="email" id="email" formControlName="email" placeholder="name@example.com"
@@ -54,7 +50,6 @@
         </div>
       }
     </div>
-
     <div class="form-group">
       <label for="password">Password</label>
       <input type="password" id="password" formControlName="password" placeholder="Minimum 6 characters"
@@ -65,17 +60,14 @@
         </div>
       }
     </div>
-
     @if (errorMessage) {
       <div class="error-message">
         {{ errorMessage }}
       </div>
     }
-
     <button type="submit" [disabled]="loginForm.invalid || isLoading">
       {{ isLoading ? 'Please wait...' : (isRegistering ? 'Sign Up' : 'Sign In') }}
     </button>
-
     <div class="toggle-mode">
       <p>
         {{ isRegistering ? 'Already have an account?' : "Don't have an account?" }}
