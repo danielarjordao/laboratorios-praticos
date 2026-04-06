@@ -1,6 +1,7 @@
 .top-header {
   height: 80px;
   width: 100%;
+  box-sizing: border-box;
   background-color: var(--background);
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -297,22 +298,65 @@ button.dropdown-item.active-item .material-symbols-outlined {
   right: auto;
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
-  /* Mostra o botão do menu */
-  .mobile-nav-only {
-    display: block;
-    margin-right: 12px;
+  .top-header {
+    padding: 0 12px;
+    max-width: 100%;
   }
 
+  .header-left {
+    gap: 8px; /* Aproxima o menu do logo */
+  }
+
+  app-logo {
+    transform: scale(0.9); /* Encolhe o logo ligeiramente a 90% */
+    transform-origin: left center;
+  }
+
+  /* Exibe o menu mobile (hambúrguer) apenas no mobile */
+  .mobile-nav-only {
+    display: block;
+    margin-right: 4px; /* Reduzido para não roubar espaço */
+  }
+
+  /* Limpeza de elementos desnecessários */
   .header-greeting,
   .divider {
     display: none;
   }
 
-  .btn-text { display: none; }
+  .btn-text,
+  .trigger-text {
+    display: none;
+  }
+
+  .header-right {
+    gap: 4px; /* Aproxima os botões da direita */
+  }
+
+  .avatar-btn,
+  .icon-btn,
+  .dropdown-trigger {
+    width: 36px;
+    height: 36px;
+  }
+
   .btn-primary {
+    display: inline-flex;
+    padding: 8px; /* Botão de adição mais quadrado e compacto */
+  }
+
+  /* Arrumar o botão do perfil */
+  .dropdown-trigger {
     padding: 8px;
-    border-radius: 50%;
+    border-radius: 50%; /* Transforma num círculo perfeito como os outros */
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Esconde a setinha (expand_more) para ficar só um ícone */
+  .dropdown-trigger .icon-small:last-child {
+    display: none;
   }
 }

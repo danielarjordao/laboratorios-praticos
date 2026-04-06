@@ -276,12 +276,30 @@
 @media (max-width: 768px) {
   .page-container {
     padding: 16px;
+    max-width: 460px; /* Limitar largura máxima para telas pequenas */
   }
 
   .page-header {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 12px 8px;
+    gap: 12px;
+    max-width: 260px;
+  }
+
+  .profiles-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .profile-card {
+    padding: 16px;
   }
 }
 

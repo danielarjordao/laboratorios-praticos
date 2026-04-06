@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { checkFieldInvalid } from '../../utils/formUtils';
 import { Subject, takeUntil } from 'rxjs';
@@ -22,6 +22,7 @@ export class UserInfo implements OnInit, OnDestroy {
   private readonly authService = inject(Auth);
   private readonly checkFieldInvalid = checkFieldInvalid;
   private readonly destroy$ = new Subject<void>();
+  private readonly location = inject(Location);
 
   // Formulario principal das informacoes do usuario.
   userInfoForm: UserInfoForm = this.createUserInfoForm();
@@ -190,5 +191,10 @@ export class UserInfo implements OnInit, OnDestroy {
   // Verifica se um campo do formulario e invalido para exibir feedback visual.
   isFieldInvalid(fieldName: string): boolean {
     return this.checkFieldInvalid(this.userInfoForm, fieldName);
+  }
+
+  // Navega para a pagina anterior.
+  goBack(): void {
+    this.location.back();
   }
 }

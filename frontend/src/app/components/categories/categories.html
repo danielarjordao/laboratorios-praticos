@@ -27,7 +27,7 @@
         <article class="category-card" (click)="openModal(category)">
 
           <div class="category-info">
-            <span class="material-symbols-outlined icon-bg">
+            <span class="material-symbols-outlined icon-bg" [style.backgroundColor]="category.color || null">
               {{ category.icon || 'category' }}
             </span>
             <div class="category-details">

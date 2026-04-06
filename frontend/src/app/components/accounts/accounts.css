@@ -288,6 +288,7 @@
 @media (max-width: 768px) {
   .page-container {
     padding: 16px;
+    max-width: 460px; /* Limitar largura máxima para telas pequenas */
   }
 
   .page-header {
@@ -298,6 +299,24 @@
 
   .form-row {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 12px 8px;
+    gap: 12px;
+    max-width: 260px;
+  }
+
+  .accounts-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .account-card {
+    padding: 16px;
+    gap: 12px;
   }
 }
 

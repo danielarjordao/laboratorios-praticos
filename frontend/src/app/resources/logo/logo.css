@@ -37,4 +37,8 @@
   .logo-text {
     display: none;
   }
+
+  .icon-logo {
+    margin-right: 0;
+  }
 }

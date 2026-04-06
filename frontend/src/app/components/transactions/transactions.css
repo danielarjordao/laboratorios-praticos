@@ -6,6 +6,7 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: 24px 16px;
+  width: 100%;
 }
 
 /* Header */
@@ -53,13 +54,11 @@
 
 .search-group {
   flex: 1;
-  min-width: 280px;
 }
 
 .search-wrapper {
   position: relative;
   flex: 1;
-  min-width: 200px;
 }
 
 .search-icon {
@@ -95,7 +94,6 @@
   background: var(--input-background);
   font-size: 0.875rem;
   color: var(--foreground);
-  min-width: 140px;
 }
 
 .btn-icon-outline {
@@ -171,6 +169,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
   padding: 16px;
   background: var(--card);
   border-radius: 16px;
@@ -184,6 +184,10 @@
   background: var(--background);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.tx-card-right {
+  flex-shrink: 1;
 }
 
 .tx-card-left {
@@ -206,29 +210,19 @@
   flex-shrink: 0;
 }
 
-.tx-icon-income {
-  background: var(--income);
-}
-
-.tx-icon-expense {
-  background: var(--expense);
-}
-
-.tx-icon-transfer {
-  background: var(--muted-foreground);
-}
-
 .tx-info {
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+  width: 100%;
 }
 
 .tx-header-row {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .tx-description {
@@ -248,6 +242,7 @@
   font-size: 0.75rem;
   color: var(--deep-saffron);
   font-weight: 500;
+  flex-shrink: 0;
 }
 
 .dot-pulse {
@@ -381,19 +376,22 @@
   justify-content: center;
 }
 
-/* =========================================
-   RESPONSIVIDADE UNIFICADA (< 768px)
-   Aplica-se a Tablets e Telemóveis
-========================================= */
 @media (max-width: 768px) {
-  /* 1. Header e Botões: Empilhados a 100% para toque fácil */
+  .page-container {
+    padding: 16px 12px; /* Margens menores para telemóvel, mas sem engessar o max-width */
+    gap: 16px;
+    max-width: 460px; /* Limitar largura máxima para telas pequenas */
+  }
+
   .header-section {
+    flex-wrap: wrap;
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
   }
 
   .header-actions {
+    flex-wrap: wrap;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -404,53 +402,66 @@
     width: 100%;
   }
 
-  /* 2. Toolbar de Filtros: Coluna a 100% da largura */
   .toolbar-main {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .search-group, .filter-group {
-    width: 100%;
-  }
-
+  /* Tudo a 100%, mas com min-width: 0 para permitir encolher ao máximo */
+  .search-group,
+  .filter-group,
+  .search-wrapper,
   .select-minimal,
   .input-minimal,
   .input-search {
     width: 100%;
-    box-sizing: border-box;
+    min-width: 0 !important;
   }
 
   .toolbar-main .filter-group:last-child {
     align-items: flex-end;
   }
 
-  /* 3. Reestruturação do Cartão de Transação (Estilo App) */
+  .toolbar-extended {
+    grid-template-columns: 1fr;
+  }
+
   .tx-card {
     flex-direction: column;
     align-items: stretch;
     padding: 16px;
     gap: 16px;
+    width: 100%;
   }
 
   .tx-card-left {
     align-items: flex-start;
+    gap: 4px;
   }
 
   .tx-description {
-    white-space: normal; /* Permite que o título quebre de linha */
-    line-height: 1.3;
+    margin: 0;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--foreground);
+
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  /* 4. A secção do dinheiro vira o "rodapé" do cartão */
   .tx-card-right {
     display: flex;
+    flex-wrap: wrap; /* Permite que conta e valor se empilhem se necessário */
     justify-content: space-between;
     align-items: center;
     padding-left: 0;
     text-align: left;
     border-top: 1px solid var(--border);
     padding-top: 12px;
+    gap: 8px;
   }
 
   .tx-amount {
@@ -460,12 +471,32 @@
 
   .tx-account-name {
     margin: 0;
-    text-align: right;
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
   }
 
-  /* 5. Paginação fluida */
+  .tx-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
   .pagination-footer {
     flex-wrap: wrap;
     gap: 12px;
   }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 12px 8px;
+    gap: 12px;
+    max-width: 260px;
+  }
+
 }

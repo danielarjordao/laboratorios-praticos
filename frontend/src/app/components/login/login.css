@@ -192,6 +192,7 @@ button[type="submit"]:disabled {
 
   .login-form {
     padding: 24px;
+    max-width: 460px; /* Limitar largura máxima para telas pequenas */
   }
 
   .login-form input {
@@ -201,5 +202,26 @@ button[type="submit"]:disabled {
   .name-row {
     flex-direction: column;
     gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form {
+    max-width: 260px;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .login-form h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+
+  .form-group {
+    gap: 6px;
+  }
+
+  .name-row {
+    gap: 8px;
   }
 }

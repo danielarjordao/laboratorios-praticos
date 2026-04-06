@@ -231,6 +231,7 @@ input:checked + .slider:before {
 @media (max-width: 768px) {
   .page-container {
     padding: 16px;
+    max-width: 460px; /* Limitar largura máxima para telas pequenas */
   }
 
   .form-row {
@@ -244,4 +245,45 @@ input:checked + .slider:before {
   .btn-primary {
     width: 100%;
   }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 12px 8px;
+    gap: 12px;
+    max-width: 260px;
+  }
+
+  .settings-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .card-header {
+    gap: 12px;
+    padding-bottom: 12px;
+  }
+
+  .form-row {
+    gap: 8px;
+  }
+}
+
+.btn-icon-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-icon-outline:hover, .btn-icon-outline.active {
+  background: var(--muted);
+  color: var(--foreground);
 }

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Subject, finalize, takeUntil } from 'rxjs';
 import { SettingsService } from '../../services/settings';
@@ -28,6 +28,7 @@ export class Settings implements OnInit, OnDestroy {
   private readonly preferences = inject(PreferencesService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
+  private readonly location = inject(Location);
 
   isLoading = true;
   isSaving = false;
@@ -200,5 +201,9 @@ export class Settings implements OnInit, OnDestroy {
         this.errorMessage = 'Failed to save preferences.';
       }
     });
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }
